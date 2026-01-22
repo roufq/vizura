@@ -1,0 +1,40 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Unit;
+use Illuminate\Database\Seeder;
+
+class UnitSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        $units = [
+            ['name' => 'Pcs', 'abbreviation' => 'PCS'],
+            ['name' => 'Box', 'abbreviation' => 'BOX'],
+            ['name' => 'Kg', 'abbreviation' => 'KG'],
+            ['name' => 'Gram', 'abbreviation' => 'G'],
+            ['name' => 'Liter', 'abbreviation' => 'L'],
+            ['name' => 'Ml', 'abbreviation' => 'ML'],
+            ['name' => 'Pack', 'abbreviation' => 'PK'],
+            ['name' => 'Dus', 'abbreviation' => 'DUS'],
+            ['name' => 'Botol', 'abbreviation' => 'BTL'],
+            ['name' => 'Kaleng', 'abbreviation' => 'KLG'],
+            ['name' => 'Sachet', 'abbreviation' => 'SCT'],
+            ['name' => 'Lusin', 'abbreviation' => 'LSN'],
+            ['name' => 'Ikat', 'abbreviation' => 'IKT'],
+            ['name' => 'Karung', 'abbreviation' => 'KRG'],
+            ['name' => 'Tray', 'abbreviation' => 'TRY'],
+        ];
+
+        foreach ($units as $unit) {
+            Unit::firstOrCreate(['name' => $unit['name']], [
+                'abbreviation' => $unit['abbreviation'],
+                'is_active' => true,
+            ]);
+        }
+    }
+}
