@@ -7,15 +7,16 @@ use App\Models\Location;
 use App\Models\Sale;
 use App\Models\SalePaymentSettlement;
 use App\Support\AccountingService;
-use App\Support\ActiveLocation;
+use App\Support\LocationResolver;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class ReceivableController extends Controller
 {
-    public function __construct()
+    public function __construct(public LocationResolver $locationResolver)
     {
         $this->middleware('role:Owner|Manager|KepalaToko');
     }
@@ -24,11 +25,12 @@ class ReceivableController extends Controller
     {
         $user = $request->user();
         $canViewAll = $user?->hasRole('Owner') ?? false;
+        $isManager = $user?->hasRole('Manager') ?? false;
         $allowedLocationIds = $user?->accessibleLocationIds() ?? [];
-        $canSelectLocations = $canViewAll || ($user?->hasRole('Manager') ?? false);
-        $locationId = $this->resolveLocationId($request, $allowedLocationIds, $canViewAll);
+        $canSelectLocations = $canViewAll || $isManager;
+        $locationId = $this->locationResolver->resolveFromRequest($request, $allowedLocationIds, $canViewAll);
 
-        $baseQuery = $canViewAll
+        $baseQuery = ($canViewAll || $isManager)
             ? Sale::withoutGlobalScope('active_location')
             : Sale::query();
 
@@ -38,14 +40,13 @@ class ReceivableController extends Controller
                 $paymentQuery->where('method', 'piutang');
             });
 
-        $normalizeQuery = clone $baseQuery;
-        if ($locationId) {
-            $normalizeQuery->where('location_id', $locationId);
+        if (! $canViewAll) {
+            if ($allowedLocationIds === []) {
+                $baseQuery->whereRaw('1 = 0');
+            } else {
+                $baseQuery->whereIn('location_id', $allowedLocationIds);
+            }
         }
-        $normalizeQuery
-            ->where('payment_status', '!=', 'paid')
-            ->where('receivable_balance', '<=', 0)
-            ->update(['payment_status' => 'paid']);
 
         $query = $baseQuery;
 
@@ -86,8 +87,10 @@ class ReceivableController extends Controller
         ]);
     }
 
-    public function show(Sale $sale, Request $request): View|RedirectResponse
+    public function show(int $sale, Request $request): View|RedirectResponse
     {
+        $sale = Sale::withoutGlobalScope('active_location')->whereKey($sale)->firstOrFail();
+
         $user = $request->user();
         if (! $this->canAccessSale($user, $sale)) {
             return redirect()
@@ -117,19 +120,15 @@ class ReceivableController extends Controller
         return view('receivables.show', compact('sale', 'paymentMethods'));
     }
 
-    public function store(StoreReceivablePaymentRequest $request, Sale $sale): RedirectResponse
+    public function store(StoreReceivablePaymentRequest $request, int $sale): RedirectResponse
     {
+        $sale = Sale::withoutGlobalScope('active_location')->whereKey($sale)->firstOrFail();
+
         $user = $request->user();
         if (! $this->canAccessSale($user, $sale)) {
             return redirect()
                 ->route('receivables.index')
                 ->withErrors(['sale' => 'Anda tidak memiliki akses ke data ini.']);
-        }
-
-        if ($sale->payment_status === 'paid') {
-            return redirect()
-                ->route('receivables.index')
-                ->withErrors(['sale' => 'Transaksi ini sudah lunas.']);
         }
 
         $data = $request->validated();
@@ -141,36 +140,53 @@ class ReceivableController extends Controller
                 ->withErrors(['amount' => 'Jumlah bayar harus lebih dari 0.']);
         }
 
-        if ($amount > (float) $sale->receivable_balance) {
+        try {
+            DB::transaction(function () use ($sale, $data, $amount, $request): void {
+                $lockedSale = Sale::withoutGlobalScope('active_location')
+                    ->whereKey($sale->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                if ($lockedSale->payment_status === 'paid') {
+                    throw ValidationException::withMessages([
+                        'sale' => 'Transaksi ini sudah lunas.',
+                    ]);
+                }
+
+                if ($amount > (float) $lockedSale->receivable_balance) {
+                    throw ValidationException::withMessages([
+                        'amount' => 'Jumlah bayar melebihi sisa piutang.',
+                    ]);
+                }
+
+                $payment = SalePaymentSettlement::create([
+                    'sale_id' => $lockedSale->id,
+                    'location_id' => $lockedSale->location_id,
+                    'method' => $data['method'],
+                    'amount' => $amount,
+                    'reference_no' => $data['reference_no'] ?? null,
+                    'paid_at' => $data['paid_at'] ?? now(),
+                    'created_by' => $request->user()?->id,
+                ]);
+
+                $newPaid = min((float) $lockedSale->total, (float) $lockedSale->paid_total + $amount);
+                $newPaid = round($newPaid, 2);
+                $newBalance = max(0, round((float) $lockedSale->total - $newPaid, 2));
+                $status = $newBalance <= 0.0 ? 'paid' : 'partial';
+
+                $lockedSale->update([
+                    'paid_total' => $newPaid,
+                    'receivable_balance' => $newBalance,
+                    'payment_status' => $status,
+                ]);
+
+                app(AccountingService::class)->recordReceivablePayment($payment);
+            });
+        } catch (ValidationException $exception) {
             return redirect()
                 ->route('receivables.show', $sale)
-                ->withErrors(['amount' => 'Jumlah bayar melebihi sisa piutang.']);
+                ->withErrors($exception->errors());
         }
-
-        DB::transaction(function () use ($sale, $data, $amount, $request): void {
-            $payment = SalePaymentSettlement::create([
-                'sale_id' => $sale->id,
-                'location_id' => $sale->location_id,
-                'method' => $data['method'],
-                'amount' => $amount,
-                'reference_no' => $data['reference_no'] ?? null,
-                'paid_at' => $data['paid_at'] ?? now(),
-                'created_by' => $request->user()?->id,
-            ]);
-
-            $newPaid = min((float) $sale->total, (float) $sale->paid_total + $amount);
-            $newPaid = round($newPaid, 2);
-            $newBalance = max(0, round((float) $sale->total - $newPaid, 2));
-            $status = $newBalance <= 0.0 ? 'paid' : 'partial';
-
-            $sale->update([
-                'paid_total' => $newPaid,
-                'receivable_balance' => $newBalance,
-                'payment_status' => $status,
-            ]);
-
-            app(AccountingService::class)->recordReceivablePayment($payment);
-        });
 
         return redirect()
             ->route('receivables.show', $sale)
@@ -179,31 +195,16 @@ class ReceivableController extends Controller
 
     private function canAccessSale($user, Sale $sale): bool
     {
-        if ($user?->hasRole('Owner')) {
+        if (! $user) {
+            return false;
+        }
+
+        if ($user->hasRole('Owner')) {
             return true;
         }
 
-        return (int) $sale->location_id === (int) ActiveLocation::id();
-    }
+        $allowedLocationIds = $user->accessibleLocationIds();
 
-    private function resolveLocationId(Request $request, array $allowedLocationIds, bool $canViewAll): ?int
-    {
-        if ($canViewAll && $request->boolean('all_locations')) {
-            return null;
-        }
-
-        if ($request->filled('location_id')) {
-            $requested = (int) $request->input('location_id');
-            if ($allowedLocationIds === [] || in_array($requested, $allowedLocationIds, true)) {
-                return $requested;
-            }
-        }
-
-        $activeLocationId = ActiveLocation::id();
-        if ($activeLocationId && ($allowedLocationIds === [] || in_array($activeLocationId, $allowedLocationIds, true))) {
-            return $activeLocationId;
-        }
-
-        return $allowedLocationIds[0] ?? null;
+        return $allowedLocationIds !== [] && in_array((int) $sale->location_id, $allowedLocationIds, true);
     }
 }

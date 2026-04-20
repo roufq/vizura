@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'index_title' => 'Product Categories',
+    'page_title' => 'Categories',
+    'card_title' => 'Category Management',
+    'search_placeholder' => 'Search categories...',
+    'add_category' => 'Add Category',
+    'name' => 'Category Name',
+    'status' => 'Status',
+    'actions' => 'Action',
+    'active' => 'Active',
+    'inactive' => 'Inactive',
+    'delete_confirm' => 'Delete this category?',
+    'no_data' => 'No categories found.',
+    'add_now' => 'Add Now',
+    'create_title' => 'Add New Category',
+    'edit_title' => 'Edit Category',
+    'category_info' => 'Category Information',
+    'name_label' => 'Category Name',
+    'name_placeholder' => 'Example: Food, Electronic...',
+    'is_active_label' => 'Active Status',
+    'active_desc' => 'Available when choosing product categories',
+    'save_category' => 'Save Category',
+    'batal' => 'Cancel',
+];

@@ -9,6 +9,7 @@ use App\Models\StockItem;
 use App\Models\Supplier;
 use App\Models\Unit;
 use App\Models\User;
+use Database\Seeders\AccountSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -19,6 +20,8 @@ class PurchaseTest extends TestCase
 
     public function test_purchase_updates_stock_and_cost(): void
     {
+        $this->seed(AccountSeeder::class);
+
         $owner = $this->makeOwner();
         $supplier = Supplier::factory()->create();
         $product = $this->makeProduct();
@@ -37,6 +40,7 @@ class PurchaseTest extends TestCase
             ->post(route('purchases.store', absolute: false), [
                 'supplier_id' => $supplier->id,
                 'reference_no' => 'PO-001',
+                'payment_method' => 'cash',
                 'discount_amount' => 0,
                 'tax_amount' => 0,
                 'items' => [

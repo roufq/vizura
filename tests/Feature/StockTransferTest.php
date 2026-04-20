@@ -67,6 +67,36 @@ class StockTransferTest extends TestCase
         $this->assertSame('5.00', $destinationStock->quantity_on_hand);
     }
 
+    public function test_kepala_toko_cannot_delete_transfer_from_other_location(): void
+    {
+        Role::firstOrCreate(['name' => 'KepalaToko']);
+
+        $locationA = Location::factory()->create();
+        $locationB = Location::factory()->create();
+
+        $user = User::factory()->create([
+            'active_location_id' => $locationA->id,
+        ]);
+        $user->assignRole('KepalaToko');
+
+        $transfer = StockTransfer::create([
+            'reference_no' => 'TRF-OTHER',
+            'source_location_id' => $locationB->id,
+            'destination_location_id' => $locationA->id,
+            'status' => 'draft',
+            'requested_by' => $user->id,
+        ]);
+
+        $response = $this
+            ->actingAs($user)
+            ->withSession(['active_location_id' => $locationA->id])
+            ->delete(route('stock-transfers.destroy', $transfer, absolute: false));
+
+        $response->assertRedirect(route('stock-transfers.index', absolute: false));
+        $response->assertSessionHasErrors(['location_id']);
+        $this->assertDatabaseHas('stock_transfers', ['id' => $transfer->id]);
+    }
+
     private function makeOwner(): User
     {
         Role::firstOrCreate(['name' => 'Owner']);

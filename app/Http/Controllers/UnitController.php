@@ -17,11 +17,21 @@ class UnitController extends Controller
 
     public function index(): View
     {
-        $units = Unit::query()
-            ->orderBy('name')
-            ->paginate(10);
+        $search = trim(request()->string('search')->toString());
 
-        return view('units.index', compact('units'));
+        $units = Unit::query()
+            ->when($search !== '', function ($query) use ($search): void {
+                $query->where(function ($builder) use ($search): void {
+                    $builder
+                        ->where('name', 'like', '%'.$search.'%')
+                        ->orWhere('abbreviation', 'like', '%'.$search.'%');
+                });
+            })
+            ->orderBy('name')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('units.index', compact('units', 'search'));
     }
 
     public function create(): View

@@ -14,6 +14,7 @@ class StockAdjustment extends Model
 
     protected $fillable = [
         'location_id',
+        'reference_no',
         'product_id',
         'requested_by',
         'approved_by',

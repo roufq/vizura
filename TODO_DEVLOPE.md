@@ -30,16 +30,16 @@ Tujuan: aplikasi siap dipakai UMKM untuk jual-beli multi-lokasi dengan data kons
 - [x] Laporan pergerakan stok (kartu stok) per produk per lokasi: pembelian, transfer, penjualan, penyesuaian; urut kronologis dengan saldo berjalan dan sumber transaksi; wajib location_id.
 
 FASE 2: Jembatan Akuntansi (Sederhana)
-Tujuan: memastikan transaksi operasional tercatat otomatis ke jurnal sehingga laporan laba rugi dan arus kas dapat disajikan akurat.
+Tujuan: transaksi operasional otomatis tercatat ke jurnal untuk laba rugi.
 
-- [x] Bagan akun dasar dengan kode unik (Kas, Bank, Piutang, Pendapatan, Persediaan, HPP, Biaya Operasional).
-- [x] Skema jurnal berpasangan (journals + journal_lines) dengan referensi transaksi (sales_id, purchase_id, transfer_id, expense_id).
-- [x] Otomasi jurnal transaksi:
+- [x] Bagan akun sederhana (kode unik): Kas, Bank, Piutang, Pendapatan, Persediaan, HPP, Biaya.
+- [x] Skema jurnal: tabel journals + journal_lines berpasangan debit/kredit; referensi ke transaksi (sales_id, purchase_id, transfer_id).
+- [x] Hook otomatis:
   - Penjualan: Dr Kas/Bank/Piutang, Cr Pendapatan.
   - HPP penjualan: Dr HPP, Cr Persediaan (berdasar HPP rata-rata).
-  - Pembelian: Dr Persediaan, Cr Kas/Bank/Hutang; termasuk diskon dan pajak.
-- [x] Modul biaya operasional (mis. gaji, sewa, listrik) yang menulis jurnal otomatis.
-- [x] Laporan laba rugi dan arus kas dengan filter lokasi dan opsi konsolidasi.
+  - Pembelian: Dr Persediaan, Cr Kas/Bank/Hutang; tangani pajak & diskon.
+- [x] Modul biaya operasional (Gaji, Sewa, Listrik) yang menulis jurnal otomatis.
+- [x] Laporan laba rugi dan arus kas sederhana dengan filter lokasi/konsolidasi.
 
 FASE 3: Keamanan, QA, dan Go-Live
 - [ ] Pengujian regresi: feature test untuk scope lokasi, stok tidak minus, alur penjualan/retur, pembelian, transfer, laporan.

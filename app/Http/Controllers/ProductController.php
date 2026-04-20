@@ -57,7 +57,7 @@ class ProductController extends Controller
 
         return redirect()
             ->route('products.index')
-            ->with('status', 'Produk berhasil dibuat.');
+            ->with('status', __('app.success_created', ['model' => __('app.product')]));
     }
 
     public function edit(Product $product): View
@@ -79,7 +79,7 @@ class ProductController extends Controller
 
         return redirect()
             ->route('products.index')
-            ->with('status', 'Produk berhasil diperbarui.');
+            ->with('status', __('app.success_updated', ['model' => __('app.product')]));
     }
 
     public function destroy(Product $product): RedirectResponse
@@ -88,6 +88,6 @@ class ProductController extends Controller
 
         return redirect()
             ->route('products.index')
-            ->with('status', 'Produk berhasil dihapus.');
+            ->with('status', __('app.success_deleted', ['model' => __('app.product')]));
     }
 }

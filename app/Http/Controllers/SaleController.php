@@ -156,18 +156,29 @@ class SaleController extends Controller
 
         try {
             DB::transaction(function () use ($request, $data, $items, $payments, $locationId, $subtotal, $orderDiscount, $taxAmount, $isTaxInclusive, $total, $paidTotal, $changeDue, $receivableBalance, $paymentStatus, $cogsTotal, $paymentLines, &$sale): void {
+                $lockedStockItems = [];
+
                 if ($data['action'] === 'post') {
-                    $this->ensureStockAvailable($items, $locationId);
+                    if (! ($data['customer_id'] ?? null) && filled($data['customer_name'] ?? '')) {
+                        $customer = \App\Models\Customer::firstOrCreate(
+                            ['name' => $data['customer_name'], 'phone' => $data['customer_phone'] ?? null]
+                        );
+                        $data['customer_id'] = $customer->id;
+                    }
+
+                    $lockedStockItems = $this->lockStockItems($items, $locationId);
+                    $this->ensureStockAvailable($items, $locationId, $lockedStockItems);
                 }
 
                 $saleData = [
                     'location_id' => $locationId,
                     'cashier_id' => $request->user()?->id,
+                    'customer_id' => $data['customer_id'] ?? null,
                     'customer_name' => $data['customer_name'] ?? null,
                     'customer_phone' => $data['customer_phone'] ?? null,
                     'notes' => $data['notes'] ?? null,
                     'reference_no' => $data['reference_no'],
-                    'type' => 'sale',
+                    'type' => $data['type'] ?? 'sale',
                     'status' => $data['action'] === 'post' ? 'posted' : 'draft',
                     'subtotal' => $subtotal,
                     'order_discount' => $orderDiscount,
@@ -213,12 +224,13 @@ class SaleController extends Controller
                     }
 
                     foreach ($items as $item) {
-                        $stockItem = StockItem::firstOrCreate([
-                            'location_id' => $locationId,
-                            'product_id' => $item['product_id'],
-                        ], [
-                            'quantity_on_hand' => 0,
-                        ]);
+                        $stockItem = $lockedStockItems[$item['product_id']]
+                            ?? StockItem::firstOrCreate([
+                                'location_id' => $locationId,
+                                'product_id' => $item['product_id'],
+                            ], [
+                                'quantity_on_hand' => 0,
+                            ]);
 
                         $stockItem->adjustQuantity(-1 * $item['quantity']);
                     }
@@ -509,21 +521,27 @@ class SaleController extends Controller
         return (float) Product::query()->whereKey($productId)->value('sale_price');
     }
 
-    private function ensureStockAvailable(array $items, int $locationId): void
+    /**
+     * @param  array<int, array{product_id:int, quantity:float}>  $items
+     * @param  array<int, \App\Models\StockItem>  $stockItems
+     */
+    private function ensureStockAvailable(array $items, int $locationId, array $stockItems): void
     {
+        $productIds = collect($items)->pluck('product_id')->unique()->values();
+        $products = Product::query()
+            ->whereIn('id', $productIds)
+            ->get()
+            ->keyBy('id');
+
         foreach ($items as $item) {
-            $product = Product::query()->whereKey($item['product_id'])->first();
+            $product = $products[$item['product_id']] ?? null;
             if (! $product) {
                 throw ValidationException::withMessages([
                     'items' => 'Produk tidak ditemukan.',
                 ]);
             }
 
-            $stockItem = StockItem::query()
-                ->where('location_id', $locationId)
-                ->where('product_id', $item['product_id'])
-                ->first();
-
+            $stockItem = $stockItems[$item['product_id']] ?? null;
             $available = $stockItem?->quantity_on_hand ?? 0;
             if ((float) $available < (float) $item['quantity']) {
                 throw ValidationException::withMessages([
@@ -594,7 +612,7 @@ class SaleController extends Controller
         $sale = Sale::query()
             ->whereKey($draftId)
             ->where('status', 'draft')
-            ->where('type', 'sale')
+            ->whereIn('type', ['sale', 'retail', 'wholesale', 'online'])
             ->with('items')
             ->first();
 
@@ -613,6 +631,7 @@ class SaleController extends Controller
     private function renderCreateView(?Sale $draft): View
     {
         $locationId = ActiveLocation::id();
+        $categories = \App\Models\Category::query()->orderBy('name')->get();
 
         $products = Product::query()
             ->where('is_active', true)
@@ -657,14 +676,21 @@ class SaleController extends Controller
         $draftTaxRate = $draft ? $this->calculateDraftTaxRate($draft) : 0;
         $drafts = Sale::query()
             ->where('status', 'draft')
-            ->where('type', 'sale')
+            ->whereIn('type', ['sale', 'retail', 'wholesale', 'online'])
             ->where('location_id', $locationId)
             ->with(['items.product', 'cashier'])
             ->latest()
             ->get();
 
+        $customers = \App\Models\Customer::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
         return view('sales.create', compact(
             'products',
+            'categories',
+            'customers',
             'referenceNo',
             'productsForJs',
             'location',
@@ -685,6 +711,7 @@ class SaleController extends Controller
         $taxAmount = (float) $sale->tax_amount;
         if ($sale->is_tax_inclusive) {
             $denominator = max(0.01, $baseTotal - $taxAmount);
+
             return round(($taxAmount / $denominator) * 100, 2);
         }
 
@@ -708,5 +735,46 @@ class SaleController extends Controller
     private function generateReferenceNo(): string
     {
         return 'POS-'.now()->format('Ymd-His').'-'.random_int(100, 999);
+    }
+
+    /**
+     * @param  array<int, array{product_id:int}>  $items
+     * @return array<int, \App\Models\StockItem>
+     */
+    private function lockStockItems(array $items, int $locationId): array
+    {
+        $productIds = collect($items)
+            ->pluck('product_id')
+            ->unique()
+            ->sort()
+            ->values();
+
+        if ($productIds->isEmpty()) {
+            return [];
+        }
+
+        $locked = StockItem::query()
+            ->where('location_id', $locationId)
+            ->whereIn('product_id', $productIds)
+            ->lockForUpdate()
+            ->get()
+            ->keyBy('product_id');
+
+        $missingIds = $productIds->diff($locked->keys());
+        foreach ($missingIds as $productId) {
+            StockItem::create([
+                'location_id' => $locationId,
+                'product_id' => $productId,
+                'quantity_on_hand' => 0,
+            ]);
+        }
+
+        return StockItem::query()
+            ->where('location_id', $locationId)
+            ->whereIn('product_id', $productIds)
+            ->lockForUpdate()
+            ->get()
+            ->keyBy('product_id')
+            ->all();
     }
 }

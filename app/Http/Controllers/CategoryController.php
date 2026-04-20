@@ -17,11 +17,17 @@ class CategoryController extends Controller
 
     public function index(): View
     {
-        $categories = Category::query()
-            ->orderBy('name')
-            ->paginate(10);
+        $search = trim(request()->string('search')->toString());
 
-        return view('categories.index', compact('categories'));
+        $categories = Category::query()
+            ->when($search !== '', function ($query) use ($search): void {
+                $query->where('name', 'like', '%'.$search.'%');
+            })
+            ->orderBy('name')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('categories.index', compact('categories', 'search'));
     }
 
     public function create(): View

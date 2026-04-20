@@ -60,12 +60,19 @@ class ExpenseController extends Controller
             ? Location::active()->orderBy('name')->get()
             : Location::active()->whereIn('id', $allowedLocationIds)->orderBy('name')->get();
 
+        $todayTotal = (clone $query)->whereDate('expense_date', now())->sum('amount');
+        $monthTotal = (clone $query)->whereMonth('expense_date', now()->month)
+            ->whereYear('expense_date', now()->year)
+            ->sum('amount');
+
         return view('expenses.index', [
             'expenses' => $expenses,
             'locations' => $locations,
             'filters' => $request->only(['search', 'start_date', 'end_date', 'location_id', 'all_locations']),
             'canViewAll' => $canViewAll,
             'locationId' => $locationId,
+            'todayTotal' => $todayTotal,
+            'monthTotal' => $monthTotal,
         ]);
     }
 

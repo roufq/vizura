@@ -16,6 +16,7 @@ class Sale extends Model
     protected $fillable = [
         'location_id',
         'cashier_id',
+        'customer_id',
         'customer_name',
         'customer_phone',
         'notes',
@@ -66,9 +67,14 @@ class Sale extends Model
         return $this->belongsTo(Location::class);
     }
 
-    public function cashier(): BelongsTo
+    public function cashier(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'cashier_id');
+    }
+
+    public function customer(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Customer::class);
     }
 
     public function originalSale(): BelongsTo

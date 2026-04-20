@@ -1,128 +1,153 @@
 @extends('layouts.app')
 
-@section('title', 'Penyesuaian Stok')
-@section('page-title', 'Penyesuaian Stok')
+@section('title', __('adjustment.index_title'))
+@section('page-title', __('adjustment.page_title'))
 
 @section('content')
-	<div class="row small-spacing">
-		<div class="col-xs-12">
-			@if (session('status'))
-				<div class="alert alert-success">
-					{{ session('status') }}
-				</div>
-			@endif
+    <div class="space-y-8">
+        <x-ui.card icon="sliders" title="{{ __('adjustment.card_title') }}">
+            <x-slot name="actions">
+                <form method="GET" action="{{ route('stock-adjustments.index') }}" class="flex flex-wrap items-center justify-end gap-3">
+                    <div class="flex items-center gap-2">
+                        <input type="text" name="search" value="{{ $search }}" placeholder="{{ __('adjustment.search_placeholder') }}" 
+                               class="bg-slate-50 border-slate-100 rounded-xl px-4 py-2 text-[10px] font-black w-32 focus:ring-2 focus:ring-brand/20 transition-all uppercase">
+                        
+                        <div class="flex items-center gap-2 bg-slate-50 rounded-xl px-3 py-1.5 border border-slate-100">
+                            <span class="text-[9px] font-black text-slate-300 uppercase whitespace-nowrap">{{ __('adjustment.period') }}:</span>
+                            <div class="flex items-center gap-2">
+                                <input type="date" name="start_date" value="{{ $startDate }}" class="bg-transparent border-none p-0 text-[10px] font-black text-slate-600 focus:ring-0 w-24 h-4 uppercase">
+                                <span class="text-slate-300">-</span>
+                                <input type="date" name="end_date" value="{{ $endDate }}" class="bg-transparent border-none p-0 text-[10px] font-black text-slate-600 focus:ring-0 w-24 h-4 uppercase">
+                            </div>
+                        </div>
+                    </div>
 
-			@if ($errors->any())
-				<div class="alert alert-danger">
-					{{ $errors->first() }}
-				</div>
-			@endif
+                    <div class="flex items-center gap-2">
+                        <div class="min-w-[140px]">
+                            <select name="status" class="bg-slate-50 border-slate-100 rounded-xl px-4 py-2 text-[10px] font-black text-slate-600">
+                                <option value="">{{ __('adjustment.all_status') }}</option>
+                                <option value="pending" {{ $status === 'pending' ? 'selected' : '' }}>{{ __('adjustment.pending') }}</option>
+                                <option value="approved" {{ $status === 'approved' ? 'selected' : '' }}>{{ __('adjustment.approved') }}</option>
+                            </select>
+                        </div>
 
-			<div class="box-content">
-				<form method="GET" action="{{ route('stock-adjustments.index') }}" class="form-inline margin-top-10">
-					<div class="form-group">
-						<label for="search">Produk</label>
-						<input type="text" id="search" name="search" class="form-control input-sm" value="{{ $search }}" placeholder="Cari produk/SKU">
-					</div>
-					<div class="form-group">
-						<label for="status">Status</label>
-						<select id="status" name="status" class="form-control input-sm">
-							<option value="">Semua</option>
-							<option value="pending" {{ $status === 'pending' ? 'selected' : '' }}>Pending</option>
-							<option value="approved" {{ $status === 'approved' ? 'selected' : '' }}>Approved</option>
-						</select>
-					</div>
-					<div class="form-group">
-						<label for="start_date">Dari</label>
-						<input type="date" id="start_date" name="start_date" class="form-control input-sm" value="{{ $startDate }}">
-					</div>
-					<div class="form-group">
-						<label for="end_date">Sampai</label>
-						<input type="date" id="end_date" name="end_date" class="form-control input-sm" value="{{ $endDate }}">
-					</div>
-					@if ($canManageAll)
-						<div class="form-group">
-							<label for="location_id">Lokasi</label>
-							<select id="location_id" name="location_id" class="form-control input-sm">
-								<option value="">Lokasi aktif</option>
-								@foreach ($locations as $location)
-									<option value="{{ $location->id }}" {{ $locationId === $location->id ? 'selected' : '' }}>
-										{{ $location->name }}
-									</option>
-								@endforeach
-							</select>
-						</div>
-					@endif
-					<button type="submit" class="btn btn-primary btn-sm">Filter</button>
-					<a href="{{ route('stock-adjustments.index') }}" class="btn btn-default btn-sm">Reset</a>
-				</form>
+                        <button type="submit" class="w-10 h-10 flex items-center justify-center bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all flex-shrink-0">
+                            <i class="fa fa-filter text-xs"></i>
+                        </button>
 
-				<div class="row">
-					<div class="col-sm-6">
-						<p class="margin-bottom-0">Total: {{ $adjustments->total() }} penyesuaian</p>
-					</div>
-					<div class="col-sm-6 text-right">
-						<a href="{{ route('stock-adjustments.create') }}" class="btn btn-success btn-sm">Buat Penyesuaian</a>
-					</div>
-				</div>
+                        @if($adjustments->where('status', 'pending')->count() > 0)
+                            <button type="button" onclick="if(confirm('Approve semua data pending?')) document.getElementById('bulk-approve-form').submit();" 
+                                    class="px-5 py-2.5 bg-emerald-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 hover:bg-emerald-600 transition-all whitespace-nowrap">
+                                <i class="fa fa-check-double mr-2 text-[10px]"></i>{{ __('adjustment.bulk_approve') }}
+                            </button>
+                        @endif
+                        
+                        <a href="{{ route('stock-adjustments.create') }}" class="px-5 py-2.5 bg-brand text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-brand/20 hover:bg-brand-dark transition-all whitespace-nowrap">
+                            <i class="fa fa-plus-circle mr-2"></i>Koreksi
+                        </a>
+                    </div>
+                </form>
 
-				<div class="table-responsive margin-top-20">
-					<table class="table table-striped">
-						<thead>
-							<tr>
-								<th>Tanggal</th>
-								<th>Lokasi</th>
-								<th>Produk</th>
-								<th>Jumlah</th>
-								<th>Status</th>
-								<th>Diminta</th>
-								<th>Disetujui</th>
-								<th>Aksi</th>
-							</tr>
-						</thead>
-						<tbody>
-							@forelse ($adjustments as $adjustment)
-								<tr>
-									<td>{{ $adjustment->created_at?->format('d/m/Y H:i') }}</td>
-									<td>{{ $adjustment->location?->name ?? '-' }}</td>
-									<td>{{ $adjustment->product?->name ?? '-' }}</td>
-									<td>{{ number_format((float) $adjustment->quantity_delta, 2, ',', '.') }}</td>
-									<td>
-										<span class="label {{ $adjustment->status === 'approved' ? 'label-success' : 'label-warning' }}">
-											{{ ucfirst($adjustment->status) }}
-										</span>
-									</td>
-									<td>{{ $adjustment->requester?->name ?? '-' }}</td>
-									<td>{{ $adjustment->approver?->name ?? '-' }}</td>
-									<td>
-										@if ($adjustment->status === 'pending')
-											<form method="POST" action="{{ route('stock-adjustments.approve', $adjustment) }}" style="display:inline">
-												@csrf
-												<button type="submit" class="btn btn-xs btn-primary" onclick="return confirm('Setujui penyesuaian ini?')">Approve</button>
-											</form>
-											<form method="POST" action="{{ route('stock-adjustments.destroy', $adjustment) }}" style="display:inline" onsubmit="return confirm('Hapus penyesuaian ini?')">
-												@csrf
-												@method('DELETE')
-												<button type="submit" class="btn btn-xs btn-danger">Hapus</button>
-											</form>
-										@else
-											<span class="text-muted">-</span>
-										@endif
-									</td>
-								</tr>
-							@empty
-								<tr>
-									<td colspan="8" class="text-center">Belum ada penyesuaian stok.</td>
-								</tr>
-							@endforelse
-						</tbody>
-					</table>
-				</div>
+                @if($adjustments->where('status', 'pending')->count() > 0)
+                    <form id="bulk-approve-form" method="POST" action="{{ route('stock-adjustments.bulk-approve') }}" class="hidden">
+                        @csrf
+                    </form>
+                @endif
+            </x-slot>
 
-				<div class="text-center">
-					{{ $adjustments->links('pagination::bootstrap-4') }}
-				</div>
-			</div>
-		</div>
-	</div>
+            <div class="overflow-x-auto -mx-8">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="bg-slate-50 border-y border-slate-100">
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">No. Ref</th>
+                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Produk & Lokasi</th>
+                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none text-center">{{ __('adjustment.delta') }}</th>
+                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none text-center">{{ __('adjustment.status') }}</th>
+                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">PIC / Admin</th>
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none text-center">{{ __('adjustment.actions') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50">
+                        @forelse ($adjustments as $adj)
+                            <tr class="hover:bg-slate-50/50 transition-colors">
+                                <td class="px-8 py-5">
+                                    <span class="text-[9px] font-black text-slate-800 bg-slate-100 px-2 py-1 rounded-lg tracking-widest">{{ $adj->reference_no ?? 'LEGACY' }}</span>
+                                    <p class="text-[9px] font-bold text-slate-400 uppercase mt-2 italic">{{ $adj->created_at->format('d/m/Y H:i') }}</p>
+                                </td>
+                                <td class="px-6 py-5">
+                                    <p class="text-sm font-black text-slate-800 leading-tight">{{ $adj->product?->name ?? 'Unknown' }}</p>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">SKU: {{ $adj->product?->sku }}</span>
+                                        <span class="text-[9px] font-bold text-indigo-500 uppercase italic"><i class="fa fa-map-marker mr-1"></i> {{ $adj->location?->name }}</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-5 text-center">
+                                    @php $delta = (float) $adj->quantity_delta; @endphp
+                                    <span class="text-sm font-black {{ $delta > 0 ? 'text-emerald-500' : 'text-rose-500' }}">
+                                        {{ $delta > 0 ? '+' : '' }}{{ number_format($delta, 0, ',', '.') }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-5 text-center">
+                                    <span class="px-3 py-1 {{ $adj->status === 'approved' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-amber-50 text-amber-600 border-amber-100' }} border rounded-full text-[9px] font-black uppercase tracking-wider">
+                                        {{ $adj->status }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-5">
+                                    <div class="space-y-1">
+                                        <p class="text-[10px] text-slate-500 font-bold"><i class="fa fa-user-o mr-1 flex-shrink-0"></i> {{ $adj->requester?->name }}</p>
+                                        @if($adj->approver)
+                                            <p class="text-[10px] text-emerald-500 font-bold"><i class="fa fa-check-square-o mr-1"></i> {{ $adj->approver?->name }}</p>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td class="px-8 py-5 text-center">
+                                    @if ($adj->status === 'pending')
+                                        <div class="flex items-center justify-center gap-2">
+                                            <form method="POST" action="{{ route('stock-adjustments.approve', $adj) }}">
+                                                @csrf
+                                                <button type="submit" onclick="return confirm('{{ __('adjustment.approve_confirm') }}')" 
+                                                        class="px-3 py-1.5 bg-brand text-white rounded-lg text-[10px] font-black uppercase tracking-widest shadow-lg shadow-brand/20 hover:scale-105 transition-all">
+                                                    {{ __('adjustment.approve_btn') }}
+                                                </button>
+                                            </form>
+                                            <a href="{{ route('stock-adjustments.show', $adj) }}" 
+                                               class="p-1.5 text-slate-400 hover:text-brand transition-colors" title="{{ __('adjustment.detail') }}">
+                                                <i class="fa fa-eye"></i>
+                                            </a>
+                                            <form method="POST" action="{{ route('stock-adjustments.destroy', $adj) }}">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" onclick="return confirm('{{ __('adjustment.delete_confirm') }}')" 
+                                                        class="p-1.5 text-slate-400 hover:text-rose-600 transition-colors">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    @else
+                                        <div class="flex items-center justify-center gap-2">
+                                            <a href="{{ route('stock-adjustments.show', $adj) }}" 
+                                               class="p-1.5 text-slate-400 hover:text-brand transition-colors" title="{{ __('adjustment.detail') }}">
+                                                <i class="fa fa-eye"></i>
+                                            </a>
+                                            <p class="text-[8px] font-black text-slate-300 uppercase tracking-widest italic">{{ __('adjustment.processed') }}</p>
+                                        </div>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="px-8 py-24 text-center">
+                                    <p class="text-slate-400 font-bold italic">{{ __('adjustment.no_data') }}</p>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-8 border-t border-slate-50 pt-8">
+                {{ $adjustments->links() }}
+            </div>
+        </x-ui.card>
+    </div>
 @endsection

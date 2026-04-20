@@ -23,10 +23,11 @@ class StoreStockAdjustmentRequest extends FormRequest
     {
         return [
             'location_id' => ['nullable', 'integer', 'exists:locations,id'],
-            'product_id' => ['required', 'integer', 'exists:products,id'],
-            'quantity_delta' => ['required', 'numeric', 'not_in:0'],
             'reason' => ['required', 'string', 'max:255'],
             'evidence' => ['nullable', 'file', 'max:2048'],
+            'items' => ['required', 'array', 'min:1'],
+            'items.*.product_id' => ['required', 'integer', 'exists:products,id'],
+            'items.*.quantity_delta' => ['required', 'numeric', 'not_in:0'],
         ];
     }
 
@@ -42,8 +43,11 @@ class StoreStockAdjustmentRequest extends FormRequest
             'quantity_delta.required' => 'Jumlah penyesuaian wajib diisi.',
             'quantity_delta.numeric' => 'Jumlah penyesuaian harus berupa angka.',
             'quantity_delta.not_in' => 'Jumlah penyesuaian tidak boleh nol.',
-            'reason.required' => 'Alasan wajib diisi.',
             'reason.max' => 'Alasan maksimal 255 karakter.',
+            'items.required' => 'Wajib menambahkan minimal satu produk.',
+            'items.*.product_id.required' => 'Produk wajib dipilih.',
+            'items.*.quantity_delta.required' => 'Jumlah penyesuaian wajib diisi.',
+            'items.*.quantity_delta.not_in' => 'Jumlah tidak boleh nol.',
             'evidence.file' => 'Bukti harus berupa file.',
             'evidence.max' => 'Bukti maksimal 2MB.',
         ];

@@ -2,33 +2,43 @@
 
 use App\Http\Controllers\ActiveLocationController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ManagerLocationController;
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductSearchController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\PurchasePayableController;
 use App\Http\Controllers\ReceivableController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SaleController;
-use App\Http\Controllers\StockTransferController;
 use App\Http\Controllers\StockAdjustmentController;
+use App\Http\Controllers\StockTransferController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UnitController;
-use App\Models\Product;
-use App\Models\Sale;
-use App\Models\SaleItem;
-use App\Models\StockAdjustment;
-use App\Models\StockItem;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return redirect()->route('login');
 });
+
+Route::get('/clear-cache', function () {
+    \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+
+    return 'Cache cleared successfully!';
+});
+
+Route::get('/lang/{locale}', function ($locale) {
+    if (in_array($locale, ['id', 'en'])) {
+        session()->put('locale', $locale);
+    }
+
+    return redirect()->back();
+})->name('lang.switch');
 
 Route::middleware('auth')->group(function () {
     Route::get('/locations/active', [ActiveLocationController::class, 'show'])->name('locations.active');
@@ -36,87 +46,9 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', 'active_location'])->group(function () {
-    Route::get('/dashboard', function () {
-        $today = now()->toDateString();
-        $monthStart = now()->startOfMonth()->toDateString();
-
-        $salesToday = Sale::query()
-            ->where('status', 'posted')
-            ->where('type', 'sale')
-            ->whereDate('posted_at', $today)
-            ->sum('total');
-
-        $salesMonth = Sale::query()
-            ->where('status', 'posted')
-            ->where('type', 'sale')
-            ->whereDate('posted_at', '>=', $monthStart)
-            ->sum('total');
-
-        $transactionsToday = Sale::query()
-            ->where('status', 'posted')
-            ->where('type', 'sale')
-            ->whereDate('posted_at', $today)
-            ->count();
-
-        $activeProducts = Product::query()->where('is_active', true)->count();
-
-        $lowStocks = StockItem::query()
-            ->with('product')
-            ->where('quantity_on_hand', '<=', 5)
-            ->orderBy('quantity_on_hand')
-            ->limit(5)
-            ->get();
-
-        $topProducts = SaleItem::query()
-            ->join('sales', 'sales.id', '=', 'sale_items.sale_id')
-            ->where('sales.status', 'posted')
-            ->where('sales.type', 'sale')
-            ->select('sale_items.product_id', DB::raw('SUM(sale_items.quantity) as total_qty'), DB::raw('SUM(sale_items.line_total) as total_sales'))
-            ->groupBy('sale_items.product_id')
-            ->orderByDesc('total_qty')
-            ->with('product')
-            ->limit(5)
-            ->get();
-
-        $recentAdjustments = StockAdjustment::query()
-            ->with(['product', 'requester'])
-            ->latest()
-            ->limit(5)
-            ->get();
-
-        $salesSeries = Sale::query()
-            ->where('status', 'posted')
-            ->where('type', 'sale')
-            ->whereDate('posted_at', '>=', now()->subDays(6)->toDateString())
-            ->selectRaw("DATE(COALESCE(posted_at, created_at)) as sale_date, SUM(total) as total")
-            ->groupBy('sale_date')
-            ->orderBy('sale_date')
-            ->get()
-            ->keyBy('sale_date');
-
-        $labels = [];
-        $series = [];
-        for ($i = 6; $i >= 0; $i--) {
-            $date = now()->subDays($i)->toDateString();
-            $labels[] = now()->subDays($i)->format('d/m');
-            $series[] = (float) ($salesSeries[$date]->total ?? 0);
-        }
-
-        $locationName = Auth::user()?->activeLocation?->name ?? '-';
-
-        return view('dashboard', compact(
-            'salesToday',
-            'salesMonth',
-            'transactionsToday',
-            'activeProducts',
-            'lowStocks',
-            'topProducts',
-            'recentAdjustments',
-            'labels',
-            'series',
-            'locationName'
-        ));
-    })->middleware('verified')->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->middleware('verified')
+        ->name('dashboard');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -134,11 +66,15 @@ Route::middleware(['auth', 'active_location'])->group(function () {
     Route::resource('users', UserController::class)->except(['show']);
     Route::resource('categories', CategoryController::class)->except(['show']);
     Route::resource('units', UnitController::class)->except(['show']);
+    Route::get('products/search', [ProductSearchController::class, 'search'])->name('products.search');
     Route::resource('products', ProductController::class)->except(['show']);
-    Route::resource('stock-adjustments', StockAdjustmentController::class)->except(['show']);
+    Route::resource('stock-adjustments', StockAdjustmentController::class);
+    Route::post('stock-adjustments/bulk-approve', [StockAdjustmentController::class, 'bulkApprove'])
+        ->name('stock-adjustments.bulk-approve');
     Route::post('stock-adjustments/{stockAdjustment}/approve', [StockAdjustmentController::class, 'approve'])
         ->name('stock-adjustments.approve');
     Route::resource('suppliers', SupplierController::class)->except(['show']);
+    Route::resource('customers', CustomerController::class);
     Route::resource('purchases', PurchaseController::class)->except(['show', 'edit', 'update', 'destroy']);
     Route::get('purchases/payables', [PurchasePayableController::class, 'index'])
         ->name('purchases.payables.index');
@@ -171,11 +107,17 @@ Route::middleware(['auth', 'active_location'])->group(function () {
         ->name('sales.return');
 
     Route::get('reports/sales', [ReportController::class, 'sales'])->name('reports.sales');
+    Route::get('reports/sales/export', [ReportController::class, 'exportSales'])->name('reports.sales.export');
     Route::get('reports/cash-up', [ReportController::class, 'cashUp'])->name('reports.cash-up');
     Route::get('reports/stock', [ReportController::class, 'stock'])->name('reports.stock');
+    Route::get('reports/stock/export', [ReportController::class, 'exportStock'])->name('reports.stock.export');
     Route::get('reports/stock-card', [ReportController::class, 'stockCard'])->name('reports.stock-card');
     Route::get('reports/income-statement', [ReportController::class, 'incomeStatement'])->name('reports.income-statement');
     Route::get('reports/cash-flow', [ReportController::class, 'cashFlow'])->name('reports.cash-flow');
 });
+
+Route::get('/ui-preview', function () {
+    return view('ui-preview');
+})->name('ui-preview');
 
 require __DIR__.'/auth.php';

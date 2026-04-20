@@ -135,19 +135,34 @@ class StockAdjustmentController extends Controller
             $evidencePath = $request->file('evidence')->store('stock-adjustments', 'public');
         }
 
-        StockAdjustment::create([
-            'location_id' => $locationId,
-            'product_id' => $data['product_id'],
-            'requested_by' => $request->user()?->id,
-            'quantity_delta' => $data['quantity_delta'],
-            'reason' => $data['reason'],
-            'evidence_path' => $evidencePath,
-            'status' => 'pending',
-        ]);
+        $referenceNo = 'ADJ-'.now()->format('YmdHis').'-'.strtoupper(bin2hex(random_bytes(2)));
+
+        DB::transaction(function () use ($data, $locationId, $request, $evidencePath, $referenceNo): void {
+            foreach ($data['items'] as $item) {
+                StockAdjustment::create([
+                    'location_id' => $locationId,
+                    'reference_no' => $referenceNo,
+                    'product_id' => $item['product_id'],
+                    'requested_by' => $request->user()?->id,
+                    'quantity_delta' => $item['quantity_delta'],
+                    'reason' => $data['reason'],
+                    'evidence_path' => $evidencePath,
+                    'status' => 'pending',
+                ]);
+            }
+        });
 
         return redirect()
             ->route('stock-adjustments.index')
-            ->with('status', 'Penyesuaian stok berhasil dibuat.');
+            ->with('status', 'Berhasil membuat '.count($data['items']).' penyesuaian stok.');
+    }
+
+    public function show(int $stockAdjustment): View
+    {
+        $stockAdjustment = $this->resolveAdjustment($stockAdjustment);
+        $stockAdjustment->load(['location', 'product', 'requester', 'approver']);
+
+        return view('stock-adjustments.show', compact('stockAdjustment'));
     }
 
     public function approve(int $stockAdjustment): RedirectResponse
@@ -162,34 +177,7 @@ class StockAdjustmentController extends Controller
 
         try {
             DB::transaction(function () use ($stockAdjustment): void {
-                $stockItem = StockItem::withoutGlobalScope('active_location')->firstOrCreate([
-                    'location_id' => $stockAdjustment->location_id,
-                    'product_id' => $stockAdjustment->product_id,
-                ], [
-                    'quantity_on_hand' => 0,
-                ]);
-
-                $stockItem->adjustQuantity((float) $stockAdjustment->quantity_delta);
-
-                $stockAdjustment->update([
-                    'status' => 'approved',
-                    'approved_by' => request()->user()?->id,
-                    'approved_at' => now(),
-                ]);
-
-                AuditLog::create([
-                    'user_id' => request()->user()?->id,
-                    'location_id' => $stockAdjustment->location_id,
-                    'action' => 'stock_adjustment_approved',
-                    'metadata' => [
-                        'stock_adjustment_id' => $stockAdjustment->id,
-                        'product_id' => $stockAdjustment->product_id,
-                        'quantity_delta' => $stockAdjustment->quantity_delta,
-                    ],
-                    'ip_address' => request()->ip(),
-                    'user_agent' => request()->userAgent(),
-                    'occurred_at' => now(),
-                ]);
+                $this->processApproval($stockAdjustment);
             });
         } catch (ValidationException $exception) {
             return redirect()
@@ -200,6 +188,80 @@ class StockAdjustmentController extends Controller
         return redirect()
             ->route('stock-adjustments.index')
             ->with('status', 'Penyesuaian stok disetujui.');
+    }
+
+    public function bulkApprove(): RedirectResponse
+    {
+        $user = request()->user();
+        $canManageAll = ($user?->hasRole('Owner') ?? false) || ($user?->hasRole('Manager') ?? false);
+        $locationId = ActiveLocation::id();
+
+        $query = $canManageAll
+            ? StockAdjustment::withoutGlobalScope('active_location')
+            : StockAdjustment::query();
+
+        if ($locationId && ! $canManageAll) {
+            $query->where('location_id', $locationId);
+        }
+
+        $pendingAdjustments = $query->where('status', 'pending')->get();
+
+        if ($pendingAdjustments->isEmpty()) {
+            return redirect()
+                ->route('stock-adjustments.index')
+                ->with('warning', 'Tidak ada penyesuaian stok pending yang ditemukan.');
+        }
+
+        $count = 0;
+        try {
+            DB::transaction(function () use ($pendingAdjustments, &$count): void {
+                /** @var \App\Models\StockAdjustment $adj */
+                foreach ($pendingAdjustments as $adj) {
+                    $this->processApproval($adj);
+                    $count++;
+                }
+            });
+        } catch (ValidationException $exception) {
+            return redirect()
+                ->route('stock-adjustments.index')
+                ->withErrors($exception->errors());
+        }
+
+        return redirect()
+            ->route('stock-adjustments.index')
+            ->with('status', "Berhasil menyetujui $count penyesuaian stok secara global.");
+    }
+
+    private function processApproval(StockAdjustment $stockAdjustment): void
+    {
+        $stockItem = StockItem::withoutGlobalScope('active_location')->firstOrCreate([
+            'location_id' => $stockAdjustment->location_id,
+            'product_id' => $stockAdjustment->product_id,
+        ], [
+            'quantity_on_hand' => 0,
+        ]);
+
+        $stockItem->adjustQuantity((float) $stockAdjustment->quantity_delta);
+
+        $stockAdjustment->update([
+            'status' => 'approved',
+            'approved_by' => request()->user()?->id,
+            'approved_at' => now(),
+        ]);
+
+        AuditLog::create([
+            'user_id' => request()->user()?->id,
+            'location_id' => $stockAdjustment->location_id,
+            'action' => 'stock_adjustment_approved',
+            'metadata' => [
+                'stock_adjustment_id' => $stockAdjustment->id,
+                'product_id' => $stockAdjustment->product_id,
+                'quantity_delta' => $stockAdjustment->quantity_delta,
+            ],
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+            'occurred_at' => now(),
+        ]);
     }
 
     public function destroy(int $stockAdjustment): RedirectResponse
@@ -232,6 +294,12 @@ class StockAdjustmentController extends Controller
             ? StockAdjustment::withoutGlobalScope('active_location')
             : StockAdjustment::query();
 
-        return $query->whereKey($stockAdjustmentId)->firstOrFail();
+        $allowedLocationIds = $user?->accessibleLocationIds() ?? [];
+
+        return $query->whereKey($stockAdjustmentId)
+            ->when(! ($user?->hasRole('Owner') ?? false) && $allowedLocationIds !== [], function ($query) use ($allowedLocationIds): void {
+                $query->whereIn('location_id', $allowedLocationIds);
+            })
+            ->firstOrFail();
     }
 }

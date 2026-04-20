@@ -9,6 +9,7 @@ use App\Models\SalePayment;
 use App\Models\StockItem;
 use App\Models\Unit;
 use App\Models\User;
+use Database\Seeders\AccountSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -19,6 +20,8 @@ class SaleTest extends TestCase
 
     public function test_posted_sale_reduces_stock_and_creates_payments(): void
     {
+        $this->seed(AccountSeeder::class);
+
         $cashier = $this->makeCashier();
         $product = $this->makeProduct();
         $stockItem = StockItem::query()
@@ -57,9 +60,9 @@ class SaleTest extends TestCase
                 'action' => 'post',
             ]);
 
-        $response->assertRedirect(route('sales.index', absolute: false));
-
         $sale = Sale::query()->firstOrFail();
+        $response->assertRedirect(route('sales.receipt', $sale, absolute: false));
+
         $this->assertSame('posted', $sale->status);
         $this->assertSame('19000.00', $sale->total);
         $this->assertSame(2, SalePayment::query()->where('sale_id', $sale->id)->count());

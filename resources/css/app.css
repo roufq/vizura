@@ -1,3 +1,16 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@plugin "@tailwindcss/forms";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --color-brand: #10b981;
+  --color-brand-light: #ecfdf5;
+  --color-brand-dark: #059669;
+}
+
+@layer components {
+  .sidebar-item-active {
+    @apply bg-brand-light text-brand font-semibold border-r-4 border-brand;
+  }
+}
+

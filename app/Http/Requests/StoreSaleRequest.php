@@ -46,8 +46,9 @@ class StoreSaleRequest extends FormRequest
             'draft_id' => [
                 'nullable',
                 'integer',
-                Rule::exists('sales', 'id')->where('status', 'draft')->where('type', 'sale'),
+                Rule::exists('sales', 'id')->where('status', 'draft')->whereIn('type', ['sale', 'retail', 'wholesale', 'online']),
             ],
+            'customer_id' => ['nullable', 'integer', 'exists:customers,id'],
             'customer_name' => ['nullable', 'string', 'max:100'],
             'customer_phone' => ['nullable', 'string', 'max:30'],
             'notes' => ['nullable', 'string', 'max:500'],
@@ -63,6 +64,7 @@ class StoreSaleRequest extends FormRequest
             'payments.*.method' => ['required_with:payments.*.amount', 'string', 'max:30'],
             'payments.*.amount' => ['required_with:payments.*.method', 'numeric', 'min:0.01'],
             'payments.*.reference_no' => ['nullable', 'string', 'max:50'],
+            'type' => ['nullable', 'string', 'max:20'],
             'action' => ['required', 'string', 'in:draft,post'],
         ];
     }

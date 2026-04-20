@@ -7,15 +7,16 @@ use App\Models\Location;
 use App\Models\Purchase;
 use App\Models\PurchasePayment;
 use App\Support\AccountingService;
-use App\Support\ActiveLocation;
+use App\Support\LocationResolver;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class PurchasePayableController extends Controller
 {
-    public function __construct()
+    public function __construct(public LocationResolver $locationResolver)
     {
         $this->middleware('role:Owner|Manager|KepalaToko');
     }
@@ -24,15 +25,24 @@ class PurchasePayableController extends Controller
     {
         $user = $request->user();
         $canViewAll = $user?->hasRole('Owner') ?? false;
+        $isManager = $user?->hasRole('Manager') ?? false;
         $allowedLocationIds = $user?->accessibleLocationIds() ?? [];
-        $canSelectLocations = $canViewAll || ($user?->hasRole('Manager') ?? false);
-        $locationId = $this->resolveLocationId($request, $allowedLocationIds, $canViewAll);
+        $canSelectLocations = $canViewAll || $isManager;
+        $locationId = $this->locationResolver->resolveFromRequest($request, $allowedLocationIds, $canViewAll);
 
-        $query = $canViewAll
+        $query = ($canViewAll || $isManager)
             ? Purchase::withoutGlobalScope('active_location')
             : Purchase::query();
 
         $query->where('payment_method', 'payable');
+
+        if (! $canViewAll) {
+            if ($allowedLocationIds === []) {
+                $query->whereRaw('1 = 0');
+            } else {
+                $query->whereIn('location_id', $allowedLocationIds);
+            }
+        }
 
         if ($locationId) {
             $query->where('location_id', $locationId);
@@ -72,8 +82,10 @@ class PurchasePayableController extends Controller
         ]);
     }
 
-    public function show(Purchase $purchase, Request $request): View|RedirectResponse
+    public function show(int $purchase, Request $request): View|RedirectResponse
     {
+        $purchase = Purchase::withoutGlobalScope('active_location')->whereKey($purchase)->firstOrFail();
+
         $user = $request->user();
         if (! $this->canAccessPurchase($user, $purchase)) {
             return redirect()
@@ -110,8 +122,10 @@ class PurchasePayableController extends Controller
         return view('purchases.payables.show', compact('purchase', 'paymentMethods'));
     }
 
-    public function store(StorePurchasePaymentRequest $request, Purchase $purchase): RedirectResponse
+    public function store(StorePurchasePaymentRequest $request, int $purchase): RedirectResponse
     {
+        $purchase = Purchase::withoutGlobalScope('active_location')->whereKey($purchase)->firstOrFail();
+
         $user = $request->user();
         if (! $this->canAccessPurchase($user, $purchase)) {
             return redirect()
@@ -134,35 +148,52 @@ class PurchasePayableController extends Controller
                 ->withErrors(['amount' => 'Jumlah bayar harus lebih dari 0.']);
         }
 
-        if ($amount > (float) $purchase->payable_balance) {
+        try {
+            DB::transaction(function () use ($purchase, $data, $amount, $request): void {
+                $lockedPurchase = Purchase::withoutGlobalScope('active_location')
+                    ->whereKey($purchase->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                if ($lockedPurchase->payment_method !== 'payable') {
+                    throw ValidationException::withMessages([
+                        'purchase' => 'Pembelian ini tidak memiliki hutang.',
+                    ]);
+                }
+
+                if ($amount > (float) $lockedPurchase->payable_balance) {
+                    throw ValidationException::withMessages([
+                        'amount' => 'Jumlah bayar melebihi sisa hutang.',
+                    ]);
+                }
+
+                $payment = PurchasePayment::create([
+                    'purchase_id' => $lockedPurchase->id,
+                    'location_id' => $lockedPurchase->location_id,
+                    'method' => $data['method'],
+                    'amount' => $amount,
+                    'reference_no' => $data['reference_no'] ?? null,
+                    'paid_at' => $data['paid_at'] ?? now(),
+                    'created_by' => $request->user()?->id,
+                ]);
+
+                $newPaid = (float) $lockedPurchase->paid_total + $amount;
+                $newBalance = max(0, (float) $lockedPurchase->total - $newPaid);
+                $status = $newBalance <= 0.0 ? 'paid' : 'partial';
+
+                $lockedPurchase->update([
+                    'paid_total' => $newPaid,
+                    'payable_balance' => $newBalance,
+                    'payment_status' => $status,
+                ]);
+
+                app(AccountingService::class)->recordPurchasePayment($payment);
+            });
+        } catch (ValidationException $exception) {
             return redirect()
                 ->route('purchases.payables.show', $purchase)
-                ->withErrors(['amount' => 'Jumlah bayar melebihi sisa hutang.']);
+                ->withErrors($exception->errors());
         }
-
-        DB::transaction(function () use ($purchase, $data, $amount, $request): void {
-            $payment = PurchasePayment::create([
-                'purchase_id' => $purchase->id,
-                'location_id' => $purchase->location_id,
-                'method' => $data['method'],
-                'amount' => $amount,
-                'reference_no' => $data['reference_no'] ?? null,
-                'paid_at' => $data['paid_at'] ?? now(),
-                'created_by' => $request->user()?->id,
-            ]);
-
-            $newPaid = (float) $purchase->paid_total + $amount;
-            $newBalance = max(0, (float) $purchase->total - $newPaid);
-            $status = $newBalance <= 0.0 ? 'paid' : 'partial';
-
-            $purchase->update([
-                'paid_total' => $newPaid,
-                'payable_balance' => $newBalance,
-                'payment_status' => $status,
-            ]);
-
-            app(AccountingService::class)->recordPurchasePayment($payment);
-        });
 
         return redirect()
             ->route('purchases.payables.show', $purchase)
@@ -171,31 +202,16 @@ class PurchasePayableController extends Controller
 
     private function canAccessPurchase($user, Purchase $purchase): bool
     {
-        if ($user?->hasRole('Owner')) {
+        if (! $user) {
+            return false;
+        }
+
+        if ($user->hasRole('Owner')) {
             return true;
         }
 
-        return (int) $purchase->location_id === (int) ActiveLocation::id();
-    }
+        $allowedLocationIds = $user->accessibleLocationIds();
 
-    private function resolveLocationId(Request $request, array $allowedLocationIds, bool $canViewAll): ?int
-    {
-        if ($canViewAll && $request->boolean('all_locations')) {
-            return null;
-        }
-
-        if ($request->filled('location_id')) {
-            $requested = (int) $request->input('location_id');
-            if ($allowedLocationIds === [] || in_array($requested, $allowedLocationIds, true)) {
-                return $requested;
-            }
-        }
-
-        $activeLocationId = ActiveLocation::id();
-        if ($activeLocationId && ($allowedLocationIds === [] || in_array($activeLocationId, $allowedLocationIds, true))) {
-            return $activeLocationId;
-        }
-
-        return $allowedLocationIds[0] ?? null;
+        return $allowedLocationIds !== [] && in_array((int) $purchase->location_id, $allowedLocationIds, true);
     }
 }

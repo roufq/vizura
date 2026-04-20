@@ -13,13 +13,13 @@
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
+                        {{ __('nav.dashboard') }}
                     </x-nav-link>
                     <x-nav-link :href="route('locations.index')" :active="request()->routeIs('locations.*')">
-                        {{ __('Lokasi') }}
+                        {{ __('nav.location') }}
                     </x-nav-link>
                     <x-nav-link :href="route('locations.active')" :active="request()->routeIs('locations.active')">
-                        {{ __('Pilih Lokasi') }}
+                        {{ __('nav.choose_location') }}
                     </x-nav-link>
                 </div>
             </div>
@@ -27,7 +27,7 @@
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <div class="mr-4 text-sm text-gray-500">
-                    {{ Auth::user()->activeLocation?->name ?? 'Lokasi belum dipilih' }}
+                    {{ Auth::user()->activeLocation?->name ?? __('nav.no_location_selected') }}
                 </div>
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
@@ -44,7 +44,7 @@
 
                     <x-slot name="content">
                         <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
+                            {{ __('nav.profile') }}
                         </x-dropdown-link>
 
                         <!-- Authentication -->
@@ -77,13 +77,13 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
+                {{ __('nav.dashboard') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('locations.index')" :active="request()->routeIs('locations.*')">
-                {{ __('Lokasi') }}
+                {{ __('nav.location') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('locations.active')" :active="request()->routeIs('locations.active')">
-                {{ __('Pilih Lokasi') }}
+                {{ __('nav.choose_location') }}
             </x-responsive-nav-link>
         </div>
 
@@ -97,7 +97,7 @@
 
             <div class="mt-3 space-y-1">
                 <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('Profile') }}
+                    {{ __('nav.profile') }}
                 </x-responsive-nav-link>
 
                 <!-- Authentication -->

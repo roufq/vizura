@@ -72,10 +72,17 @@ class PurchaseController extends Controller
 
         $discount = (float) ($data['discount_amount'] ?? 0);
         $tax = (float) ($data['tax_amount'] ?? 0);
+        $subtotal = collect($items)->sum('line_total');
+
+        if ($discount > $subtotal) {
+            return redirect()
+                ->route('purchases.create')
+                ->withErrors(['discount_amount' => 'Diskon tidak boleh melebihi subtotal.'])
+                ->withInput();
+        }
 
         try {
-            DB::transaction(function () use ($request, $data, $items, $locationId, $discount, $tax): void {
-                $subtotal = collect($items)->sum('line_total');
+            DB::transaction(function () use ($request, $data, $items, $locationId, $discount, $tax, $subtotal): void {
                 $total = max(0, $subtotal - $discount + $tax);
 
                 $isPayable = $data['payment_method'] === 'payable';

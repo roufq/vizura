@@ -2,33 +2,31 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CashUpReportRequest;
 use App\Http\Requests\CashFlowReportRequest;
+use App\Http\Requests\CashUpReportRequest;
 use App\Http\Requests\IncomeStatementReportRequest;
 use App\Http\Requests\SalesReportRequest;
 use App\Http\Requests\StockCardReportRequest;
 use App\Http\Requests\StockReportRequest;
-use App\Models\Account;
-use App\Models\Location;
 use App\Models\Product;
 use App\Models\PurchaseItem;
-use App\Models\Sale;
 use App\Models\SaleItem;
-use App\Models\SalePayment;
 use App\Models\StockAdjustment;
-use App\Models\StockItem;
 use App\Models\StockTransferItem;
 use App\Models\User;
 use App\Support\AccountingService;
-use App\Support\ActiveLocation;
+use App\Support\LocationResolver;
+use App\Support\ReportService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class ReportController extends Controller
 {
-    public function __construct()
-    {
+    public function __construct(
+        public ReportService $reportService,
+        public LocationResolver $locationResolver
+    ) {
         $this->middleware('role:Owner|Manager|KepalaToko,web');
     }
 
@@ -39,72 +37,64 @@ class ReportController extends Controller
         $canViewAll = $this->canViewAllLocations($user);
         $allowedLocationIds = $user?->accessibleLocationIds() ?? [];
         $canSelectLocations = $canViewAll || ($user?->hasRole('Manager') ?? false);
-        $locationId = $this->resolveLocationId($data, $allowedLocationIds, $canViewAll);
+        $locationId = $this->locationResolver->resolveFromFilters($data, $allowedLocationIds, $canViewAll);
 
-        $salesQuery = $canViewAll
-            ? Sale::withoutGlobalScope('active_location')
-            : Sale::query();
-
-        if ($locationId) {
-            $salesQuery->where('location_id', $locationId);
-        }
-
-        if (! empty($data['start_date'])) {
-            $salesQuery->whereDate('created_at', '>=', $data['start_date']);
-        }
-
-        if (! empty($data['end_date'])) {
-            $salesQuery->whereDate('created_at', '<=', $data['end_date']);
-        }
-
-        if (! empty($data['cashier_id'])) {
-            $salesQuery->where('cashier_id', $data['cashier_id']);
-        }
-
-        if (! empty($data['status'])) {
-            $salesQuery->where('status', $data['status']);
-        }
-
-        if (! empty($data['type'])) {
-            $salesQuery->where('type', $data['type']);
-        }
-
-        if (! empty($data['method'])) {
-            $salesQuery->whereHas('payments', function ($query) use ($data): void {
-                $query->where('method', $data['method']);
-            });
-        }
-
-        $summary = (clone $salesQuery)
-            ->selectRaw('COALESCE(SUM(subtotal), 0) as gross_total')
-            ->selectRaw('COALESCE(SUM(order_discount), 0) as discount_total')
-            ->selectRaw('COALESCE(SUM(tax_amount), 0) as tax_total')
-            ->selectRaw('COALESCE(SUM(total), 0) as net_total')
-            ->first();
-
-        $sales = $salesQuery
-            ->with(['cashier', 'payments'])
-            ->latest()
-            ->paginate(15)
-            ->withQueryString();
-
-        $locations = $canViewAll
-            ? Location::active()->orderBy('name')->get()
-            : Location::active()->whereIn('id', $allowedLocationIds)->orderBy('name')->get();
-        $cashiers = User::role('Kasir')->orderBy('name')->get();
-        $paymentMethods = $this->getPaymentMethods($canViewAll, $locationId);
+        $reportData = $this->reportService->buildSalesReport($data, $canViewAll, $locationId);
+        $locations = $this->reportService->locations($canViewAll, $allowedLocationIds);
+        $cashiers = $this->reportService->cashiers();
 
         return view('reports.sales', [
-            'sales' => $sales,
-            'summary' => $summary,
+            'sales' => $reportData['sales'],
+            'summary' => $reportData['summary'],
             'locations' => $locations,
             'cashiers' => $cashiers,
-            'paymentMethods' => $paymentMethods,
+            'paymentMethods' => $reportData['paymentMethods'],
             'filters' => $data,
             'canViewAll' => $canViewAll,
             'canSelectLocations' => $canSelectLocations,
             'locationId' => $locationId,
         ]);
+    }
+
+    public function exportSales(SalesReportRequest $request)
+    {
+        $data = $request->validated();
+        $user = $request->user();
+        $canViewAll = $this->canViewAllLocations($user);
+        $allowedLocationIds = $user?->accessibleLocationIds() ?? [];
+        $locationId = $this->locationResolver->resolveFromFilters($data, $allowedLocationIds, $canViewAll);
+
+        $reportData = $this->reportService->buildSalesReport($data, $canViewAll, $locationId, false);
+        $sales = $reportData['sales'];
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="pos_sales_report_'.now()->format('YmdHis').'.csv"',
+        ];
+
+        $callback = function () use ($sales) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, ['Tanggal', 'Referensi', 'Tipe', 'Status', 'Kasir', 'Pelanggan', 'Subtotal', 'Diskon', 'Pajak', 'Total']);
+
+            foreach ($sales as $sale) {
+                fputcsv($file, [
+                    $sale->posted_at?->format('Y-m-d H:i') ?? $sale->created_at->format('Y-m-d H:i'),
+                    $sale->reference_no,
+                    strtoupper($sale->type),
+                    strtoupper($sale->status),
+                    $sale->cashier?->name,
+                    $sale->customer_name ?: 'Umum',
+                    (float) $sale->subtotal,
+                    (float) $sale->order_discount,
+                    (float) $sale->tax_amount,
+                    (float) $sale->total,
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 
     public function cashUp(CashUpReportRequest $request): View
@@ -114,49 +104,15 @@ class ReportController extends Controller
         $canViewAll = $this->canViewAllLocations($user);
         $allowedLocationIds = $user?->accessibleLocationIds() ?? [];
         $canSelectLocations = $canViewAll || ($user?->hasRole('Manager') ?? false);
-        $locationId = $this->resolveLocationId($data, $allowedLocationIds, $canViewAll);
+        $locationId = $this->locationResolver->resolveFromFilters($data, $allowedLocationIds, $canViewAll);
 
-        $paymentsQuery = $canViewAll
-            ? SalePayment::withoutGlobalScope('active_location')
-            : SalePayment::query();
-
-        $paymentsQuery
-            ->join('sales', 'sales.id', '=', 'sale_payments.sale_id')
-            ->where('sales.status', 'posted')
-            ->where('sales.type', 'sale');
-
-        if ($locationId) {
-            $paymentsQuery->where('sales.location_id', $locationId);
-        }
-
-        if (! empty($data['start_date'])) {
-            $paymentsQuery->whereDate('sales.created_at', '>=', $data['start_date']);
-        }
-
-        if (! empty($data['end_date'])) {
-            $paymentsQuery->whereDate('sales.created_at', '<=', $data['end_date']);
-        }
-
-        $rows = $paymentsQuery
-            ->selectRaw('DATE(sales.created_at) as sale_date, sale_payments.method, SUM(sale_payments.amount) as total')
-            ->groupBy('sale_date', 'sale_payments.method')
-            ->orderByDesc('sale_date')
-            ->get();
-
-        $totalsByMethod = $rows
-            ->groupBy('method')
-            ->map(fn (Collection $group): float => (float) $group->sum('total'));
-
-        $grandTotal = (float) $rows->sum('total');
-
-        $locations = $canViewAll
-            ? Location::active()->orderBy('name')->get()
-            : Location::active()->whereIn('id', $allowedLocationIds)->orderBy('name')->get();
+        $reportData = $this->reportService->buildCashUpReport($data, $canViewAll, $locationId);
+        $locations = $this->reportService->locations($canViewAll, $allowedLocationIds);
 
         return view('reports.cash-up', [
-            'rows' => $rows,
-            'totalsByMethod' => $totalsByMethod,
-            'grandTotal' => $grandTotal,
+            'rows' => $reportData['rows'],
+            'totalsByMethod' => $reportData['totalsByMethod'],
+            'grandTotal' => $reportData['grandTotal'],
             'locations' => $locations,
             'filters' => $data,
             'canViewAll' => $canViewAll,
@@ -172,46 +128,56 @@ class ReportController extends Controller
         $canViewAll = $this->canViewAllLocations($user);
         $allowedLocationIds = $user?->accessibleLocationIds() ?? [];
         $canSelectLocations = $canViewAll || ($user?->hasRole('Manager') ?? false);
-        $locationId = $this->resolveLocationId($data, $allowedLocationIds, $canViewAll);
+        $locationId = $this->locationResolver->resolveFromFilters($data, $allowedLocationIds, $canViewAll);
 
-        $stockQuery = $canViewAll
-            ? StockItem::withoutGlobalScope('active_location')
-            : StockItem::query();
-
-        if ($locationId) {
-            $stockQuery->where('location_id', $locationId);
-        }
-
-        if (! empty($data['search'])) {
-            $stockQuery->whereHas('product', function ($query) use ($data): void {
-                $query->where('name', 'like', '%'.$data['search'].'%')
-                    ->orWhere('sku', 'like', '%'.$data['search'].'%');
-            });
-        }
-
-        $totalValue = (clone $stockQuery)
-            ->join('products', 'products.id', '=', 'stock_items.product_id')
-            ->sum(DB::raw('stock_items.quantity_on_hand * products.cost_price'));
-
-        $stockItems = $stockQuery
-            ->with(['product', 'location'])
-            ->orderBy('product_id')
-            ->paginate(20)
-            ->withQueryString();
-
-        $locations = $canViewAll
-            ? Location::active()->orderBy('name')->get()
-            : Location::active()->whereIn('id', $allowedLocationIds)->orderBy('name')->get();
+        $reportData = $this->reportService->buildStockReport($data, $canViewAll, $locationId);
+        $locations = $this->reportService->locations($canViewAll, $allowedLocationIds);
 
         return view('reports.stock', [
-            'stockItems' => $stockItems,
-            'totalValue' => (float) $totalValue,
+            'stockItems' => $reportData['stockItems'],
+            'totalValue' => $reportData['totalValue'],
             'locations' => $locations,
             'filters' => $data,
             'canViewAll' => $canViewAll,
             'canSelectLocations' => $canSelectLocations,
             'locationId' => $locationId,
         ]);
+    }
+
+    public function exportStock(StockReportRequest $request)
+    {
+        $data = $request->validated();
+        $user = $request->user();
+        $canViewAll = $this->canViewAllLocations($user);
+        $allowedLocationIds = $user?->accessibleLocationIds() ?? [];
+        $locationId = $this->locationResolver->resolveFromFilters($data, $allowedLocationIds, $canViewAll);
+
+        $reportData = $this->reportService->buildStockReport($data, $canViewAll, $locationId, false);
+        $items = $reportData['stockItems'];
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="pos_stock_report_'.now()->format('YmdHis').'.csv"',
+        ];
+
+        $callback = function () use ($items) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, ['Lokasi', 'SKU', 'Produk', 'Stok Saat Ini', 'Satuan']);
+
+            foreach ($items as $item) {
+                fputcsv($file, [
+                    $item->location?->name,
+                    $item->product?->sku,
+                    $item->product?->name,
+                    (float) $item->quantity_on_hand,
+                    $item->product?->unit?->name,
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 
     public function stockCard(StockCardReportRequest $request): View
@@ -221,7 +187,7 @@ class ReportController extends Controller
         $canViewAll = $this->canViewAllLocations($user);
         $allowedLocationIds = $user?->accessibleLocationIds() ?? [];
         $canSelectLocations = $canViewAll || ($user?->hasRole('Manager') ?? false);
-        $locationId = $this->resolveLocationId($data, $allowedLocationIds, $canViewAll);
+        $locationId = $this->locationResolver->resolveFromFilters($data, $allowedLocationIds, $canViewAll);
 
         $products = Product::query()->orderBy('name')->get();
         $productId = $data['product_id'] ?? $products->first()?->id;
@@ -238,9 +204,7 @@ class ReportController extends Controller
             );
         }
 
-        $locations = $canViewAll
-            ? Location::active()->orderBy('name')->get()
-            : Location::active()->whereIn('id', $allowedLocationIds)->orderBy('name')->get();
+        $locations = $this->reportService->locations($canViewAll, $allowedLocationIds);
 
         return view('reports.stock-card', [
             'entries' => $entries,
@@ -261,9 +225,9 @@ class ReportController extends Controller
         $canViewAll = $this->canViewAllLocations($user);
         $allowedLocationIds = $user?->accessibleLocationIds() ?? [];
         $canSelectLocations = $canViewAll || ($user?->hasRole('Manager') ?? false);
-        $locationId = $this->resolveLocationId($data, $allowedLocationIds, $canViewAll);
+        $locationId = $this->locationResolver->resolveFromFilters($data, $allowedLocationIds, $canViewAll);
 
-        $journalQuery = $this->buildJournalLineQuery($canViewAll, $locationId, $data['start_date'] ?? null, $data['end_date'] ?? null);
+        $journalQuery = $this->reportService->buildJournalLineQuery($canViewAll, $locationId, $data['start_date'] ?? null, $data['end_date'] ?? null);
 
         $incomeTotal = (clone $journalQuery)
             ->join('accounts as income_accounts', 'income_accounts.id', '=', 'journal_lines.account_id')
@@ -284,9 +248,7 @@ class ReportController extends Controller
         $grossProfit = (float) $incomeTotal - (float) $cogsTotal;
         $netProfit = $grossProfit - (float) $expenseTotal;
 
-        $locations = $canViewAll
-            ? Location::active()->orderBy('name')->get()
-            : Location::active()->whereIn('id', $allowedLocationIds)->orderBy('name')->get();
+        $locations = $this->reportService->locations($canViewAll, $allowedLocationIds);
 
         return view('reports.income-statement', [
             'incomeTotal' => (float) $incomeTotal,
@@ -309,36 +271,14 @@ class ReportController extends Controller
         $canViewAll = $this->canViewAllLocations($user);
         $allowedLocationIds = $user?->accessibleLocationIds() ?? [];
         $canSelectLocations = $canViewAll || ($user?->hasRole('Manager') ?? false);
-        $locationId = $this->resolveLocationId($data, $allowedLocationIds, $canViewAll);
+        $locationId = $this->locationResolver->resolveFromFilters($data, $allowedLocationIds, $canViewAll);
 
-        $journalQuery = $this->buildJournalLineQuery($canViewAll, $locationId, $data['start_date'] ?? null, $data['end_date'] ?? null);
-
-        $cashAccounts = Account::query()
-            ->where('is_cash', true)
-            ->where('is_active', true)
-            ->orderBy('name')
-            ->get();
-
-        $cashMovements = $cashAccounts->map(function (Account $account) use ($journalQuery): array {
-            $total = (clone $journalQuery)
-                ->where('journal_lines.account_id', $account->id)
-                ->sum(DB::raw('journal_lines.debit - journal_lines.credit'));
-
-            return [
-                'account' => $account,
-                'total' => (float) $total,
-            ];
-        });
-
-        $netChange = (float) $cashMovements->sum('total');
-
-        $locations = $canViewAll
-            ? Location::active()->orderBy('name')->get()
-            : Location::active()->whereIn('id', $allowedLocationIds)->orderBy('name')->get();
+        $reportData = $this->reportService->buildCashFlowReport($data, $canViewAll, $locationId);
+        $locations = $this->reportService->locations($canViewAll, $allowedLocationIds);
 
         return view('reports.cash-flow', [
-            'cashMovements' => $cashMovements,
-            'netChange' => $netChange,
+            'cashMovements' => $reportData['cashMovements'],
+            'netChange' => $reportData['netChange'],
             'locations' => $locations,
             'filters' => $data,
             'canViewAll' => $canViewAll,
@@ -563,69 +503,5 @@ class ReportController extends Controller
     private function canViewAllLocations(?User $user): bool
     {
         return $user?->hasRole('Owner') ?? false;
-    }
-
-    private function resolveLocationId(array $data, array $allowedLocationIds, bool $canViewAll): ?int
-    {
-        if ($canViewAll && ($data['all_locations'] ?? false)) {
-            return null;
-        }
-
-        if (! empty($data['location_id'])) {
-            $requested = (int) $data['location_id'];
-            if ($allowedLocationIds === [] || in_array($requested, $allowedLocationIds, true)) {
-                return $requested;
-            }
-        }
-
-        $activeLocationId = ActiveLocation::id();
-        if ($activeLocationId && ($allowedLocationIds === [] || in_array($activeLocationId, $allowedLocationIds, true))) {
-            return $activeLocationId;
-        }
-
-        return $allowedLocationIds[0] ?? null;
-    }
-
-    private function getPaymentMethods(bool $canViewAll, ?int $locationId): Collection
-    {
-        $query = $canViewAll
-            ? SalePayment::withoutGlobalScope('active_location')
-            : SalePayment::query();
-
-        $query->join('sales', 'sales.id', '=', 'sale_payments.sale_id');
-
-        if ($locationId) {
-            $query->where('sales.location_id', $locationId);
-        }
-
-        return $query
-            ->select('sale_payments.method')
-            ->distinct()
-            ->orderBy('sale_payments.method')
-            ->pluck('method');
-    }
-
-    private function buildJournalLineQuery(bool $canViewAll, ?int $locationId, ?string $startDate, ?string $endDate)
-    {
-        $query = DB::table('journal_lines')
-            ->join('journals', 'journals.id', '=', 'journal_lines.journal_id');
-
-        if (! $canViewAll && ! $locationId) {
-            $query->where('journals.location_id', ActiveLocation::id());
-        }
-
-        if ($locationId) {
-            $query->where('journals.location_id', $locationId);
-        }
-
-        if ($startDate) {
-            $query->whereDate('journals.posted_at', '>=', $startDate);
-        }
-
-        if ($endDate) {
-            $query->whereDate('journals.posted_at', '<=', $endDate);
-        }
-
-        return $query;
     }
 }

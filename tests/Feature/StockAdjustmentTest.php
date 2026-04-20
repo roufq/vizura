@@ -48,6 +48,31 @@ class StockAdjustmentTest extends TestCase
         $this->assertNotNull(AuditLog::query()->where('action', 'stock_adjustment_approved')->first());
     }
 
+    public function test_bulk_stock_adjustment_store(): void
+    {
+        $user = $this->makeOwner();
+        $p1 = $this->makeProduct();
+        $p2 = $this->makeProduct();
+
+        $response = $this
+            ->actingAs($user)
+            ->withSession(['active_location_id' => $user->active_location_id])
+            ->post(route('stock-adjustments.store'), [
+                'reason' => 'Bulk adjustment test',
+                'items' => [
+                    ['product_id' => $p1->id, 'quantity_delta' => 10],
+                    ['product_id' => $p2->id, 'quantity_delta' => -5],
+                ],
+            ]);
+
+        $response->assertRedirect(route('stock-adjustments.index'));
+        $this->assertEquals(2, StockAdjustment::where('reason', 'Bulk adjustment test')->count());
+
+        $adj = StockAdjustment::where('product_id', $p1->id)->first();
+        $this->assertNotNull($adj->reference_no);
+        $this->assertEquals(10, $adj->quantity_delta);
+    }
+
     private function makeOwner(): User
     {
         Role::firstOrCreate(['name' => 'Owner']);

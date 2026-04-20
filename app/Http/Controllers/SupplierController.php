@@ -17,11 +17,22 @@ class SupplierController extends Controller
 
     public function index(): View
     {
-        $suppliers = Supplier::query()
-            ->orderBy('name')
-            ->paginate(10);
+        $search = trim(request()->string('search')->toString());
 
-        return view('suppliers.index', compact('suppliers'));
+        $suppliers = Supplier::query()
+            ->when($search !== '', function ($query) use ($search): void {
+                $query->where(function ($builder) use ($search): void {
+                    $builder
+                        ->where('name', 'like', '%'.$search.'%')
+                        ->orWhere('phone', 'like', '%'.$search.'%')
+                        ->orWhere('email', 'like', '%'.$search.'%');
+                });
+            })
+            ->orderBy('name')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('suppliers.index', compact('suppliers', 'search'));
     }
 
     public function create(): View

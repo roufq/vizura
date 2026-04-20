@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>{{ config('app.name', 'Laravel') }} - Register</title>
+    <title>{{ config('app.name', 'Vizura') }} - Daftar</title>
     <link rel="stylesheet" href="{{ asset('assets/styles/style.min.css') }}">
 
     <!-- Waves Effect -->
@@ -19,8 +19,8 @@
     <form method="POST" action="{{ route('register') }}" class="frm-single">
         @csrf
         <div class="inside">
-            <div class="title"><strong>Ninja</strong>Admin</div>
-            <div class="frm-title">Register</div>
+            <div class="title">{{ config('app.name', 'Vizura') }}</div>
+            <div class="frm-title">Daftar</div>
 
             <div class="frm-input">
                 <input type="email" name="email" placeholder="Email" class="frm-inp" value="{{ old('email') }}" required autocomplete="username">
@@ -57,18 +57,18 @@
             <div class="clearfix margin-bottom-20">
                 <div class="checkbox primary">
                     <input type="checkbox" id="accept">
-                    <label for="accept">I accept Terms and Conditions</label>
+                    <label for="accept">Saya menyetujui Syarat & Ketentuan</label>
                 </div>
             </div>
 
             <button type="submit" class="frm-submit">
-                Register <i class="fa fa-arrow-circle-right"></i>
+                Daftar <i class="fa fa-arrow-circle-right"></i>
             </button>
 
             <a href="{{ route('login') }}" class="a-link">
-                <i class="fa fa-sign-in"></i>Already have account? Login.
+                <i class="fa fa-sign-in"></i>Sudah punya akun? Masuk.
             </a>
-            <div class="frm-footer">NinjaAdmin Ac 2016.</div>
+            <div class="frm-footer">{{ config('app.name', 'Vizura') }}.</div>
         </div>
     </form>
 </div>
