@@ -32,7 +32,7 @@
                         @method('DELETE')
                         <button type="submit" onclick="return confirm('{{ __('adjustment.delete_confirm') }}')" 
                                 class="px-6 py-2.5 bg-white text-slate-400 border border-slate-100 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-rose-50 hover:text-rose-600 hover:border-rose-100 transition-all">
-                            <i class="fa fa-trash mr-2"></i>{{ __('adjustment.batal') }}
+                            <i class="fa fa-trash mr-2"></i>{{ __('adjustment.cancel') }}
                         </button>
                     </form>
                 @endif
@@ -87,7 +87,7 @@
                                             <span class="text-3xl font-black {{ $delta > 0 ? 'text-emerald-600' : 'text-rose-600' }}">
                                                 {{ $delta > 0 ? '+' : '' }}{{ number_format($delta, 0, ',', '.') }}
                                             </span>
-                                            <p class="text-[9px] font-black uppercase text-slate-400 tracking-widest mt-1">{{ $delta > 0 ? 'Penambahan Stok' : 'Pengurangan Stok' }}</p>
+                                            <p class="text-[9px] font-black uppercase text-slate-400 tracking-widest mt-1">{{ $delta > 0 ? __('adjustment.stock_addition') : __('adjustment.stock_subtraction') }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -100,7 +100,7 @@
                                 <div class="p-6 bg-slate-50 rounded-2xl border border-slate-100 relative min-h-[140px]">
                                     <i class="fa fa-quote-left absolute top-4 left-4 text-slate-200"></i>
                                     <p class="text-sm font-medium text-slate-500 leading-relaxed italic pl-4">
-                                        "{{ $stockAdjustment->reason ?: 'Tidak ada alasan yang diberikan' }}"
+                                        "{{ $stockAdjustment->reason ?: __('adjustment.no_reason') }}"
                                     </p>
                                 </div>
                             </div>
@@ -130,7 +130,7 @@
                         {{-- Requested By --}}
                         <div class="relative pl-6 border-l-2 border-slate-50">
                             <div class="absolute -left-[5px] top-0 w-2 h-2 rounded-full bg-slate-300"></div>
-                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">PENGASUAN (REQUESTED)</label>
+                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">{{ __('adjustment.requested_label') }}</label>
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 text-xs">
                                     <i class="fa fa-user"></i>
@@ -146,7 +146,7 @@
                         @if($stockAdjustment->approved_at)
                             <div class="relative pl-6 border-l-2 border-emerald-50">
                                 <div class="absolute -left-[5px] top-0 w-2 h-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/40"></div>
-                                <label class="text-[9px] font-black text-emerald-500 uppercase tracking-widest block mb-2">PERSETUJUAN (APPROVED)</label>
+                                <label class="text-[9px] font-black text-emerald-500 uppercase tracking-widest block mb-2">{{ __('adjustment.approved_label') }}</label>
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500 text-xs shadow-sm">
                                         <i class="fa fa-check-circle"></i>
@@ -160,25 +160,25 @@
                         @else
                              <div class="relative pl-6 border-l-2 border-amber-50">
                                 <div class="absolute -left-[5px] top-0 w-2 h-2 rounded-full bg-amber-400"></div>
-                                <label class="text-[9px] font-black text-amber-500 uppercase tracking-widest block mb-2">STATUS</label>
+                                <label class="text-[9px] font-black text-amber-500 uppercase tracking-widest block mb-2">{{ __('adjustment.status_label') }}</label>
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center text-amber-500 text-xs">
                                         <i class="fa fa-clock-o"></i>
                                     </div>
-                                    <p class="text-xs font-black text-amber-600 uppercase tracking-widest">Menunggu Persetujuan</p>
+                                    <p class="text-xs font-black text-amber-600 uppercase tracking-widest">{{ __('adjustment.waiting_approval') }}</p>
                                 </div>
                             </div>
                         @endif
 
                         <div class="pt-4 border-t border-slate-50 flex flex-col gap-3">
                             <div class="flex items-center justify-between">
-                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">WAKTU TUNGGU</span>
+                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">{{ __('adjustment.wait_time') }}</span>
                                 <span class="text-[10px] font-bold text-slate-600">
                                     {{ $stockAdjustment->created_at->diffForHumans($stockAdjustment->approved_at ?: now(), true) }}
                                 </span>
                             </div>
                             <div class="flex items-center justify-between">
-                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">ID TRANSAKSI</span>
+                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">{{ __('adjustment.transaction_id') }}</span>
                                 <span class="text-[10px] font-black text-slate-800 bg-slate-50 px-2 py-0.5 rounded tracking-tighter">{{ $stockAdjustment->id }}</span>
                             </div>
                         </div>
@@ -192,16 +192,16 @@
                             <div class="w-10 h-10 rounded-xl bg-brand text-white flex items-center justify-center shadow-lg shadow-brand/20">
                                 <i class="fa fa-bolt"></i>
                             </div>
-                            <h4 class="text-sm font-black text-slate-800 tracking-tight">Butuh Persetujuan</h4>
+                            <h4 class="text-sm font-black text-slate-800 tracking-tight">{{ __('adjustment.needs_approval_title') }}</h4>
                         </div>
                         <p class="text-xs text-slate-500 leading-relaxed">
-                            Data koreksi ini harus diverifikasi oleh Owner atau Manager sebelum stok barang diperbarui secara resmi di sistem.
+                            {{ __('adjustment.needs_approval_desc') }}
                         </p>
                         <form method="POST" action="{{ route('stock-adjustments.approve', $stockAdjustment) }}">
                             @csrf
                             <button type="submit" onclick="return confirm('{{ __('adjustment.approve_confirm') }}')" 
                                     class="w-full py-3 bg-brand text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-brand/30 hover:bg-brand-dark transition-all">
-                                Update Stok Sekarang
+                                {{ __('adjustment.update_stock_now') }}
                             </button>
                         </form>
                     </div>

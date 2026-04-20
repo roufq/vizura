@@ -26,8 +26,8 @@ class DashboardService
 
         $isOwner = $user?->hasRole('Owner') ?? false;
         $isManager = $user?->hasRole('Manager') ?? false;
-        $isKepalaToko = $user?->hasRole('KepalaToko') ?? false;
-        $isKasir = $user?->hasRole('Kasir') ?? false;
+        $isHeadStore = $user?->hasRole('HeadStore') ?? false;
+        $isCashier = $user?->hasRole('Cashier') ?? false;
         $canCrossLocation = $isOwner;
 
         $salesQuery = $this->buildSalesQuery($canCrossLocation, $allowedLocationIds, $locationId, $canViewAll);
@@ -45,7 +45,7 @@ class DashboardService
 
         $cashierSalesToday = null;
         $cashierTransactionsToday = null;
-        if ($isKasir && $user) {
+        if ($isCashier && $user) {
             $cashierQuery = (clone $salesQuery)->where('cashier_id', $user->id);
             $cashierSalesToday = (clone $cashierQuery)
                 ->whereDate(DB::raw('COALESCE(posted_at, created_at)'), $today)
@@ -100,13 +100,13 @@ class DashboardService
             $pendingAdjustments = $this->countPendingAdjustments($locationId, $allowedLocationIds, $canViewAll);
         }
 
-        if ($isKepalaToko) {
+        if ($isHeadStore) {
             $pendingTransfersIn = $this->countPendingTransfersByDirection($locationId, 'in');
             $pendingTransfersOut = $this->countPendingTransfersByDirection($locationId, 'out');
         }
 
         $draftSales = [];
-        if ($isKasir && $user) {
+        if ($isCashier && $user) {
             $draftSales = Sale::query()
                 ->where('status', 'draft')
                 ->where('type', 'sale')
@@ -129,8 +129,8 @@ class DashboardService
         return compact(
             'isOwner',
             'isManager',
-            'isKepalaToko',
-            'isKasir',
+            'isHeadStore',
+            'isCashier',
             'locationId',
             'locationName',
             'filters',
@@ -430,6 +430,6 @@ class DashboardService
             return $location?->name ?? '-';
         }
 
-        return $canViewAll ? 'Semua Lokasi' : '-';
+        return $canViewAll ? 'All Locations' : '-';
     }
 }

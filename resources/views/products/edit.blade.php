@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Produk: '.$product->name)
-@section('page-title', 'Produk')
+@section('title', __('product.edit_title') . ': ' . $product->name)
+@section('page-title', __('product.page_title'))
 
 @section('content')
     <div class="max-w-4xl mx-auto">
-        <x-ui.card icon="pencil" title="Perbarui Data Produk">
+        <x-ui.card icon="pencil" title="{{ __('product.edit_title') }}">
             <x-slot name="actions">
-                <a href="{{ route('products.index') }}" class="text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors">Batal</a>
+                <a href="{{ route('products.index') }}" class="text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors">{{ __('product.cancel') }}</a>
             </x-slot>
 
             <form method="POST" action="{{ route('products.update', $product) }}" class="space-y-8">
@@ -29,7 +29,7 @@
                         @error('barcode') <p class="text-[10px] text-rose-500 font-bold mt-1 ml-1">{{ $message }}</p> @enderror
                     </div>
                     <div class="md:col-span-2 space-y-2">
-                        <label for="name" class="text-xs font-black uppercase tracking-wider text-slate-400 ml-1">Nama Produk</label>
+                        <label for="name" class="text-xs font-black uppercase tracking-wider text-slate-400 ml-1">{{ __('product.product_name') }}</label>
                         <input type="text" id="name" name="name" value="{{ old('name', $product->name) }}" 
                                class="w-full bg-slate-50 border-transparent rounded-2xl px-6 py-4 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-brand/20 transition-all" required>
                         @error('name') <p class="text-[10px] text-rose-500 font-bold mt-1 ml-1">{{ $message }}</p> @enderror
@@ -39,9 +39,9 @@
                 <!-- Section: Klasifikasi -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pb-8 border-b border-slate-50">
                     <div class="space-y-2">
-                        <label for="category_id" class="text-xs font-black uppercase tracking-wider text-slate-400 ml-1">Kategori</label>
+                        <label for="category_id" class="text-xs font-black uppercase tracking-wider text-slate-400 ml-1">{{ __('product.category_label') }}</label>
                         <select id="category_id" name="category_id" class="w-full bg-slate-50 border-transparent rounded-2xl px-6 py-4 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-brand/20 transition-all cursor-pointer">
-                            <option value="">Pilih Kategori...</option>
+                            <option value="">{{ __('product.select_category') }}</option>
                             @foreach ($categories as $category)
                                 <option value="{{ $category->id }}" {{ (int) old('category_id', $product->category_id) === $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                             @endforeach
@@ -49,7 +49,7 @@
                         @error('category_id') <p class="text-[10px] text-rose-500 font-bold mt-1 ml-1">{{ $message }}</p> @enderror
                     </div>
                     <div class="space-y-2">
-                        <label for="unit_id" class="text-xs font-black uppercase tracking-wider text-slate-400 ml-1">Satuan Dasar</label>
+                        <label for="unit_id" class="text-xs font-black uppercase tracking-wider text-slate-400 ml-1">{{ __('product.unit_label') }}</label>
                         <select id="unit_id" name="unit_id" class="w-full bg-slate-50 border-transparent rounded-2xl px-6 py-4 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-brand/20 transition-all cursor-pointer" required>
                             @foreach ($units as $unit)
                                 <option value="{{ $unit->id }}" {{ (int) old('unit_id', $product->unit_id) === $unit->id ? 'selected' : '' }}>
@@ -64,7 +64,7 @@
                 <!-- Section: Harga -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pb-8 border-b border-slate-50">
                     <div class="space-y-2">
-                        <label for="sale_price" class="text-xs font-black uppercase tracking-wider text-slate-400 ml-1">Harga Jual (Rp)</label>
+                        <label for="sale_price" class="text-xs font-black uppercase tracking-wider text-slate-400 ml-1">{{ __('product.sale_price_label') }} (Rp)</label>
                         <div class="relative">
                             <span class="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">Rp</span>
                             <input type="number" id="sale_price" name="sale_price" value="{{ old('sale_price', $product->sale_price) }}" min="0" step="0.01" 
@@ -73,7 +73,7 @@
                         @error('sale_price') <p class="text-[10px] text-rose-500 font-bold mt-1 ml-1">{{ $message }}</p> @enderror
                     </div>
                     <div class="space-y-2">
-                        <label for="cost_price" class="text-xs font-black uppercase tracking-wider text-slate-400 ml-1">HPP / Modal (Rp)</label>
+                        <label for="cost_price" class="text-xs font-black uppercase tracking-wider text-slate-400 ml-1">{{ __('product.cost_price_label') }} (Rp)</label>
                         <div class="relative">
                             <span class="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">Rp</span>
                             <input type="number" id="cost_price" name="cost_price" value="{{ old('cost_price', $product->cost_price) }}" min="0" step="0.01" 
@@ -88,28 +88,28 @@
                     <label class="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl cursor-pointer hover:bg-emerald-50 transition-colors {{ old('is_taxable', $product->is_taxable) ? 'ring-1 ring-emerald-200 bg-emerald-50' : '' }}">
                         <input type="checkbox" name="is_taxable" value="1" {{ old('is_taxable', $product->is_taxable) ? 'checked' : '' }} class="w-5 h-5 rounded border-slate-300 text-brand focus:ring-brand">
                         <div>
-                            <p class="text-xs font-bold text-slate-800">Kena PPN</p>
+                            <p class="text-xs font-bold text-slate-800">{{ __('product.is_taxable') }}</p>
                         </div>
                     </label>
 
                     <label class="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl cursor-pointer hover:bg-amber-50 transition-colors {{ old('block_when_out_of_stock', $product->block_when_out_of_stock) ? 'ring-1 ring-amber-200 bg-amber-50' : '' }}">
                         <input type="checkbox" name="block_when_out_of_stock" value="1" {{ old('block_when_out_of_stock', $product->block_when_out_of_stock) ? 'checked' : '' }} class="w-5 h-5 rounded border-slate-300 text-amber-500 focus:ring-amber-500">
                         <div>
-                            <p class="text-xs font-bold text-slate-800">Blokir Stok Nol</p>
+                            <p class="text-xs font-bold text-slate-800">{{ __('product.block_out_of_stock') }}</p>
                         </div>
                     </label>
 
                     <label class="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl cursor-pointer hover:bg-brand/5 transition-colors {{ old('is_active', $product->is_active) ? 'ring-1 ring-brand/20 bg-brand/5' : '' }}">
                         <input type="checkbox" name="is_active" value="1" {{ old('is_active', $product->is_active) ? 'checked' : '' }} class="w-5 h-5 rounded border-slate-300 text-brand focus:ring-brand">
                         <div>
-                            <p class="text-xs font-bold text-slate-800">Produk Aktif</p>
+                            <p class="text-xs font-bold text-slate-800">{{ __('product.is_active_label') }}</p>
                         </div>
                     </label>
                 </div>
 
                 <div class="pt-8 flex justify-end gap-3">
                     <button type="submit" class="bg-brand text-white px-10 py-4 rounded-2xl font-bold text-sm shadow-xl shadow-brand/20 hover:bg-brand-dark transition-all active:scale-[0.98]">
-                        Simpan Perubahan
+                        {{ __('product.save_product') }}
                     </button>
                 </div>
             </form>

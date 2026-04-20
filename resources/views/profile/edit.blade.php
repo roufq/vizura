@@ -16,7 +16,7 @@
                 
                 <div class="mt-8 pt-8 border-t border-slate-50 space-y-3">
                     <div class="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-400">
-                        <span>Role</span>
+                        <span>{{ __('profile.role') }}</span>
                         <span class="text-brand">{{ $user->roles->pluck('name')->first() ?: '-' }}</span>
                     </div>
                     <div class="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-400">

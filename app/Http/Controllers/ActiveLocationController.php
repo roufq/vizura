@@ -49,6 +49,6 @@ class ActiveLocationController extends Controller
 
         return redirect()
             ->route('dashboard')
-            ->with('status', 'Lokasi aktif diperbarui.');
+            ->with('status', 'Active location updated.');
     }
 }

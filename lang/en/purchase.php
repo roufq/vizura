@@ -46,5 +46,4 @@ return [
     'total_billing' => 'Total Billing',
     'stock_impact_title' => 'Stock Impact',
     'stock_impact_desc' => 'Saving this purchase will automatically increase stock in the warehouse.',
-    'batal' => 'Cancel',
 ];

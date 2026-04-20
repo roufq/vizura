@@ -5,7 +5,7 @@
 
 @section('content')
     <div class="max-w-2xl">
-        <x-ui.card icon="plus" title="Buat Kategori Baru">
+        <x-ui.card icon="plus" title="{{ __('category.create_title') }}">
             <x-slot name="actions">
                 <a href="{{ route('categories.index') }}" class="text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors">{{ __('category.batal') }}</a>
             </x-slot>

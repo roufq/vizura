@@ -92,7 +92,7 @@
             <div class="px-4">
                 <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
                 <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
-                <div class="mt-1 text-xs text-gray-500">{{ Auth::user()->activeLocation?->name ?? 'Lokasi belum dipilih' }}</div>
+                <div class="mt-1 text-xs text-gray-500">{{ Auth::user()->activeLocation?->name ?? __('nav.no_location_selected') }}</div>
             </div>
 
             <div class="mt-3 space-y-1">

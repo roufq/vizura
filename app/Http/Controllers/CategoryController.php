@@ -12,7 +12,7 @@ class CategoryController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('role:Owner|Manager|KepalaToko');
+        $this->middleware('role:Owner|Manager|HeadStore');
     }
 
     public function index(): View
@@ -44,7 +44,7 @@ class CategoryController extends Controller
 
         return redirect()
             ->route('categories.index')
-            ->with('status', 'Kategori berhasil dibuat.');
+            ->with('status', 'Category created successfully.');
     }
 
     public function edit(Category $category): View
@@ -61,7 +61,7 @@ class CategoryController extends Controller
 
         return redirect()
             ->route('categories.index')
-            ->with('status', 'Kategori berhasil diperbarui.');
+            ->with('status', 'Category updated successfully.');
     }
 
     public function destroy(Category $category): RedirectResponse
@@ -70,6 +70,6 @@ class CategoryController extends Controller
 
         return redirect()
             ->route('categories.index')
-            ->with('status', 'Kategori berhasil dihapus.');
+            ->with('status', 'Category deleted successfully.');
     }
 }

@@ -1,16 +1,16 @@
 @extends('layouts.app')
 
-@section('title', 'Kartu Stok')
-@section('page-title', 'Kartu Stok')
+@section('title', __('report.stock_card'))
+@section('page-title', __('report.stock_card'))
 
 @section('content')
     <div class="space-y-8">
         <!-- Filter Card -->
-        <x-ui.card icon="filter" title="Filter Pencarian Stok">
+        <x-ui.card icon="filter" title="{{ __('report.filter_stock_search') }}">
             @if ($products->isEmpty())
                 <div class="p-4 bg-amber-50 border border-amber-100 rounded-2xl text-amber-700 text-sm font-semibold flex items-center gap-3">
                     <i class="fa fa-exclamation-triangle"></i>
-                    Belum ada produk untuk ditampilkan.
+                    {{ __('report.no_products_title') }}
                 </div>
             @else
                 <form method="GET" action="{{ route('reports.stock-card') }}" class="space-y-6">
@@ -59,12 +59,12 @@
                             <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1 italic">{{ __('report.period') }}</label>
                             <div class="flex items-center gap-4 bg-slate-50 rounded-2xl px-6 py-1 border border-slate-100 shadow-inner group focus-within:ring-4 focus-within:ring-brand/10 transition-all">
                                 <div class="flex-1 flex flex-col pt-2 pb-1">
-                                    <span class="text-[8px] font-black uppercase text-slate-300 mb-0.5 tracking-tighter">Mulai</span>
+                                    <span class="text-[8px] font-black uppercase text-slate-300 mb-0.5 tracking-tighter">{{ __('report.start') }}</span>
                                     <input type="date" name="start_date" value="{{ $filters['start_date'] ?? '' }}" class="bg-transparent border-none p-0 text-xs font-black text-slate-600 focus:ring-0">
                                 </div>
                                 <div class="h-8 w-px bg-slate-200"></div>
                                 <div class="flex-1 flex flex-col pt-2 pb-1">
-                                    <span class="text-[8px] font-black uppercase text-slate-300 mb-0.5 tracking-tighter">Selesai</span>
+                                    <span class="text-[8px] font-black uppercase text-slate-300 mb-0.5 tracking-tighter">{{ __('report.end') }}</span>
                                     <input type="date" name="end_date" value="{{ $filters['end_date'] ?? '' }}" class="bg-transparent border-none p-0 text-xs font-black text-slate-600 focus:ring-0">
                                 </div>
                             </div>
@@ -84,7 +84,7 @@
         @if ($product)
             <!-- Info Card -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <x-ui.card icon="cube" title="Produk Terpilih">
+                <x-ui.card icon="cube" title="{{ __('report.selected_product') }}">
                     <div class="mt-2 flex items-center gap-4">
                         <div class="w-12 h-12 rounded-2xl bg-brand/5 flex items-center justify-center text-brand">
                             <i class="fa fa-barcode text-xl"></i>
@@ -96,28 +96,28 @@
                     </div>
                 </x-ui.card>
 
-                <x-ui.card icon="map-marker" title="Lokasi">
+                <x-ui.card icon="map-marker" title="{{ __('report.location_title') }}">
                     <div class="mt-2 flex items-center gap-4">
                         <div class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400">
                             <i class="fa fa-building text-xl"></i>
                         </div>
                         <div>
                             <h3 class="text-lg font-black text-slate-800 tracking-tight leading-none">
-                                {{ $locationId ? ($locations->firstWhere('id', $locationId)?->name ?? 'Lokasi Aktif') : 'Seluruh Lokasi' }}
+                                {{ $locationId ? ($locations->firstWhere('id', $locationId)?->name ?? __('report.active_location')) : __('report.all_locations') }}
                             </h3>
                             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Inventory Point</p>
                         </div>
                     </div>
                 </x-ui.card>
 
-                <x-ui.card icon="calendar" title="Periode Laporan">
+                <x-ui.card icon="calendar" title="{{ __('report.report_period') }}">
                     <div class="mt-2 flex items-center gap-4">
                         <div class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400">
                             <i class="fa fa-clock-o text-xl"></i>
                         </div>
                         <div>
                             <p class="text-sm font-black text-slate-700 leading-none">
-                                {{ $filters['start_date'] ?? 'Awal' }} <span class="text-slate-300 mx-1">&rarr;</span> {{ $filters['end_date'] ?? 'Sekarang' }}
+                                {{ $filters['start_date'] ?? __('report.start') }} <span class="text-slate-300 mx-1">&rarr;</span> {{ $filters['end_date'] ?? __('report.end') }}
                             </p>
                             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Timeline History</p>
                         </div>
@@ -126,17 +126,17 @@
             </div>
 
             <!-- Table Card -->
-            <x-ui.card icon="history" title="Riwayat Mutasi Stok">
+            <x-ui.card icon="history" title="{{ __('report.stock_mutation_history') }}">
                 <div class="overflow-x-auto -mx-8">
                     <table class="w-full text-left">
                         <thead>
                             <tr class="bg-brand/[0.02] border-y border-slate-100">
-                                <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Waktu Transaksi</th>
-                                <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Tipe Aktivitas</th>
-                                <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Referensi / No. Dok</th>
-                                <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none text-center">Masuk</th>
-                                <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none text-center">Keluar</th>
-                                <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none text-right">Saldo Akhir</th>
+                                <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">{{ __('report.transaction_time') }}</th>
+                                <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">{{ __('report.activity_type') }}</th>
+                                <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">{{ __('report.reference_doc') }}</th>
+                                <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none text-center">{{ __('report.in') }}</th>
+                                <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none text-center">{{ __('report.out') }}</th>
+                                <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none text-right">{{ __('report.final_balance') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-50">
@@ -187,7 +187,7 @@
                                     <td colspan="6" class="px-8 py-24 text-center">
                                         <div class="flex flex-col items-center justify-center opacity-20">
                                             <div class="w-16 h-16 mb-4 border-4 border-slate-300 rounded-2xl flex items-center justify-center text-3xl">⏳</div>
-                                            <p class="text-slate-500 font-bold text-sm">Belum ada riwayat pergerakan stok.</p>
+                                            <p class="text-slate-500 font-bold text-sm">{{ __('report.no_mutation_history') }}</p>
                                         </div>
                                     </td>
                                 </tr>

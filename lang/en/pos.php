@@ -49,4 +49,8 @@ return [
     'tax_none' => 'None',
     'tax_inc' => 'Inc 11%',
     'tax_exc' => 'Exc 11%',
+    'select_or_add_customer' => 'Select or Add Customer',
+    'customer_info_hint' => 'Type a new name to automatically add a new customer when the transaction is posted.',
+    'add_payment_method' => '+ Add Method',
+    'product_not_found' => 'Barcode/Product not found.',
 ];

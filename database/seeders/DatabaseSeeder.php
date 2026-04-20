@@ -21,8 +21,8 @@ class DatabaseSeeder extends Seeder
         $location = Location::updateOrCreate(
             ['code' => 'HQ'],
             [
-                'name' => 'Kantor Pusat',
-                'address' => 'Jalan Contoh No. 1',
+                'name' => 'Main Headquarters',
+                'address' => 'Sample Street No. 1',
                 'phone' => '021000000',
                 'is_active' => true,
                 'toko_pusat' => true,
@@ -32,7 +32,7 @@ class DatabaseSeeder extends Seeder
         $user = User::updateOrCreate(
             ['email' => 'test@example.com'],
             [
-                'name' => 'Test User',
+                'name' => 'Test Owner',
                 'password' => bcrypt('password'),
                 'active_location_id' => $location->id,
             ]
@@ -58,29 +58,29 @@ class DatabaseSeeder extends Seeder
         $manager->locations()->sync([$location->id]);
 
         $headStore = User::updateOrCreate(
-            ['email' => 'kepalatoko@example.com'],
+            ['email' => 'headstore@example.com'],
             [
-                'name' => 'Kepala Toko',
+                'name' => 'Head Store',
                 'password' => bcrypt('password'),
                 'active_location_id' => $location->id,
             ]
         );
 
-        if (! $headStore->hasRole('KepalaToko')) {
-            $headStore->assignRole('KepalaToko');
+        if (! $headStore->hasRole('HeadStore')) {
+            $headStore->assignRole('HeadStore');
         }
 
         $cashier = User::updateOrCreate(
-            ['email' => 'kasir@example.com'],
+            ['email' => 'cashier@example.com'],
             [
-                'name' => 'Kasir User',
+                'name' => 'Cashier User',
                 'password' => bcrypt('password'),
                 'active_location_id' => $location->id,
             ]
         );
 
-        if (! $cashier->hasRole('Kasir')) {
-            $cashier->assignRole('Kasir');
+        if (! $cashier->hasRole('Cashier')) {
+            $cashier->assignRole('Cashier');
         }
 
         $this->call([

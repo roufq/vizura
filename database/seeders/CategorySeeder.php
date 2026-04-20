@@ -13,20 +13,20 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         $categories = [
-            'Makanan',
-            'Minuman',
-            'Bahan Pokok',
+            'Food',
+            'Beverages',
+            'Essential Goods',
             'Snack',
-            'Sembako',
+            'Groceries',
             'Frozen Food',
-            'Bumbu Dapur',
-            'Kebersihan',
-            'Perawatan',
-            'ATK',
-            'Perlengkapan Bayi',
-            'Kesehatan',
-            'Roti dan Kue',
-            'Produk Segar',
+            'Kitchen Spices',
+            'Cleaning Supplies',
+            'Personal Care',
+            'Stationery',
+            'Baby Care',
+            'Health Care',
+            'Bakery',
+            'Fresh Products',
         ];
 
         foreach ($categories as $name) {

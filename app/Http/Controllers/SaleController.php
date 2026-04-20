@@ -25,7 +25,7 @@ class SaleController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('role:Owner|Manager|KepalaToko|Kasir');
+        $this->middleware('role:Owner|Manager|HeadStore|Cashier');
     }
 
     public function index(): View
@@ -52,7 +52,7 @@ class SaleController extends Controller
         if (! $draft) {
             return redirect()
                 ->route('sales.index')
-                ->withErrors(['draft' => 'Draft tidak ditemukan atau tidak bisa diakses.']);
+                ->withErrors(['draft' => 'Draft not found or inaccessible.']);
         }
 
         return $this->renderCreateView($draft);
@@ -65,7 +65,7 @@ class SaleController extends Controller
         if (! $draft) {
             return redirect()
                 ->route('sales.create')
-                ->withErrors(['draft' => 'Draft tidak ditemukan atau tidak bisa diakses.']);
+                ->withErrors(['draft' => 'Draft not found or inaccessible.']);
         }
 
         DB::transaction(function () use ($draft): void {
@@ -76,7 +76,7 @@ class SaleController extends Controller
 
         return redirect()
             ->route('sales.create')
-            ->with('status', 'Draft berhasil dihapus.');
+            ->with('status', 'Draft deleted successfully.');
     }
 
     public function store(StoreSaleRequest $request): RedirectResponse
@@ -85,7 +85,7 @@ class SaleController extends Controller
         if (! $locationId) {
             return redirect()
                 ->route('sales.index')
-                ->withErrors(['location_id' => 'Lokasi aktif wajib dipilih.']);
+                ->withErrors(['location_id' => 'Active location must be selected.']);
         }
 
         $data = $request->validated();
@@ -93,14 +93,14 @@ class SaleController extends Controller
         if (($data['draft_id'] ?? null) && ! $draftSale) {
             return redirect()
                 ->route('sales.index')
-                ->withErrors(['draft' => 'Draft tidak ditemukan atau tidak bisa diakses.']);
+                ->withErrors(['draft' => 'Draft not found or inaccessible.']);
         }
         $items = $this->normalizeItems($data['items'] ?? []);
 
         if ($items === []) {
             return redirect()
                 ->route('sales.create')
-                ->withErrors(['items' => 'Item penjualan wajib diisi.'])
+                ->withErrors(['items' => 'Sale items are required.'])
                 ->withInput();
         }
 
@@ -120,7 +120,7 @@ class SaleController extends Controller
         if ($orderDiscount > $subtotal) {
             return redirect()
                 ->route('sales.create')
-                ->withErrors(['order_discount' => 'Diskon order tidak boleh melebihi subtotal.'])
+                ->withErrors(['order_discount' => 'Order discount cannot exceed subtotal.'])
                 ->withInput();
         }
 
@@ -148,7 +148,7 @@ class SaleController extends Controller
         if ($data['action'] === 'post' && $paidTotal < $total && ! $hasReceivablePayment) {
             return redirect()
                 ->route('sales.create')
-                ->withErrors(['payments' => 'Total pembayaran kurang dari total transaksi.'])
+                ->withErrors(['payments' => 'Total payment is less than the transaction total.'])
                 ->withInput();
         }
 
@@ -262,12 +262,12 @@ class SaleController extends Controller
         if ($data['action'] === 'post' && $sale) {
             return redirect()
                 ->route('sales.receipt', $sale)
-                ->with('status', $draftSale ? 'Draft berhasil diposting.' : 'Penjualan berhasil diposting.');
+                ->with('status', $draftSale ? 'Draft posted successfully.' : 'Sale posted successfully.');
         }
 
         return redirect()
             ->route('sales.index')
-            ->with('status', $draftSale ? 'Draft penjualan berhasil diperbarui.' : 'Draft penjualan berhasil disimpan.');
+            ->with('status', $draftSale ? 'Sale draft updated successfully.' : 'Sale draft saved successfully.');
     }
 
     public function void(Sale $sale, VoidSaleRequest $request): RedirectResponse
@@ -275,7 +275,7 @@ class SaleController extends Controller
         if ($sale->status !== 'posted' || $sale->type !== 'sale') {
             return redirect()
                 ->route('sales.index')
-                ->withErrors(['status' => 'Penjualan tidak dapat di-void.']);
+                ->withErrors(['status' => 'Sale cannot be voided.']);
         }
 
         DB::transaction(function () use ($sale, $request): void {
@@ -327,13 +327,13 @@ class SaleController extends Controller
                 $sale,
                 $paymentLines,
                 $cogsTotal,
-                'Void Penjualan'
+                'Sale Void'
             );
         });
 
         return redirect()
             ->route('sales.index')
-            ->with('status', 'Penjualan berhasil di-void.');
+            ->with('status', 'Sale voided successfully.');
     }
 
     public function return(Sale $sale, ReturnSaleRequest $request): RedirectResponse
@@ -341,20 +341,20 @@ class SaleController extends Controller
         if ($sale->status !== 'posted' || $sale->type !== 'sale') {
             return redirect()
                 ->route('sales.index')
-                ->withErrors(['status' => 'Penjualan tidak dapat diretur.']);
+                ->withErrors(['status' => 'Sale cannot be returned.']);
         }
 
         if (Sale::query()->where('original_sale_id', $sale->id)->exists()) {
             return redirect()
                 ->route('sales.index')
-                ->withErrors(['status' => 'Penjualan sudah diretur.']);
+                ->withErrors(['status' => 'Sale already returned.']);
         }
 
         $postedAt = $sale->posted_at ?? $sale->created_at;
         if ($postedAt && now()->diffInDays($postedAt) > 30) {
             return redirect()
                 ->route('sales.index')
-                ->withErrors(['status' => 'Masa retur sudah lewat.']);
+                ->withErrors(['status' => 'Return period has expired.']);
         }
 
         DB::transaction(function () use ($sale, $request): void {
@@ -435,13 +435,13 @@ class SaleController extends Controller
                 $returnSale,
                 $paymentLines,
                 $cogsTotal,
-                'Retur Penjualan'
+                'Sale Return'
             );
         });
 
         return redirect()
             ->route('sales.index')
-            ->with('status', 'Retur penjualan berhasil diproses.');
+            ->with('status', 'Sale return processed successfully.');
     }
 
     public function receipt(Sale $sale): View|RedirectResponse
@@ -449,7 +449,7 @@ class SaleController extends Controller
         if ($sale->status === 'draft') {
             return redirect()
                 ->route('sales.index')
-                ->withErrors(['status' => 'Struk hanya tersedia untuk transaksi yang sudah diposting.']);
+                ->withErrors(['status' => 'Receipt only available for posted transactions.']);
         }
 
         $sale->load(['items.product', 'payments', 'location', 'cashier']);
@@ -472,7 +472,7 @@ class SaleController extends Controller
 
                 if ($lineTotal < 0) {
                     throw ValidationException::withMessages([
-                        'items' => 'Diskon baris tidak boleh melebihi subtotal baris.',
+                        'items' => 'Line discount cannot exceed line subtotal.',
                     ]);
                 }
 
@@ -537,7 +537,7 @@ class SaleController extends Controller
             $product = $products[$item['product_id']] ?? null;
             if (! $product) {
                 throw ValidationException::withMessages([
-                    'items' => 'Produk tidak ditemukan.',
+                    'items' => 'Product not found.',
                 ]);
             }
 
@@ -545,7 +545,7 @@ class SaleController extends Controller
             $available = $stockItem?->quantity_on_hand ?? 0;
             if ((float) $available < (float) $item['quantity']) {
                 throw ValidationException::withMessages([
-                    'items' => 'Stok tidak cukup untuk produk '.$product->name.'.',
+                    'items' => 'Insufficient stock for product '.$product->name.'.',
                 ]);
             }
         }

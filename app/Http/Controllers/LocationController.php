@@ -16,7 +16,7 @@ class LocationController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('role:Owner|Manager|KepalaToko');
+        $this->middleware('role:Owner|Manager|HeadStore');
     }
 
     public function index(): View
@@ -63,7 +63,7 @@ class LocationController extends Controller
 
         return redirect()
             ->route('locations.index')
-            ->with('status', 'Lokasi berhasil dibuat.');
+            ->with('status', 'Location created successfully.');
     }
 
     public function edit(Location $location): View
@@ -87,7 +87,7 @@ class LocationController extends Controller
 
         return redirect()
             ->route('locations.index')
-            ->with('status', 'Lokasi berhasil diperbarui.');
+            ->with('status', 'Location updated successfully.');
     }
 
     public function destroy(Location $location): RedirectResponse
@@ -96,7 +96,7 @@ class LocationController extends Controller
 
         return redirect()
             ->route('locations.index')
-            ->with('status', 'Lokasi berhasil dihapus.');
+            ->with('status', 'Location deleted successfully.');
     }
 
     public function syncStock(Location $location): RedirectResponse
@@ -109,7 +109,7 @@ class LocationController extends Controller
         if ($productIds->isEmpty()) {
             return redirect()
                 ->route('locations.index')
-                ->with('status', 'Tidak ada produk untuk disinkronkan.');
+                ->with('status', 'No products to sync.');
         }
 
         $existingProductIds = StockItem::withoutGlobalScope('active_location')
@@ -120,7 +120,7 @@ class LocationController extends Controller
         if ($missingProductIds->isEmpty()) {
             return redirect()
                 ->route('locations.index')
-                ->with('status', 'Produk lokasi sudah sinkron.');
+                ->with('status', 'Location products are already horizontal-synced.');
         }
 
         $now = now();
@@ -138,7 +138,7 @@ class LocationController extends Controller
 
         return redirect()
             ->route('locations.index')
-            ->with('status', 'Produk berhasil disinkronkan ke lokasi.');
+            ->with('status', 'Products synced to location successfully.');
     }
 
     private function canSyncLocations(?User $user): bool
@@ -151,7 +151,7 @@ class LocationController extends Controller
             return true;
         }
 
-        if (! $user->hasRole('Manager') && ! $user->hasRole('KepalaToko')) {
+        if (! $user->hasRole('Manager') && ! $user->hasRole('HeadStore')) {
             return false;
         }
 

@@ -1,19 +1,19 @@
 @extends('layouts.app')
 
-@section('title', 'Manajemen Supplier')
-@section('page-title', 'Supplier')
+@section('title', __('supplier.index_title'))
+@section('page-title', __('supplier.page_title'))
 
 @section('content')
     <div class="space-y-8">
-        <x-ui.card icon="address-book" title="Daftar Rekanan Supplier">
+        <x-ui.card icon="address-book" title="{{ __('supplier.card_title') }}">
             <x-slot name="actions">
                 <form method="GET" action="{{ route('suppliers.index') }}" class="flex items-center gap-3">
                     <div class="relative">
-                        <input type="text" name="search" value="{{ $search }}" placeholder="Cari nama atau kontak..." 
+                        <input type="text" name="search" value="{{ $search }}" placeholder="{{ __('supplier.search_placeholder') }}" 
                                class="bg-slate-50 border-transparent rounded-xl px-5 py-2.5 text-sm focus:ring-2 focus:ring-brand/20 w-64 transition-all">
                     </div>
                     <a href="{{ route('suppliers.create') }}" class="px-6 py-2.5 bg-brand text-white rounded-xl text-xs font-bold shadow-lg shadow-brand/20 hover:bg-brand-dark transition-all">
-                        <i class="fa fa-plus mr-2"></i>Tambah Supplier
+                        <i class="fa fa-plus mr-2"></i>{{ __('supplier.add_supplier') }}
                     </a>
                 </form>
             </x-slot>
@@ -22,10 +22,10 @@
                 <table class="w-full text-left">
                     <thead>
                         <tr class="bg-slate-50 border-y border-slate-100">
-                            <th class="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Informasi Supplier</th>
-                            <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Kontak</th>
-                            <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
-                            <th class="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Aksi</th>
+                            <th class="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ __('supplier.info_header') }}</th>
+                            <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ __('supplier.contact') }}</th>
+                            <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">{{ __('supplier.status') }}</th>
+                            <th class="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">{{ __('supplier.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-50">
@@ -58,18 +58,18 @@
                                 </td>
                                 <td class="px-6 py-5 text-center">
                                     <span class="px-3 py-1 {{ $supplier->is_active ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500' }} rounded-full text-[9px] font-black uppercase">
-                                        {{ $supplier->is_active ? 'Aktif' : 'Nonaktif' }}
+                                        {{ $supplier->is_active ? __('supplier.active') : __('supplier.inactive') }}
                                     </span>
                                 </td>
                                 <td class="px-8 py-5 text-right">
                                     <div class="flex items-center justify-end gap-2">
-                                        <a href="{{ route('suppliers.edit', $supplier) }}" class="p-2.5 bg-slate-50 text-slate-500 rounded-xl hover:bg-brand/10 hover:text-brand transition-all">
+                                        <a href="{{ route('suppliers.edit', $supplier) }}" class="p-2.5 bg-slate-50 text-slate-500 rounded-xl hover:bg-brand/10 hover:text-brand transition-all" title="{{ __('app.edit') }}">
                                             <i class="fa fa-pencil"></i>
                                         </a>
-                                        <form method="POST" action="{{ route('suppliers.destroy', $supplier) }}" onsubmit="return confirm('Hapus supplier ini?')">
+                                        <form method="POST" action="{{ route('suppliers.destroy', $supplier) }}" onsubmit="return confirm('{{ __('supplier.delete_confirm') }}')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="p-2.5 bg-slate-50 text-slate-500 rounded-xl hover:bg-rose-50 hover:text-rose-600 transition-all">
+                                            <button type="submit" class="p-2.5 bg-slate-50 text-slate-500 rounded-xl hover:bg-rose-50 hover:text-rose-600 transition-all" title="{{ __('app.delete') }}">
                                                 <i class="fa fa-trash"></i>
                                             </button>
                                         </form>
@@ -79,8 +79,8 @@
                         @empty
                             <tr>
                                 <td colspan="4" class="px-8 py-24 text-center">
-                                    <p class="text-slate-400 font-bold mb-6">Belum ada supplier ditemukan.</p>
-                                    <a href="{{ route('suppliers.create') }}" class="px-8 py-3 bg-brand text-white rounded-2xl font-bold shadow-xl shadow-brand/20">Tambah Sekarang</a>
+                                    <p class="text-slate-400 font-bold mb-6">{{ __('supplier.no_data') }}</p>
+                                    <a href="{{ route('suppliers.create') }}" class="px-8 py-3 bg-brand text-white rounded-2xl font-bold shadow-xl shadow-brand/20 uppercase text-xs tracking-widest">{{ __('supplier.add_now') }}</a>
                                 </td>
                             </tr>
                         @endforelse

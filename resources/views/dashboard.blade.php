@@ -69,12 +69,12 @@
                         ['label' => __('dashboard.metrics.payable_outstanding'), 'value' => $payableTotal, 'icon' => 'credit-card', 'color' => 'bg-rose-500'],
                         ['label' => __('dashboard.metrics.transactions_today'), 'value' => $transactionsToday, 'icon' => 'list-ul', 'color' => 'bg-slate-700', 'is_qty' => true],
                     ];
-                } elseif ($isKepalaToko) {
+                } elseif ($isHeadStore) {
                     $metrics = [
                         ['label' => __('dashboard.metrics.sales_today'), 'value' => $salesToday, 'icon' => 'shopping-bag', 'color' => 'bg-brand'],
                         ['label' => __('dashboard.metrics.transactions_today'), 'value' => $transactionsToday, 'icon' => 'hashtag', 'color' => 'bg-slate-700', 'is_qty' => true],
                     ];
-                } elseif ($isKasir) {
+                } elseif ($isCashier) {
                     $metrics = [
                         ['label' => __('dashboard.metrics.my_sales_today'), 'value' => $cashierSalesToday, 'icon' => 'user', 'color' => 'bg-brand'],
                         ['label' => __('dashboard.metrics.my_transactions_today'), 'value' => $cashierTransactionsToday, 'icon' => 'check-circle', 'color' => 'bg-emerald-600', 'is_qty' => true],
@@ -115,7 +115,7 @@
                         <i class="fa fa-plus-circle text-lg"></i>
                         <span>{{ __('dashboard.new_transaction') }}</span>
                     </a>
-                    @if (! $isKasir)
+                    @if (! $isCashier)
                         <a href="{{ route('purchases.create') }}" class="flex items-center gap-3 bg-white border border-slate-200 px-6 py-4 rounded-2xl text-slate-700 font-bold hover:bg-slate-50 transition-all">
                             <i class="fa fa-shopping-basket text-emerald-500"></i>
                             <span>{{ __('dashboard.make_purchase') }}</span>
@@ -125,7 +125,7 @@
                             <span>{{ __('dashboard.stock_adjustment') }}</span>
                         </a>
                     @endif
-                    @if ($isManager || $isKepalaToko || $isOwner)
+                    @if ($isManager || $isHeadStore || $isOwner)
                         <a href="{{ route('stock-transfers.create') }}" class="flex items-center gap-3 bg-white border border-slate-200 px-6 py-4 rounded-2xl text-slate-700 font-bold hover:bg-slate-50 transition-all">
                             <i class="fa fa-truck text-indigo-500"></i>
                             <span>{{ __('dashboard.stock_transfer') }}</span>
@@ -257,7 +257,7 @@
                 </div>
             @endif
 
-             @if ($isKasir)
+             @if ($isCashier)
                 <div class="lg:col-span-12 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
                     <div class="flex items-center justify-between mb-8">
                         <div class="flex items-center gap-4">
@@ -313,7 +313,7 @@
                 data: {
                     labels: @json($labels),
                     datasets: [{
-                        label: 'Penjualan',
+                        label: 'Sales',
                         backgroundColor: 'rgba(16, 185, 129, 0.05)',
                         borderColor: '#10b981',
                         borderWidth: 4,

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Biaya Pengeluaran Operasional')
-@section('page-title', 'Biaya')
+@section('title', __('expense.index_title'))
+@section('page-title', __('app.menu.expenses'))
 
 @section('content')
     <div class="space-y-8">
@@ -11,33 +11,36 @@
 
         <!-- Quick Summary Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <x-ui.card icon="calendar-check-o" title="Total Biaya Hari Ini" class="from-rose-500/5 to-white bg-gradient-to-br">
+            <x-ui.card icon="calendar-check-o" title="{{ __('expense.summary_today') }}" class="from-rose-500/5 to-white bg-gradient-to-br">
                 <h2 class="text-2xl font-black tracking-tight text-rose-600 mt-2">Rp {{ number_format((float) $todayTotal, 0, ',', '.') }}</h2>
-                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">Total seluruh pengeluaran hari ini</p>
+                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">{{ __('expense.summary_today_desc') }}</p>
             </x-ui.card>
 
-            <x-ui.card icon="bar-chart" title="Total Biaya Bulan Ini" class="from-indigo-500/5 to-white bg-gradient-to-br">
+            <x-ui.card icon="bar-chart" title="{{ __('expense.summary_month') }}" class="from-indigo-500/5 to-white bg-gradient-to-br">
                 <h2 class="text-2xl font-black tracking-tight text-indigo-600 mt-2">Rp {{ number_format((float) $monthTotal, 0, ',', '.') }}</h2>
-                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">Akumulasi pengeluaran bulan {{ now()->format('F') }}</p>
+                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">{{ __('expense.summary_month_desc', ['month' => now()->translatedFormat('F')]) }}</p>
             </x-ui.card>
 
-            <x-ui.card icon="money" title="Total Biaya (Halaman Ini)">
+            <x-ui.card icon="money" title="{{ __('expense.summary_page') }}">
                 <h2 class="text-2xl font-black tracking-tight text-slate-800 mt-2">Rp {{ number_format((float) $pageTotalAmount, 0, ',', '.') }}</h2>
-                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">Dihitung dari {{ $expenses->count() }} baris data</p>
+                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">{{ __('expense.summary_page_desc', ['count' => $expenses->count()]) }}</p>
             </x-ui.card>
         </div>
 
-        <x-ui.card icon="list-alt" title="Log Pengeluaran Kas">
+        <x-ui.card icon="list-alt" title="{{ __('expense.log_card_title') }}">
             <x-slot name="actions">
                 <form method="GET" action="{{ route('expenses.index') }}" class="flex flex-wrap items-center justify-end gap-3">
                     <div class="flex items-center gap-2">
-                        <input type="text" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Cari..." 
+                        <input type="text" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="{{ __('expense.search_placeholder') }}" 
                                class="bg-slate-50 border-slate-100 rounded-xl px-4 py-2 text-[10px] font-black w-32 focus:ring-2 focus:ring-brand/20 transition-all uppercase">
                         
                         <div class="flex items-center gap-2 bg-slate-50 rounded-xl px-3 py-1.5 border border-slate-100">
-                            <input type="date" name="start_date" value="{{ $filters['start_date'] ?? '' }}" class="bg-transparent border-none p-0 text-[10px] font-black text-slate-600 focus:ring-0 w-24 h-4 uppercase">
-                            <span class="text-slate-300">-</span>
-                            <input type="date" name="end_date" value="{{ $filters['end_date'] ?? '' }}" class="bg-transparent border-none p-0 text-[10px] font-black text-slate-600 focus:ring-0 w-24 h-4 uppercase">
+                            <span class="text-[9px] font-black text-slate-400 uppercase whitespace-nowrap">{{ __('adjustment.period') }}:</span>
+                            <div class="flex items-center gap-2">
+                                <input type="date" name="start_date" value="{{ $filters['start_date'] ?? '' }}" class="bg-transparent border-none p-0 text-[10px] font-black text-slate-600 focus:ring-0 w-24 h-4 uppercase">
+                                <span class="text-slate-300">-</span>
+                                <input type="date" name="end_date" value="{{ $filters['end_date'] ?? '' }}" class="bg-transparent border-none p-0 text-[10px] font-black text-slate-600 focus:ring-0 w-24 h-4 uppercase">
+                            </div>
                         </div>
                     </div>
 
@@ -45,7 +48,7 @@
                         @if ($canViewAll)
                             <div class="min-w-[160px]">
                                 <select name="location_id" class="no-select2 bg-slate-50 border-slate-100 rounded-xl px-4 py-2 text-[10px] font-black text-slate-600">
-                                    <option value="">Semua Lokasi</option>
+                                    <option value="">{{ __('expense.all_locations') }}</option>
                                     @foreach ($locations as $location)
                                         <option value="{{ $location->id }}" {{ (int) ($filters['location_id'] ?? 0) === $location->id ? 'selected' : '' }}>{{ $location->name }}</option>
                                     @endforeach
@@ -54,11 +57,11 @@
                         @endif
 
                         <button type="submit" class="w-10 h-10 flex items-center justify-center bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all flex-shrink-0">
-                            <i class="fa fa-filter"></i>
+                            <i class="fa fa-filter text-xs"></i>
                         </button>
                         
                         <a href="{{ route('expenses.create') }}" class="px-6 py-2.5 bg-brand text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-brand/20 hover:bg-brand-dark transition-all flex-shrink-0">
-                            <i class="fa fa-plus-circle mr-2"></i>Biaya
+                            <i class="fa fa-plus-circle mr-2 text-[10px]"></i>{{ __('expense.page_title') }}
                         </a>
                     </div>
                 </form>
@@ -68,10 +71,10 @@
                 <table class="w-full text-left">
                     <thead>
                         <tr class="bg-slate-50 border-y border-slate-100">
-                            <th class="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Waktu & Referensi</th>
-                            <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Kategori & Akun</th>
-                            <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Nominal</th>
-                            <th class="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Petugas / Lokasi</th>
+                            <th class="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ __('expense.table_time_ref') }}</th>
+                            <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ __('expense.table_category_account') }}</th>
+                            <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">{{ __('app.amount') }}</th>
+                            <th class="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ __('expense.table_staff_location') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-50">
@@ -103,7 +106,7 @@
                         @empty
                             <tr>
                                 <td colspan="4" class="px-8 py-24 text-center">
-                                    <p class="text-slate-400 font-bold italic">Belum ada catatan pengeluaran operasional.</p>
+                                    <p class="text-slate-400 font-bold italic">{{ __('expense.no_data') }}</p>
                                 </td>
                             </tr>
                         @endforelse

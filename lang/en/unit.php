@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'index_title' => 'Product Units',
+    'page_title' => 'Units',
+    'card_title' => 'Unit Management',
+    'search_placeholder' => 'Search units...',
+    'add_unit' => 'Add Unit',
+    'name' => 'Unit Name',
+    'abbreviation' => 'Abbreviation',
+    'status' => 'Status',
+    'actions' => 'Actions',
+    'active' => 'Active',
+    'inactive' => 'Inactive',
+    'delete_confirm' => 'Delete this unit?',
+    'no_data' => 'No units found.',
+    'add_now' => 'Add Now',
+    'create_title' => 'Add New Unit',
+    'edit_title' => 'Edit Unit',
+    'unit_info' => 'Unit Information',
+    'name_label' => 'Unit Name',
+    'name_placeholder' => 'Example: Kilogram, Piece, Box...',
+    'abbr_label' => 'Abbreviation',
+    'abbr_placeholder' => 'Example: Kg, Pcs, Box...',
+    'is_active_label' => 'Active Status',
+    'save_unit' => 'Save Unit',
+    'cancel' => 'Cancel',
+];

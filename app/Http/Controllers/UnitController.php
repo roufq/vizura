@@ -12,7 +12,7 @@ class UnitController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('role:Owner|Manager|KepalaToko');
+        $this->middleware('role:Owner|Manager|HeadStore');
     }
 
     public function index(): View
@@ -48,7 +48,7 @@ class UnitController extends Controller
 
         return redirect()
             ->route('units.index')
-            ->with('status', 'Satuan berhasil dibuat.');
+            ->with('status', 'Unit created successfully.');
     }
 
     public function edit(Unit $unit): View
@@ -65,7 +65,7 @@ class UnitController extends Controller
 
         return redirect()
             ->route('units.index')
-            ->with('status', 'Satuan berhasil diperbarui.');
+            ->with('status', 'Unit updated successfully.');
     }
 
     public function destroy(Unit $unit): RedirectResponse
@@ -74,6 +74,6 @@ class UnitController extends Controller
 
         return redirect()
             ->route('units.index')
-            ->with('status', 'Satuan berhasil dihapus.');
+            ->with('status', 'Unit deleted successfully.');
     }
 }

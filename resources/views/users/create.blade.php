@@ -86,7 +86,7 @@
 
                 <div class="pt-8 border-t border-slate-50 flex items-center justify-end gap-3">
                     <a href="{{ route('users.index') }}" class="px-8 py-4 bg-slate-50 text-slate-400 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-100 transition-all">
-                        {{ __('user.batal') }}
+                        {{ __('user.cancel') }}
                     </a>
                     <button type="submit" class="px-10 py-4 bg-brand text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-brand/20 hover:bg-brand-dark transition-all">
                         {{ __('user.save_user') }}

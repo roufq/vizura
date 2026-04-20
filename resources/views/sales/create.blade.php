@@ -85,11 +85,11 @@
                     <table class="w-full text-left">
                         <thead>
                             <tr class="bg-slate-50 border-y border-slate-100">
-                                <th class="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Produk</th>
-                                <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Qty</th>
-                                <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Harga</th>
-                                <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Diskon</th>
-                                <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Subtotal</th>
+                                <th class="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ __('app.product') }}</th>
+                                <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">{{ __('pos.qty') }}</th>
+                                <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">{{ __('pos.price') }}</th>
+                                <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">{{ __('app.discount') }}</th>
+                                <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">{{ __('pos.subtotal') }}</th>
                                 <th class="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center"></th>
                             </tr>
                         </thead>
@@ -146,7 +146,7 @@
                     </div>
                     <div>
                         <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-400">{{ __('pos.customer_info') }}</h4>
-                        <p class="text-xs font-bold text-slate-700">Pilih atau Tambah Pelanggan</p>
+                        <p class="text-xs font-bold text-slate-700">{{ __('pos.select_or_add_customer') }}</p>
                     </div>
                 </div>
 
@@ -184,7 +184,7 @@
                     <div class="p-4 bg-blue-50/50 rounded-2xl border border-blue-100/50">
                         <p class="text-[10px] text-blue-600 leading-relaxed font-medium">
                             <i class="fa fa-info-circle mr-1"></i>
-                            Ketik nama baru untuk menambah pelanggan baru secara otomatis saat transaksi diposting.
+                            {{ __('pos.customer_info_hint') }}
                         </p>
                     </div>
                 </div>
@@ -236,7 +236,7 @@
                 </div>
 
                 <button type="button" id="add_payment_row" class="w-full py-3 bg-slate-50 text-slate-400 rounded-2xl border-2 border-dashed border-slate-100 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-slate-100 transition-all">
-                    + Tambah Metode
+                    {{ __('pos.add_payment_method') }}
                 </button>
 
                 <div class="space-y-3 pt-4 border-t border-slate-50">
@@ -339,7 +339,7 @@
 
                                 <div class="mt-auto pt-3 border-t border-slate-100 flex flex-col gap-3">
                                     <div class="flex flex-col min-w-0">
-                                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">Harga</span>
+                                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">{{ __('pos.price') }}</span>
                                         <span class="text-[13px] font-black text-emerald-600 leading-none truncate block">Rp {{ number_format($p->sale_price, 0, ',', '.') }}</span>
                                     </div>
 
@@ -575,8 +575,8 @@
                     .then(data => {
                         const found = data.find(item => item.barcode === kw || item.sku === kw);
                         if (!found) {
-                            if (window.swal) swal("Oops!", "Barcode/Produk tidak ditemukan.", "error");
-                            else alert('Barcode/Produk tidak ditemukan.');
+                            if (window.swal) swal("Oops!", "{{ __('pos.product_not_found') }}", "error");
+                            else alert("{{ __('pos.product_not_found') }}");
                             if (scanInput) { scanInput.value = ''; scanInput.focus(); }
                             return;
                         }
@@ -596,13 +596,13 @@
                 }
 
                 productSelect.select2({ 
-                    placeholder: 'Pilih Produk Manual...', 
+                    placeholder: '{{ __('pos.select_product') }}', 
                     width: '100%',
                     containerCssClass: 'vizura-select2-container'
                 });
 
                 $('.select2-customer').select2({
-                    placeholder: 'Ketik Nama atau Pilih Pelanggan...',
+                    placeholder: '{{ __('pos.customer_select_placeholder') }}',
                     tags: true,
                     width: '100%',
                     allowClear: true,
@@ -823,9 +823,9 @@
                         <option value="card" ${m === 'card' ? 'selected' : ''}>CARD</option>
                         <option value="transfer" ${m === 'transfer' ? 'selected' : ''}>TRF</option>
                         <option value="qris" ${m === 'qris' ? 'selected' : ''}>QRIS</option>
-                        <option value="piutang" ${m === 'piutang' ? 'selected' : ''}>PIUTANG</option>
+                        <option value="piutang" ${m === 'piutang' ? 'selected' : ''}>RECEIVABLE</option>
                     </select>
-                    <input type="number" step="0.01" class="payment-amount flex-1 bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-black text-slate-900 focus:ring-1 focus:ring-brand" name="payments[${idx}][amount]" value="${a}" placeholder="Nominal" form="pos-form">
+                    <input type="number" step="0.01" class="payment-amount flex-1 bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-black text-slate-900 focus:ring-1 focus:ring-brand" name="payments[${idx}][amount]" value="${a}" placeholder="Amount" form="pos-form">
                     <input type="text" class="w-16 bg-slate-50 border-none rounded-xl px-2 py-3 text-[10px] font-bold text-slate-400 focus:ring-1 focus:ring-brand" name="payments[${idx}][reference_no]" value="${r}" placeholder="Ref" form="pos-form">
                 `;
                 paymentRows.appendChild(row);

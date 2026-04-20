@@ -14,7 +14,7 @@
                     </div>
                     <select name="role" class="bg-slate-50 border-transparent rounded-xl px-5 py-2.5 text-sm focus:ring-2 focus:ring-brand/20 transition-all font-bold text-slate-600">
                         <option value="">{{ __('user.all_roles') }}</option>
-                        @foreach (['Owner', 'Manager', 'KepalaToko', 'Kasir'] as $roleOption)
+                        @foreach (['Owner', 'Manager', 'HeadStore', 'Cashier'] as $roleOption)
                             <option value="{{ $roleOption }}" {{ $role === $roleOption ? 'selected' : '' }}>{{ $roleOption }}</option>
                         @endforeach
                     </select>
@@ -62,7 +62,7 @@
                                         $roleColor = match($roleName) {
                                             'Owner' => 'bg-rose-50 text-rose-600',
                                             'Manager' => 'bg-indigo-50 text-indigo-600',
-                                            'Kasir' => 'bg-emerald-50 text-emerald-600',
+                                            'Cashier' => 'bg-emerald-50 text-emerald-600',
                                             default => 'bg-slate-100 text-slate-600'
                                         };
                                     @endphp

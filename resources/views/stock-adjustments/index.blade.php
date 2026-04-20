@@ -43,7 +43,7 @@
                         @endif
                         
                         <a href="{{ route('stock-adjustments.create') }}" class="px-5 py-2.5 bg-brand text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-brand/20 hover:bg-brand-dark transition-all whitespace-nowrap">
-                            <i class="fa fa-plus-circle mr-2"></i>Koreksi
+                            <i class="fa fa-plus-circle mr-2"></i>{{ __('adjustment.create_btn') }}
                         </a>
                     </div>
                 </form>
@@ -59,11 +59,11 @@
                 <table class="w-full text-left">
                     <thead>
                         <tr class="bg-slate-50 border-y border-slate-100">
-                            <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">No. Ref</th>
-                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Produk & Lokasi</th>
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">{{ __('adjustment.ref_no') }}</th>
+                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">{{ __('adjustment.product_location') }}</th>
                             <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none text-center">{{ __('adjustment.delta') }}</th>
                             <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none text-center">{{ __('adjustment.status') }}</th>
-                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">PIC / Admin</th>
+                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">{{ __('adjustment.pic_admin') }}</th>
                             <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none text-center">{{ __('adjustment.actions') }}</th>
                         </tr>
                     </thead>

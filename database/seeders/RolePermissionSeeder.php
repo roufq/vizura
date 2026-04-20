@@ -28,13 +28,13 @@ class RolePermissionSeeder extends Seeder
         }
 
         Role::query()
-            ->whereIn('name', ['Owner', 'Manager', 'KepalaToko', 'Kasir'])
+            ->whereIn('name', ['Owner', 'Manager', 'HeadStore', 'Cashier'])
             ->update(['guard_name' => 'web']);
 
         $owner = Role::firstOrCreate(['name' => 'Owner', 'guard_name' => 'web']);
         $manager = Role::firstOrCreate(['name' => 'Manager', 'guard_name' => 'web']);
-        $headStore = Role::firstOrCreate(['name' => 'KepalaToko', 'guard_name' => 'web']);
-        $cashier = Role::firstOrCreate(['name' => 'Kasir', 'guard_name' => 'web']);
+        $headStore = Role::firstOrCreate(['name' => 'HeadStore', 'guard_name' => 'web']);
+        $cashier = Role::firstOrCreate(['name' => 'Cashier', 'guard_name' => 'web']);
 
         $owner->syncPermissions($permissions);
         $manager->syncPermissions(['create', 'update', 'approve']);

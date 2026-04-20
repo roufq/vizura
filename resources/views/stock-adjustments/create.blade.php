@@ -15,7 +15,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
                 <!-- Left: Master Info -->
                 <div class="lg:col-span-1 space-y-6">
-                    <x-ui.card icon="info-circle" title="Informasi Penyesuaian">
+                    <x-ui.card icon="info-circle" title="{{ __('adjustment.info_card') }}">
                         <div class="space-y-6">
                             @if ($canManageAll)
                                 <div class="space-y-2">
@@ -59,9 +59,9 @@
                                             <i class="fa fa-cloud-upload text-xl"></i>
                                         </div>
                                         <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest group-hover:text-slate-600 transition-colors" id="file-chosen">
-                                            {{ __('report.select_file') ?? 'Pilih File Bukti' }}
+                                            {{ __('report.select_file') ?? 'Select Evidence File' }}
                                         </p>
-                                        <p class="text-[8px] text-slate-300 font-bold mt-1 uppercase italic">JPG, PNG, atau PDF (Max 2MB)</p>
+                                        <p class="text-[8px] text-slate-300 font-bold mt-1 uppercase italic">JPG, PNG, or PDF (Max 2MB)</p>
                                     </div>
                                 </label>
                                 @error('evidence') <p class="text-[10px] text-rose-500 font-bold mt-1 ml-1 uppercase">{{ $message }}</p> @enderror
@@ -73,17 +73,17 @@
                         <button type="submit" class="w-full py-5 bg-white text-brand rounded-2xl font-black text-xs uppercase tracking-[0.3em] hover:scale-[1.02] active:scale-95 transition-all">
                             {{ __('adjustment.save_adj') }}
                         </button>
-                        <p class="text-[9px] text-white/60 font-medium text-center mt-4 uppercase tracking-widest">Pastikan data stok sudah sesuai sebelum disimpan.</p>
+                        <p class="text-[9px] text-white/60 font-medium text-center mt-4 uppercase tracking-widest">{{ __('adjustment.save_confirmation') }}</p>
                     </div>
                 </div>
 
                 <!-- Right: Product Selector & List -->
                 <div class="lg:col-span-2 space-y-8">
-                    <x-ui.card icon="plus-circle" title="Pilih Produk & Detail Penyesuaian">
+                    <x-ui.card icon="plus-circle" title="{{ __('adjustment.selection_card') }}">
                         <div class="space-y-6">
                             <div class="flex gap-4 items-end">
                                 <div class="flex-1 space-y-2">
-                                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Pencarian Produk</label>
+                                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">{{ __('adjustment.product_search') }}</label>
                                     <select id="product_selector" class="w-full select2-basic">
                                         <option value="">{{ __('adjustment.search_prod_sku') }}</option>
                                         @foreach ($products as $product)
@@ -94,7 +94,7 @@
                                     </select>
                                 </div>
                                 <button type="button" id="add-product-btn" class="px-8 py-3.5 bg-brand text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-brand-dark transition-all">
-                                    Tambah
+                                    {{ __('adjustment.add_product') }}
                                 </button>
                             </div>
 
@@ -103,9 +103,9 @@
                                     <table class="w-full border-collapse min-w-[500px]">
                                         <thead class="sticky top-0 z-10 bg-white">
                                             <tr class="border-b border-slate-100 shadow-sm">
-                                                <th class="px-4 py-4 text-[10px] font-black text-slate-400 uppercase text-left bg-white/95 backdrop-blur-sm">Produk</th>
-                                                <th class="px-4 py-4 text-[10px] font-black text-slate-400 uppercase text-center w-32 bg-white/95 backdrop-blur-sm">Status</th>
-                                                <th class="px-4 py-4 text-[10px] font-black text-slate-400 uppercase text-center w-32 bg-white/95 backdrop-blur-sm">Jumlah</th>
+                                                <th class="px-4 py-4 text-[10px] font-black text-slate-400 uppercase text-left bg-white/95 backdrop-blur-sm">{{ __('adjustment.product') }}</th>
+                                                <th class="px-4 py-4 text-[10px] font-black text-slate-400 uppercase text-center w-32 bg-white/95 backdrop-blur-sm">{{ __('adjustment.status') }}</th>
+                                                <th class="px-4 py-4 text-[10px] font-black text-slate-400 uppercase text-center w-32 bg-white/95 backdrop-blur-sm">{{ __('adjustment.qty_delta') }}</th>
                                                 <th class="px-4 py-4 text-[10px] font-black text-slate-400 uppercase text-center w-16 bg-white/95 backdrop-blur-sm"></th>
                                             </tr>
                                         </thead>
@@ -114,7 +114,7 @@
                                             <td colspan="4" class="px-8 py-20 text-center">
                                                 <div class="opacity-20 flex flex-col items-center">
                                                     <div class="w-16 h-16 border-4 border-slate-300 rounded-3xl flex items-center justify-center text-3xl mb-4 italic">📦</div>
-                                                    <p class="text-sm font-black uppercase">Belum ada produk dipilih</p>
+                                                    <p class="text-sm font-black uppercase">{{ __('adjustment.empty_product_state') }}</p>
                                                 </div>
                                             </td>
                                         </tr>
@@ -144,7 +144,7 @@
                 if (!productId) return;
                 
                 if (items.has(productId)) {
-                    alert('Produk sudah ada di daftar.');
+                    alert('{{ __('adjustment.already_added') }}');
                     return;
                 }
 

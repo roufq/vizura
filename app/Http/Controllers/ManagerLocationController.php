@@ -59,6 +59,6 @@ class ManagerLocationController extends Controller
 
         return redirect()
             ->route('manager-locations.index')
-            ->with('status', 'Akses lokasi manager diperbarui.');
+            ->with('status', 'Manager location access updated.');
     }
 }

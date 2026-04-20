@@ -30,7 +30,7 @@ return [
     'address_placeholder' => 'Street name, house number, city...',
     'is_active_label' => 'Active Membership Status',
     'save_customer' => 'Save Customer',
-    'batal' => 'Cancel',
+    'cancel' => 'Cancel',
     'show_title' => 'Customer Profile',
     'summary' => 'Activity Summary',
     'total_spent' => 'Total Spent',

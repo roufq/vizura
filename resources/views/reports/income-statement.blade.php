@@ -1,16 +1,16 @@
 @extends('layouts.app')
 
-@section('title', 'Laporan Laba Rugi (Profit & Loss)')
-@section('page-title', 'Laporan')
+@section('title', __('report.income_statement'))
+@section('page-title', __('report.page_title'))
 
 @section('content')
     <div class="space-y-8">
         
         <!-- Filter Card -->
-        <x-ui.card icon="filter" title="Filter Periode Analisa">
+        <x-ui.card icon="filter" title="{{ __('report.filter_period') }}">
             <form method="GET" action="{{ route('reports.income-statement') }}" class="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div class="space-y-2">
-                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Rentang Tanggal</label>
+                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">{{ __('report.date_range') }}</label>
                     <div class="flex items-center gap-2 bg-slate-50 rounded-xl px-4 py-3 border border-slate-100">
                         <input type="date" name="start_date" value="{{ $filters['start_date'] ?? '' }}" class="bg-transparent border-none p-0 text-xs font-bold text-slate-700 focus:ring-0 flex-1">
                         <span class="text-slate-300">-</span>
@@ -20,9 +20,9 @@
 
                 @if ($canSelectLocations)
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Cabang</label>
+                        <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">{{ __('report.location') }}</label>
                         <select name="location_id" class="w-full bg-slate-50 border-transparent rounded-xl px-5 py-3.5 text-xs font-bold text-slate-700">
-                            <option value="">Lokasi Aktif</option>
+                            <option value="">{{ __('report.active_location') }}</option>
                             @foreach ($locations as $loc)
                                 <option value="{{ $loc->id }}" {{ (int) ($filters['location_id'] ?? 0) === $loc->id ? 'selected' : '' }}>{{ $loc->name }}</option>
                             @endforeach
@@ -31,32 +31,32 @@
                 @endif
 
                 <div class="flex items-end gap-3 md:col-span-2">
-                    <button type="submit" class="px-8 py-3.5 bg-brand text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-xl shadow-brand/20 hover:bg-brand-dark transition-all">Tampilkan Laporan</button>
-                    <a href="{{ route('reports.income-statement') }}" class="px-5 py-3.5 bg-slate-100 text-slate-500 rounded-xl text-xs font-black uppercase text-center">Reset</a>
+                    <button type="submit" class="px-8 py-3.5 bg-brand text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-xl shadow-brand/20 hover:bg-brand-dark transition-all">{{ __('report.show') }}</button>
+                    <a href="{{ route('reports.income-statement') }}" class="px-5 py-3.5 bg-slate-100 text-slate-500 rounded-xl text-xs font-black uppercase text-center">{{ __('report.reset') }}</a>
                 </div>
             </form>
         </x-ui.card>
 
         <!-- Income Statement Summary -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <x-ui.card icon="plus-circle" title="Pendapatan (Sales)">
+            <x-ui.card icon="plus-circle" title="{{ __('report.income_sales') }}">
                 <h3 class="text-2xl font-black text-slate-800 tracking-tighter mt-2">Rp {{ number_format($incomeTotal, 0, ',', '.') }}</h3>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Total Penjualan</p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{{ __('report.income_sales_sub') }}</p>
             </x-ui.card>
 
-            <x-ui.card icon="minus-circle" title="HPP (COGS)">
+            <x-ui.card icon="minus-circle" title="{{ __('report.cogs') }}">
                 <h3 class="text-2xl font-black text-rose-500 tracking-tighter mt-2">Rp {{ number_format($cogsTotal, 0, ',', '.') }}</h3>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Modal Penjualan</p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{{ __('report.cogs_sub') }}</p>
             </x-ui.card>
 
-            <x-ui.card icon="line-chart" title="Laba Kotor">
+            <x-ui.card icon="line-chart" title="{{ __('report.gross_profit') }}">
                 <h3 class="text-2xl font-black text-slate-800 tracking-tighter mt-2">Rp {{ number_format($grossProfit, 0, ',', '.') }}</h3>
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">Sales - COGS</p>
             </x-ui.card>
 
-            <x-ui.card icon="credit-card" title="Biaya Ops">
+            <x-ui.card icon="credit-card" title="{{ __('report.ops_expense') }}">
                 <h3 class="text-2xl font-black text-rose-500 tracking-tighter mt-2">Rp {{ number_format($expenseTotal, 0, ',', '.') }}</h3>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">Total Pengeluaran</p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">{{ __('report.ops_expense_sub') }}</p>
             </x-ui.card>
         </div>
 
@@ -68,14 +68,14 @@
             <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8 text-center md:text-left">
                 <div>
                      <p class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-4 italic">Bottom Line Results</p>
-                     <h1 class="text-sm font-bold text-slate-400 mb-2">Estimasi Laba Bersih (Net Profit)</h1>
+                     <h1 class="text-sm font-bold text-slate-400 mb-2">{{ __('report.net_profit') }}</h1>
                      <h2 class="text-6xl font-black tracking-tighter {{ $netProfit >= 0 ? 'text-emerald-400' : 'text-rose-400' }}">
                         Rp {{ number_format($netProfit, 0, ',', '.') }}
                      </h2>
                 </div>
                 
                 <div class="px-8 py-4 bg-white/5 border border-white/10 rounded-3xl backdrop-blur-md">
-                     <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Margin</p>
+                     <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">{{ __('report.margin') }}</p>
                      @php
                         $margin = $incomeTotal > 0 ? ($netProfit / $incomeTotal) * 100 : 0;
                      @endphp
@@ -87,11 +87,9 @@
         <div class="bg-blue-50 p-8 rounded-[2.5rem] border border-blue-100 flex items-start gap-5">
             <div class="p-4 bg-white rounded-2xl shadow-sm text-blue-500 text-xl"><i class="fa fa-info-circle"></i></div>
             <div>
-                 <h5 class="text-sm font-black text-blue-900 uppercase tracking-widest mb-2">Penjelasan Laporan</h5>
+                 <h5 class="text-sm font-black text-blue-900 uppercase tracking-widest mb-2">{{ __('report.report_explanation') }}</h5>
                  <p class="text-xs text-blue-700/70 font-bold leading-relaxed max-w-2xl">
-                    Laporan ini menampilkan estimasi laba rugi berdasarkan data transaksi yang tercatat di sistem. 
-                    HPP dihitung berdasarkan biaya rata-rata (Average Cost) pada saat barang terjual. 
-                    Biaya Operasional mencakup seluruh pengeluaran kas yang didefinisikan sebagai biaya pada menu Biaya.
+                    {{ __('report.report_explanation_desc') }}
                  </p>
             </div>
         </div>

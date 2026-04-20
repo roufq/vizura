@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Struk Penjualan')
+@section('title', 'Sale Receipt')
 
 @section('content')
     <style>
@@ -86,8 +86,8 @@
                 </div>
                 <div>
                     <h3 class="text-2xl font-black text-slate-900 tracking-tighter italic">{{ $sale->location?->name ?? config('app.name') }}</h3>
-                    <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mt-1.5 leading-relaxed">{{ $sale->location?->address ?? 'Alamat Operasional' }}</p>
-                    <p class="text-[10px] font-bold text-slate-300 mt-1 italic">Telp: {{ $sale->location?->phone ?? '-' }}</p>
+                    <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mt-1.5 leading-relaxed">{{ $sale->location?->address ?? 'Operation Address' }}</p>
+                    <p class="text-[10px] font-bold text-slate-300 mt-1 italic">Phone: {{ $sale->location?->phone ?? '-' }}</p>
                 </div>
             </div>
 
@@ -98,12 +98,12 @@
                     <span class="text-xs font-black text-slate-900 tracking-tighter italic">#{{ $sale->reference_no }}</span>
                 </div>
                 <div class="flex justify-between items-center text-[10px] font-bold">
-                    <span class="text-slate-400 uppercase tracking-widest">Waktu</span>
+                    <span class="text-slate-400 uppercase tracking-widest">Time</span>
                     <span class="text-slate-700">{{ $sale->posted_at?->format('d/m/Y H:i') ?? $sale->created_at?->format('d/m/Y H:i') }}</span>
                 </div>
                 <div class="flex justify-between items-center text-[10px] font-bold">
-                    <span class="text-slate-400 uppercase tracking-widest">Kasir</span>
-                    <span class="text-slate-900 uppercase tracking-tighter">{{ $sale->cashier?->name ?? 'Kasir' }}</span>
+                    <span class="text-slate-400 uppercase tracking-widest">Cashier</span>
+                    <span class="text-slate-900 uppercase tracking-tighter">{{ $sale->cashier?->name ?? 'Cashier' }}</span>
                 </div>
             </div>
 
@@ -140,14 +140,14 @@
                 
                 @if($sale->order_discount > 0)
                     <div class="flex justify-between items-center text-[11px] font-bold text-rose-500">
-                        <span class="uppercase tracking-widest italic">Diskon</span>
+                        <span class="uppercase tracking-widest italic">Discount</span>
                         <span class="tabular-nums font-black"> - Rp {{ number_format((float) $sale->order_discount, 0, ',', '.') }}</span>
                     </div>
                 @endif
 
                 <div class="flex justify-between items-end pt-6">
                     <div class="flex flex-col">
-                        <span class="text-[9px] font-black text-slate-300 uppercase tracking-[0.4em] mb-1 italic">Total Bersih</span>
+                        <span class="text-[9px] font-black text-slate-300 uppercase tracking-[0.4em] mb-1 italic">Net Total</span>
                         <span class="text-3xl font-black text-slate-900 tracking-tighter italic">Rp {{ number_format((float) $sale->total, 0, ',', '.') }}</span>
                     </div>
                 </div>
@@ -163,7 +163,7 @@
                 @endforeach
                 
                 <div class="mt-4 pt-4 border-t border-white/10 flex justify-between items-center">
-                    <span class="text-[9px] font-black text-brand uppercase tracking-[0.3em]">Kembalian</span>
+                    <span class="text-[9px] font-black text-brand uppercase tracking-[0.3em]">Change Due</span>
                     <span class="text-xl font-black text-brand tracking-tighter tabular-nums italic">Rp {{ number_format((float) $sale->change_due, 0, ',', '.') }}</span>
                 </div>
             </div>
@@ -172,8 +172,8 @@
             <div class="mt-16 text-center">
                 <div class="py-6 border-y border-slate-50 relative">
                     <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 bg-white text-[9px] font-black text-slate-300 uppercase tracking-[0.3em] italic">Closing Tag</div>
-                    <p class="text-sm font-black text-slate-900 uppercase tracking-[0.2em] italic">Terima Kasih</p>
-                    <p class="text-[10px] font-bold text-slate-400 mt-1 italic">Silakan Datang Kembali</p>
+                    <p class="text-sm font-black text-slate-900 uppercase tracking-[0.2em] italic">Thank You</p>
+                    <p class="text-[10px] font-bold text-slate-400 mt-1 italic">Please Come Again</p>
                 </div>
                 <div class="mt-10 flex justify-center items-center gap-2 opacity-30">
                      <span class="w-8 h-px bg-slate-300"></span>
@@ -189,7 +189,7 @@
                 <i class="fa fa-arrow-left mr-2 font-light"></i> POS Menu
             </a>
             <button type="button" onclick="window.print()" class="px-14 py-5 bg-slate-900 text-white rounded-3xl text-[11px] font-black uppercase tracking-widest shadow-2xl shadow-slate-900/40 hover:scale-105 transition-all">
-                <i class="fa fa-print mr-2"></i> Cetak Struk
+                <i class="fa fa-print mr-2"></i> Print Receipt
             </button>
         </div>
     </div>

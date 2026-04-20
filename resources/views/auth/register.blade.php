@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>{{ config('app.name', 'Vizura') }} - Daftar</title>
+    <title>{{ config('app.name', 'Vizura') }} - {{ __('auth.register_title') }}</title>
     <link rel="stylesheet" href="{{ asset('assets/styles/style.min.css') }}">
 
     <!-- Waves Effect -->
@@ -20,7 +20,7 @@
         @csrf
         <div class="inside">
             <div class="title">{{ config('app.name', 'Vizura') }}</div>
-            <div class="frm-title">Daftar</div>
+            <div class="frm-title">{{ __('auth.register_title') }}</div>
 
             <div class="frm-input">
                 <input type="email" name="email" placeholder="Email" class="frm-inp" value="{{ old('email') }}" required autocomplete="username">
@@ -31,7 +31,7 @@
             @enderror
 
             <div class="frm-input">
-                <input type="text" name="name" placeholder="Nama" class="frm-inp" value="{{ old('name') }}" required autofocus autocomplete="name">
+                <input type="text" name="name" placeholder="{{ __('auth.full_name') }}" class="frm-inp" value="{{ old('name') }}" required autofocus autocomplete="name">
                 <i class="fa fa-user frm-ico"></i>
             </div>
             @error('name')
@@ -47,7 +47,7 @@
             @enderror
 
             <div class="frm-input">
-                <input type="password" name="password_confirmation" placeholder="Konfirmasi Password" class="frm-inp" required autocomplete="new-password">
+                <input type="password" name="password_confirmation" placeholder="{{ __('auth.confirm_password') }}" class="frm-inp" required autocomplete="new-password">
                 <i class="fa fa-lock frm-ico"></i>
             </div>
             @error('password_confirmation')
@@ -57,16 +57,16 @@
             <div class="clearfix margin-bottom-20">
                 <div class="checkbox primary">
                     <input type="checkbox" id="accept">
-                    <label for="accept">Saya menyetujui Syarat & Ketentuan</label>
+                    <label for="accept">{{ __('auth.agree_terms') }}</label>
                 </div>
             </div>
 
             <button type="submit" class="frm-submit">
-                Daftar <i class="fa fa-arrow-circle-right"></i>
+                {{ __('auth.register_btn') }} <i class="fa fa-arrow-circle-right"></i>
             </button>
 
             <a href="{{ route('login') }}" class="a-link">
-                <i class="fa fa-sign-in"></i>Sudah punya akun? Masuk.
+                <i class="fa fa-sign-in"></i>{{ __('auth.has_account') }}
             </a>
             <div class="frm-footer">{{ config('app.name', 'Vizura') }}.</div>
         </div>

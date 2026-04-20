@@ -19,7 +19,7 @@ class StockAdjustmentController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('role:Owner|Manager|KepalaToko');
+        $this->middleware('role:Owner|Manager|HeadStore');
     }
 
     public function index(): View
@@ -127,7 +127,7 @@ class StockAdjustmentController extends Controller
         if (! $locationId) {
             return redirect()
                 ->route('stock-adjustments.index')
-                ->withErrors(['location_id' => 'Lokasi aktif wajib dipilih.']);
+                ->withErrors(['location_id' => 'Active location must be selected.']);
         }
 
         $evidencePath = null;
@@ -154,7 +154,7 @@ class StockAdjustmentController extends Controller
 
         return redirect()
             ->route('stock-adjustments.index')
-            ->with('status', 'Berhasil membuat '.count($data['items']).' penyesuaian stok.');
+            ->with('status', 'Successfully created '.count($data['items']).' stock adjustments.');
     }
 
     public function show(int $stockAdjustment): View
@@ -172,7 +172,7 @@ class StockAdjustmentController extends Controller
         if ($stockAdjustment->status !== 'pending') {
             return redirect()
                 ->route('stock-adjustments.index')
-                ->withErrors(['status' => 'Penyesuaian stok sudah diproses.']);
+                ->withErrors(['status' => 'Stock adjustment has been processed.']);
         }
 
         try {
@@ -187,7 +187,7 @@ class StockAdjustmentController extends Controller
 
         return redirect()
             ->route('stock-adjustments.index')
-            ->with('status', 'Penyesuaian stok disetujui.');
+            ->with('status', 'Stock adjustment approved.');
     }
 
     public function bulkApprove(): RedirectResponse
@@ -209,7 +209,7 @@ class StockAdjustmentController extends Controller
         if ($pendingAdjustments->isEmpty()) {
             return redirect()
                 ->route('stock-adjustments.index')
-                ->with('warning', 'Tidak ada penyesuaian stok pending yang ditemukan.');
+                ->with('warning', 'No pending stock adjustments found.');
         }
 
         $count = 0;
@@ -229,7 +229,7 @@ class StockAdjustmentController extends Controller
 
         return redirect()
             ->route('stock-adjustments.index')
-            ->with('status', "Berhasil menyetujui $count penyesuaian stok secara global.");
+            ->with('status', "Successfully approved $count stock adjustments globally.");
     }
 
     private function processApproval(StockAdjustment $stockAdjustment): void
@@ -271,7 +271,7 @@ class StockAdjustmentController extends Controller
         if ($stockAdjustment->status !== 'pending') {
             return redirect()
                 ->route('stock-adjustments.index')
-                ->withErrors(['status' => 'Penyesuaian stok yang sudah diproses tidak bisa dihapus.']);
+                ->withErrors(['status' => 'Stock adjustment that has been processed cannot be deleted.']);
         }
 
         if ($stockAdjustment->evidence_path) {
@@ -282,7 +282,7 @@ class StockAdjustmentController extends Controller
 
         return redirect()
             ->route('stock-adjustments.index')
-            ->with('status', 'Penyesuaian stok dihapus.');
+            ->with('status', 'Stock adjustment deleted.');
     }
 
     private function resolveAdjustment(int $stockAdjustmentId): StockAdjustment

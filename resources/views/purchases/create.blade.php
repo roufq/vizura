@@ -8,7 +8,7 @@
         <div class="lg:col-span-8">
             <x-ui.card icon="plus" title="{{ __('purchase.entry_title') }}">
                 <x-slot name="actions">
-                    <a href="{{ route('purchases.index') }}" class="text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors uppercase tracking-widest px-4">{{ __('purchase.batal') }}</a>
+                    <a href="{{ route('purchases.index') }}" class="text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors uppercase tracking-widest px-4">{{ __('purchase.cancel') }}</a>
                 </x-slot>
 
                 <form method="POST" action="{{ route('purchases.store') }}" id="purchase-form" class="space-y-8">

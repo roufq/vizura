@@ -32,13 +32,7 @@ Route::get('/clear-cache', function () {
     return 'Cache cleared successfully!';
 });
 
-Route::get('/lang/{locale}', function ($locale) {
-    if (in_array($locale, ['id', 'en'])) {
-        session()->put('locale', $locale);
-    }
 
-    return redirect()->back();
-})->name('lang.switch');
 
 Route::middleware('auth')->group(function () {
     Route::get('/locations/active', [ActiveLocationController::class, 'show'])->name('locations.active');

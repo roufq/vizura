@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <title>{{ config('app.name', 'Vizura') }} - Terminal Login</title>
+    <title>{{ config('app.name', 'Vizura') }} - {{ __('auth.login_title') }}</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,8 +46,8 @@
         <!-- Login Card -->
         <div class="glass-panel rounded-[3.5rem] shadow-2xl shadow-slate-200/50 p-10 sm:p-16 border border-white">
             <div class="mb-10">
-                <h1 class="text-2xl font-black text-slate-900 tracking-tighter">Selamat Datang Kembali</h1>
-                <p class="text-sm font-bold text-slate-400 mt-2">Masuk untuk mengelola bisnis Anda.</p>
+                <h1 class="text-2xl font-black text-slate-900 tracking-tighter">{{ __('auth.welcome_back') }}</h1>
+                <p class="text-sm font-bold text-slate-400 mt-2">{{ __('auth.manage_business') }}</p>
             </div>
 
             @if (session('status'))
@@ -60,21 +60,21 @@
                 @csrf
 
                 <div class="space-y-2">
-                    <label for="email" class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Email Karyawan</label>
+                    <label for="email" class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">{{ __('auth.email_label') }}</label>
                     <div class="relative">
                         <span class="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400"><i class="fa fa-envelope-o"></i></span>
                         <input type="email" id="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username"
                                class="w-full bg-slate-100/50 border-transparent focus:bg-white focus:ring-4 focus:ring-brand/10 rounded-2xl pl-14 pr-6 py-4 text-sm font-bold text-slate-700 transition-all placeholder:text-slate-300"
-                               placeholder="nama@perusahaan.com">
+                               placeholder="name@company.com">
                     </div>
                     @error('email') <p class="text-[10px] text-rose-500 font-bold mt-1 ml-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div class="space-y-2">
                     <div class="flex justify-between items-center px-1">
-                        <label for="password" class="text-[10px] font-black uppercase tracking-widest text-slate-400">Security Password</label>
+                        <label for="password" class="text-[10px] font-black uppercase tracking-widest text-slate-400">{{ __('auth.password_label') }}</label>
                         @if (Route::has('password.request'))
-                            <a href="{{ route('password.request') }}" class="text-[10px] font-black uppercase text-brand/60 hover:text-brand transition-colors">Lupa Password?</a>
+                            <a href="{{ route('password.request') }}" class="text-[10px] font-black uppercase text-brand/60 hover:text-brand transition-colors">{{ __('auth.forgot_password') }}</a>
                         @endif
                     </div>
                     <div class="relative">
@@ -88,16 +88,16 @@
 
                 <div class="flex items-center gap-3 px-1">
                     <input type="checkbox" id="remember_me" name="remember" class="w-4 h-4 rounded-md border-slate-200 text-brand focus:ring-brand">
-                    <label for="remember_me" class="text-xs font-bold text-slate-500 cursor-pointer">Ingat sesi saya</label>
+                    <label for="remember_me" class="text-xs font-bold text-slate-500 cursor-pointer">{{ __('auth.remember_me') }}</label>
                 </div>
 
                 <button type="submit" class="w-full py-5 bg-brand text-white rounded-3xl font-black text-sm uppercase tracking-[0.2em] shadow-2xl shadow-brand/40 hover:scale-[1.02] active:scale-95 transition-all">
-                    Masuk Sekarang
+                    {{ __('auth.login_btn') }}
                 </button>
             </form>
 
             <div class="mt-12 text-center">
-                 <p class="text-xs font-bold text-slate-400">Belum memiliki akun? <a href="{{ route('register') }}" class="text-brand font-black hover:underline underline-offset-4 decoration-2">Daftar Cabang Baru</a></p>
+                 <p class="text-xs font-bold text-slate-400">{{ __('auth.no_account') }} <a href="{{ route('register') }}" class="text-brand font-black hover:underline underline-offset-4 decoration-2">{{ __('auth.register_branch') }}</a></p>
             </div>
         </div>
 

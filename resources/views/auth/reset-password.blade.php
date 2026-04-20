@@ -21,7 +21,7 @@
 
         <!-- Confirm Password -->
         <div class="mt-4">
-            <x-input-label for="password_confirmation" value="Konfirmasi Password" />
+            <x-input-label for="password_confirmation" :value="__('auth.confirm_password')" />
 
             <x-text-input id="password_confirmation" class="block mt-1 w-full"
                                 type="password"
@@ -32,7 +32,7 @@
 
         <div class="flex items-center justify-end mt-4">
             <x-primary-button>
-                Reset Password
+                {{ __('auth.reset_password') }}
             </x-primary-button>
         </div>
     </form>

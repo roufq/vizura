@@ -70,7 +70,7 @@ class AccountingService
             'account_id' => $revenueAccount->id,
             'debit' => 0,
             'credit' => (float) $sale->total,
-            'memo' => 'Pendapatan',
+            'memo' => 'Revenue',
         ];
 
         if ($cogsTotal > 0) {
@@ -78,20 +78,20 @@ class AccountingService
                 'account_id' => $cogsAccount->id,
                 'debit' => $cogsTotal,
                 'credit' => 0,
-                'memo' => 'HPP',
+                'memo' => 'COGS',
             ];
             $lines[] = [
                 'account_id' => $inventoryAccount->id,
                 'debit' => 0,
                 'credit' => $cogsTotal,
-                'memo' => 'Persediaan',
+                'memo' => 'Inventory',
             ];
         }
 
         return $this->createJournal([
             'location_id' => $sale->location_id,
             'reference_no' => $sale->reference_no,
-            'description' => $description ?? 'Penjualan',
+            'description' => $description ?? 'Sale',
             'sale_id' => $sale->id,
             'created_by' => $sale->cashier_id,
             'posted_at' => $sale->posted_at ?? now(),
@@ -113,7 +113,7 @@ class AccountingService
                 'account_id' => $account->id,
                 'debit' => 0,
                 'credit' => abs((float) $payment['amount']),
-                'memo' => 'Pembalikan '.strtoupper((string) $payment['method']),
+                'memo' => 'Reversal '.strtoupper((string) $payment['method']),
             ];
         }
 
@@ -121,7 +121,7 @@ class AccountingService
             'account_id' => $revenueAccount->id,
             'debit' => $amount,
             'credit' => 0,
-            'memo' => 'Pembalikan Pendapatan',
+            'memo' => 'Revenue Reversal',
         ];
 
         if ($cogsTotal > 0) {
@@ -129,13 +129,13 @@ class AccountingService
                 'account_id' => $inventoryAccount->id,
                 'debit' => $cogsTotal,
                 'credit' => 0,
-                'memo' => 'Pembalikan Persediaan',
+                'memo' => 'Inventory Reversal',
             ];
             $lines[] = [
                 'account_id' => $cogsAccount->id,
                 'debit' => 0,
                 'credit' => $cogsTotal,
-                'memo' => 'Pembalikan HPP',
+                'memo' => 'COGS Reversal',
             ];
         }
 
@@ -159,20 +159,20 @@ class AccountingService
                 'account_id' => $inventoryAccount->id,
                 'debit' => (float) $purchase->total,
                 'credit' => 0,
-                'memo' => 'Persediaan',
+                'memo' => 'Inventory',
             ],
             [
                 'account_id' => $paymentAccount->id,
                 'debit' => 0,
                 'credit' => (float) $purchase->total,
-                'memo' => 'Pembayaran',
+                'memo' => 'Payment',
             ],
         ];
 
         return $this->createJournal([
             'location_id' => $purchase->location_id,
             'reference_no' => $purchase->reference_no,
-            'description' => $description ?? 'Pembelian',
+            'description' => $description ?? 'Purchase',
             'purchase_id' => $purchase->id,
             'created_by' => $purchase->received_by,
             'posted_at' => $purchase->received_at ?? now(),
@@ -186,20 +186,20 @@ class AccountingService
                 'account_id' => $expense->account_id,
                 'debit' => (float) $expense->amount,
                 'credit' => 0,
-                'memo' => 'Biaya Operasional',
+                'memo' => 'Operating Expense',
             ],
             [
                 'account_id' => $expense->payment_account_id,
                 'debit' => 0,
                 'credit' => (float) $expense->amount,
-                'memo' => 'Pembayaran',
+                'memo' => 'Payment',
             ],
         ];
 
         return $this->createJournal([
             'location_id' => $expense->location_id,
             'reference_no' => $expense->reference_no,
-            'description' => $description ?? 'Biaya Operasional',
+            'description' => $description ?? 'Operating Expense',
             'expense_id' => $expense->id,
             'created_by' => $expense->created_by,
             'posted_at' => $expense->expense_date,
@@ -216,20 +216,20 @@ class AccountingService
                 'account_id' => $payableAccount->id,
                 'debit' => (float) $payment->amount,
                 'credit' => 0,
-                'memo' => 'Pelunasan Hutang',
+                'memo' => 'Debt Settlement',
             ],
             [
                 'account_id' => $paymentAccount->id,
                 'debit' => 0,
                 'credit' => (float) $payment->amount,
-                'memo' => 'Pembayaran',
+                'memo' => 'Payment',
             ],
         ];
 
         return $this->createJournal([
             'location_id' => $payment->location_id,
             'reference_no' => $payment->reference_no,
-            'description' => $description ?? 'Pembayaran Hutang',
+            'description' => $description ?? 'Debt Payment',
             'purchase_id' => $payment->purchase_id,
             'created_by' => $payment->created_by,
             'posted_at' => $payment->paid_at ?? now(),
@@ -246,20 +246,20 @@ class AccountingService
                 'account_id' => $paymentAccount->id,
                 'debit' => (float) $payment->amount,
                 'credit' => 0,
-                'memo' => 'Pelunasan Piutang',
+                'memo' => 'Receivable Settlement',
             ],
             [
                 'account_id' => $receivableAccount->id,
                 'debit' => 0,
                 'credit' => (float) $payment->amount,
-                'memo' => 'Piutang',
+                'memo' => 'Receivable',
             ],
         ];
 
         return $this->createJournal([
             'location_id' => $payment->location_id,
             'reference_no' => $payment->reference_no,
-            'description' => $description ?? 'Pembayaran Piutang',
+            'description' => $description ?? 'Receivable Payment',
             'sale_id' => $payment->sale_id,
             'created_by' => $payment->created_by,
             'posted_at' => $payment->paid_at ?? now(),
@@ -290,7 +290,7 @@ class AccountingService
 
         if (! $account) {
             throw ValidationException::withMessages([
-                'account' => 'Akun dengan kode '.$code.' tidak ditemukan.',
+                'account' => 'Account with code '.$code.' not found.',
             ]);
         }
 
@@ -307,7 +307,7 @@ class AccountingService
 
         if (abs($debit - $credit) > 0.01) {
             throw ValidationException::withMessages([
-                'journal' => 'Jurnal tidak seimbang.',
+                'journal' => 'Journal is not balanced.',
             ]);
         }
     }

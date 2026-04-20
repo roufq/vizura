@@ -201,7 +201,7 @@ class ReportService
 
     public function cashiers(): Collection
     {
-        return \App\Models\User::role('Kasir')->orderBy('name')->get();
+        return \App\Models\User::role('Cashier')->orderBy('name')->get();
     }
 
     public function getPaymentMethods(bool $canViewAll, ?int $locationId): Collection

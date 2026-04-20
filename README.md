@@ -45,11 +45,14 @@ Vizura POS is a professional, high-performance Point of Sale application built w
 - **Frontend**: Blade + Alpine.js / jQuery
 
 ## 📦 Installation
+For a detailed step-by-step installation guide, please refer to [INSTALLATION.md](INSTALLATION.md).
+
+Quick start:
 1. Clone the repository.
 2. Run `composer install` & `npm install`.
 3. Configure `.env` with your database credentials.
 4. Run `php artisan migrate --seed`.
-5. Run `npm run build`.
+5. Run `php artisan storage:link`.
 6. Access your dashboard at `/login`.
 
 ## 🌐 Globalization

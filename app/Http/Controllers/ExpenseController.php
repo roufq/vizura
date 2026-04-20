@@ -16,7 +16,7 @@ class ExpenseController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('role:Owner|Manager|KepalaToko');
+        $this->middleware('role:Owner|Manager|HeadStore');
     }
 
     public function index(Request $request): View
@@ -101,7 +101,7 @@ class ExpenseController extends Controller
         if (! $locationId) {
             return redirect()
                 ->route('expenses.index')
-                ->withErrors(['location_id' => 'Lokasi aktif wajib dipilih.']);
+                ->withErrors(['location_id' => 'Active location must be selected.']);
         }
 
         $data = $request->validated();
@@ -121,7 +121,7 @@ class ExpenseController extends Controller
 
         return redirect()
             ->route('expenses.index')
-            ->with('status', 'Biaya operasional berhasil disimpan.');
+            ->with('status', 'Operational expense saved successfully.');
     }
 
     private function generateReferenceNo(): string

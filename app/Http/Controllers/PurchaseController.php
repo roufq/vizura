@@ -21,7 +21,7 @@ class PurchaseController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('role:Owner|Manager|KepalaToko');
+        $this->middleware('role:Owner|Manager|HeadStore');
     }
 
     public function index(): View
@@ -57,7 +57,7 @@ class PurchaseController extends Controller
         if (! $locationId) {
             return redirect()
                 ->route('purchases.index')
-                ->withErrors(['location_id' => 'Lokasi aktif wajib dipilih.']);
+                ->withErrors(['location_id' => 'Active location must be selected.']);
         }
 
         $data = $request->validated();
@@ -66,7 +66,7 @@ class PurchaseController extends Controller
         if ($items === []) {
             return redirect()
                 ->route('purchases.create')
-                ->withErrors(['items' => 'Item pembelian wajib diisi.'])
+                ->withErrors(['items' => 'Purchase items are required.'])
                 ->withInput();
         }
 
@@ -77,7 +77,7 @@ class PurchaseController extends Controller
         if ($discount > $subtotal) {
             return redirect()
                 ->route('purchases.create')
-                ->withErrors(['discount_amount' => 'Diskon tidak boleh melebihi subtotal.'])
+                ->withErrors(['discount_amount' => 'Discount cannot exceed subtotal.'])
                 ->withInput();
         }
 
@@ -173,7 +173,7 @@ class PurchaseController extends Controller
 
         return redirect()
             ->route('purchases.index')
-            ->with('status', 'Pembelian berhasil disimpan.');
+            ->with('status', 'Purchase saved successfully.');
     }
 
     private function normalizeItems(array $items): array

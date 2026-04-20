@@ -12,7 +12,7 @@ class CustomerController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('role:Owner|Manager|Kasir');
+        $this->middleware('role:Owner|Manager|Cashier');
     }
 
     public function index(): View
@@ -49,7 +49,7 @@ class CustomerController extends Controller
 
         return redirect()
             ->route('customers.index')
-            ->with('status', 'Pelanggan berhasil ditambahkan.');
+            ->with('status', 'Customer added successfully.');
     }
 
     public function show(Customer $customer): View
@@ -73,7 +73,7 @@ class CustomerController extends Controller
 
         return redirect()
             ->route('customers.index')
-            ->with('status', 'Data pelanggan berhasil diperbarui.');
+            ->with('status', 'Customer data updated successfully.');
     }
 
     public function destroy(Customer $customer): RedirectResponse
@@ -82,13 +82,13 @@ class CustomerController extends Controller
         if ($customer->sales()->exists()) {
             return redirect()
                 ->route('customers.index')
-                ->withErrors(['customer' => 'Pelanggan tidak bisa dihapus karena memiliki riwayat transaksi.']);
+                ->withErrors(['customer' => 'Customer cannot be deleted because they have transaction history.']);
         }
 
         $customer->delete();
 
         return redirect()
             ->route('customers.index')
-            ->with('status', 'Data pelanggan berhasil dihapus.');
+            ->with('status', 'Customer data deleted successfully.');
     }
 }

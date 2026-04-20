@@ -69,14 +69,14 @@ class UserController extends Controller
         if (! in_array($activeLocationId, $this->allowedLocationIds($creator), true)) {
             return redirect()
                 ->route('users.create')
-                ->withErrors(['active_location_id' => 'Lokasi tidak diizinkan.'])
+                ->withErrors(['active_location_id' => 'Location not authorized.'])
                 ->withInput();
         }
 
         if ($data['role'] === 'Manager' && $locationIds === []) {
             return redirect()
                 ->route('users.create')
-                ->withErrors(['location_ids' => 'Pilih minimal satu lokasi untuk manager.'])
+                ->withErrors(['location_ids' => 'Select at least one location for manager.'])
                 ->withInput();
         }
 
@@ -101,7 +101,7 @@ class UserController extends Controller
 
         return redirect()
             ->route('users.index')
-            ->with('status', 'User berhasil dibuat.');
+            ->with('status', 'User created successfully.');
     }
 
     public function edit(User $user): View
@@ -132,14 +132,14 @@ class UserController extends Controller
         if (! in_array($activeLocationId, $this->allowedLocationIds($editor), true)) {
             return redirect()
                 ->route('users.edit', $user)
-                ->withErrors(['active_location_id' => 'Lokasi tidak diizinkan.'])
+                ->withErrors(['active_location_id' => 'Location not authorized.'])
                 ->withInput();
         }
 
         if ($data['role'] === 'Manager' && $locationIds === []) {
             return redirect()
                 ->route('users.edit', $user)
-                ->withErrors(['location_ids' => 'Pilih minimal satu lokasi untuk manager.'])
+                ->withErrors(['location_ids' => 'Select at least one location for manager.'])
                 ->withInput();
         }
 
@@ -168,7 +168,7 @@ class UserController extends Controller
 
         return redirect()
             ->route('users.index')
-            ->with('status', 'User berhasil diperbarui.');
+            ->with('status', 'User updated successfully.');
     }
 
     public function destroy(User $user): RedirectResponse
@@ -176,7 +176,7 @@ class UserController extends Controller
         if ($user->id === request()->user()?->id) {
             return redirect()
                 ->route('users.index')
-                ->withErrors(['user' => 'Tidak bisa menghapus akun sendiri.']);
+                ->withErrors(['user' => 'Cannot delete your own account.']);
         }
 
         $this->ensureUserAccessible(request()->user(), $user);
@@ -185,7 +185,7 @@ class UserController extends Controller
 
         return redirect()
             ->route('users.index')
-            ->with('status', 'User berhasil dihapus.');
+            ->with('status', 'User deleted successfully.');
     }
 
     /**
@@ -194,10 +194,10 @@ class UserController extends Controller
     private function availableRoles($user): array
     {
         if ($user?->hasRole('Owner')) {
-            return ['Owner', 'Manager', 'KepalaToko', 'Kasir'];
+            return ['Owner', 'Manager', 'HeadStore', 'Cashier'];
         }
 
-        return ['KepalaToko', 'Kasir'];
+        return ['HeadStore', 'Cashier'];
     }
 
     /**

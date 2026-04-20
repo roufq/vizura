@@ -18,7 +18,7 @@ class StockTransferController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('role:Owner|Manager|KepalaToko');
+        $this->middleware('role:Owner|Manager|HeadStore');
     }
 
     public function index(): View
@@ -93,20 +93,20 @@ class StockTransferController extends Controller
         if (! $sourceLocationId) {
             return redirect()
                 ->route('stock-transfers.index')
-                ->withErrors(['location_id' => 'Lokasi aktif wajib dipilih.']);
+                ->withErrors(['location_id' => 'Active location must be selected.']);
         }
 
         if ((int) $data['source_location_id'] !== $sourceLocationId) {
             return redirect()
                 ->route('stock-transfers.create')
-                ->withErrors(['source_location_id' => 'Lokasi sumber harus sesuai lokasi aktif.'])
+                ->withErrors(['source_location_id' => 'Source location must match active location.'])
                 ->withInput();
         }
 
         if (! $canViewAll && ! in_array((int) $data['destination_location_id'], $allowedLocationIds, true)) {
             return redirect()
                 ->route('stock-transfers.create')
-                ->withErrors(['destination_location_id' => 'Anda tidak memiliki akses ke lokasi tujuan.'])
+                ->withErrors(['destination_location_id' => 'You do not have access to the destination location.'])
                 ->withInput();
         }
 
@@ -114,7 +114,7 @@ class StockTransferController extends Controller
         if ($items === []) {
             return redirect()
                 ->route('stock-transfers.create')
-                ->withErrors(['items' => 'Item transfer wajib diisi.'])
+                ->withErrors(['items' => 'Transfer items are required.'])
                 ->withInput();
         }
 
@@ -130,7 +130,7 @@ class StockTransferController extends Controller
 
         return redirect()
             ->route('stock-transfers.index')
-            ->with('status', 'Transfer stok berhasil dibuat.');
+            ->with('status', 'Stock transfer created successfully.');
     }
 
     public function send(StockTransfer $stockTransfer): RedirectResponse
@@ -138,13 +138,13 @@ class StockTransferController extends Controller
         if ($stockTransfer->status !== 'draft') {
             return redirect()
                 ->route('stock-transfers.index')
-                ->withErrors(['status' => 'Transfer stok sudah diproses.']);
+                ->withErrors(['status' => 'Stock transfer has been processed.']);
         }
 
         if (! $this->canAccessLocation(request()->user(), (int) $stockTransfer->source_location_id)) {
             return redirect()
                 ->route('stock-transfers.index')
-                ->withErrors(['location_id' => 'Anda tidak memiliki akses ke lokasi sumber.']);
+                ->withErrors(['location_id' => 'You do not have access to the source location.']);
         }
 
         try {
@@ -194,7 +194,7 @@ class StockTransferController extends Controller
 
         return redirect()
             ->route('stock-transfers.index')
-            ->with('status', 'Transfer stok dikirim.');
+            ->with('status', 'Stock transfer sent.');
     }
 
     public function receive(StockTransfer $stockTransfer): RedirectResponse
@@ -202,19 +202,19 @@ class StockTransferController extends Controller
         if ($stockTransfer->status !== 'sent') {
             return redirect()
                 ->route('stock-transfers.index')
-                ->withErrors(['status' => 'Transfer stok belum dikirim.']);
+                ->withErrors(['status' => 'Stock transfer has not been sent yet.']);
         }
 
         if (! $this->canAccessLocation(request()->user(), (int) $stockTransfer->destination_location_id)) {
             return redirect()
                 ->route('stock-transfers.index')
-                ->withErrors(['location_id' => 'Anda tidak memiliki akses ke lokasi tujuan.']);
+                ->withErrors(['location_id' => 'You do not have access to the destination location.']);
         }
 
         if ($stockTransfer->sent_by === request()->user()?->id) {
             return redirect()
                 ->route('stock-transfers.index')
-                ->withErrors(['received_by' => 'Penerima harus berbeda dengan pengirim.']);
+                ->withErrors(['received_by' => 'The receiver must be different from the sender.']);
         }
 
         DB::transaction(function () use ($stockTransfer): void {
@@ -258,7 +258,7 @@ class StockTransferController extends Controller
 
         return redirect()
             ->route('stock-transfers.index')
-            ->with('status', 'Transfer stok diterima.');
+            ->with('status', 'Stock transfer received.');
     }
 
     public function destroy(StockTransfer $stockTransfer): RedirectResponse
@@ -266,20 +266,20 @@ class StockTransferController extends Controller
         if ($stockTransfer->status !== 'draft') {
             return redirect()
                 ->route('stock-transfers.index')
-                ->withErrors(['status' => 'Transfer stok yang sudah diproses tidak bisa dihapus.']);
+                ->withErrors(['status' => 'Stock transfer that has been processed cannot be deleted.']);
         }
 
         if (! $this->canAccessLocation(request()->user(), (int) $stockTransfer->source_location_id)) {
             return redirect()
                 ->route('stock-transfers.index')
-                ->withErrors(['location_id' => 'Anda tidak memiliki akses ke lokasi sumber.']);
+                ->withErrors(['location_id' => 'You do not have access to the source location.']);
         }
 
         $stockTransfer->delete();
 
         return redirect()
             ->route('stock-transfers.index')
-            ->with('status', 'Transfer stok dihapus.');
+            ->with('status', 'Stock transfer deleted.');
     }
 
     private function normalizeItems(array $items): array

@@ -80,7 +80,7 @@
                                     <div class="flex items-center justify-center gap-2">
                                         <a href="{{ route('locations.edit', $loc) }}"
                                             class="p-2.5 bg-slate-50 text-slate-500 rounded-xl hover:bg-brand/10 hover:text-brand transition-all"
-                                            title="Edit">
+                                            title="{{ __('app.edit') }}">
                                             <i class="fa fa-pencil"></i>
                                         </a>
                                         @if ($canSync)
@@ -89,7 +89,7 @@
                                                 @csrf
                                                 <button type="submit"
                                                     class="p-2.5 bg-slate-50 text-amber-500 rounded-xl hover:bg-amber-50 transition-all"
-                                                    title="Sinkron Stok">
+                                                    title="{{ __('location.sync_stock') }}">
                                                     <i class="fa fa-refresh"></i>
                                                 </button>
                                             </form>
@@ -101,7 +101,7 @@
                                                 @method('DELETE')
                                                 <button type="submit"
                                                     class="p-2.5 bg-slate-50 text-slate-500 rounded-xl hover:bg-rose-50 hover:text-rose-600 transition-all"
-                                                    title="Hapus">
+                                                    title="{{ __('app.delete') }}">
                                                     <i class="fa fa-trash"></i>
                                                 </button>
                                             </form>

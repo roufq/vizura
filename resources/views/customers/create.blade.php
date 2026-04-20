@@ -36,7 +36,7 @@
                     </div>
 
                     <div class="space-y-2">
-                        <label for="is_active" class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Status Keanggotaan</label>
+                        <label for="is_active" class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">{{ __('customer.is_active_label') }}</label>
                         <div class="flex items-center gap-4 mt-2">
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" name="is_active" value="1" class="sr-only peer" {{ old('is_active', true) ? 'checked' : '' }}>
@@ -56,7 +56,7 @@
 
                 <div class="pt-6 border-t border-slate-50 flex items-center justify-end gap-3">
                     <a href="{{ route('customers.index') }}" class="px-8 py-4 bg-slate-50 text-slate-400 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-100 transition-all">
-                        {{ __('customer.batal') }}
+                        {{ __('customer.cancel') }}
                     </a>
                     <button type="submit" class="px-10 py-4 bg-brand text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-brand/20 hover:bg-brand-dark transition-all">
                         {{ __('customer.save_customer') }}

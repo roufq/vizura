@@ -27,7 +27,7 @@ class ReportController extends Controller
         public ReportService $reportService,
         public LocationResolver $locationResolver
     ) {
-        $this->middleware('role:Owner|Manager|KepalaToko,web');
+        $this->middleware('role:Owner|Manager|HeadStore,web');
     }
 
     public function sales(SalesReportRequest $request): View
@@ -74,7 +74,7 @@ class ReportController extends Controller
 
         $callback = function () use ($sales) {
             $file = fopen('php://output', 'w');
-            fputcsv($file, ['Tanggal', 'Referensi', 'Tipe', 'Status', 'Kasir', 'Pelanggan', 'Subtotal', 'Diskon', 'Pajak', 'Total']);
+            fputcsv($file, ['Date', 'Reference', 'Type', 'Status', 'Cashier', 'Customer', 'Subtotal', 'Discount', 'Tax', 'Total']);
 
             foreach ($sales as $sale) {
                 fputcsv($file, [
@@ -83,7 +83,7 @@ class ReportController extends Controller
                     strtoupper($sale->type),
                     strtoupper($sale->status),
                     $sale->cashier?->name,
-                    $sale->customer_name ?: 'Umum',
+                    $sale->customer_name ?: 'General',
                     (float) $sale->subtotal,
                     (float) $sale->order_discount,
                     (float) $sale->tax_amount,
@@ -162,7 +162,7 @@ class ReportController extends Controller
 
         $callback = function () use ($items) {
             $file = fopen('php://output', 'w');
-            fputcsv($file, ['Lokasi', 'SKU', 'Produk', 'Stok Saat Ini', 'Satuan']);
+            fputcsv($file, ['Location', 'SKU', 'Product', 'Current Stock', 'Unit']);
 
             foreach ($items as $item) {
                 fputcsv($file, [
@@ -393,7 +393,7 @@ class ReportController extends Controller
                     'date' => $transfer->sent_at,
                     'type' => 'transfer_out',
                     'reference' => $transfer->reference_no,
-                    'note' => 'Kirim ke '.$transfer->destinationLocation?->name,
+                    'note' => 'Sent to '.$transfer->destinationLocation?->name,
                     'qty_in' => 0.0,
                     'qty_out' => (float) $item->quantity,
                 ]);
@@ -404,7 +404,7 @@ class ReportController extends Controller
                     'date' => $transfer->received_at,
                     'type' => 'transfer_in',
                     'reference' => $transfer->reference_no,
-                    'note' => 'Terima dari '.$transfer->sourceLocation?->name,
+                    'note' => 'Received from '.$transfer->sourceLocation?->name,
                     'qty_in' => (float) $item->quantity,
                     'qty_out' => 0.0,
                 ]);

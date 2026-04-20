@@ -1,6 +1,6 @@
 <x-guest-layout>
     <div class="mb-4 text-sm text-gray-600">
-        Lupa password? Masukkan email Anda, kami akan mengirimkan tautan untuk mengatur ulang password.
+        {{ __('auth.forgot_password_desc') }}
     </div>
 
     <!-- Session Status -->
@@ -18,7 +18,7 @@
 
         <div class="flex items-center justify-end mt-4">
             <x-primary-button>
-                Kirim Tautan Reset Password
+                {{ __('auth.email_password_reset_link') }}
             </x-primary-button>
         </div>
     </form>

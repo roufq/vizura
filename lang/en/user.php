@@ -28,5 +28,5 @@ return [
     'select_main_loc' => 'Select main location...',
     'additional_access' => 'Additional Location Access (Manager Only)',
     'save_user' => 'Save User',
-    'batal' => 'Cancel',
+    'cancel' => 'Cancel',
 ];

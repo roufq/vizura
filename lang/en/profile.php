@@ -16,4 +16,5 @@ return [
     'type_password' => 'Type Your Password',
     'delete_account_btn' => 'Delete Account Now',
     'delete_confirm' => 'This action is permanent. Continue?',
+    'role' => 'Role',
 ];

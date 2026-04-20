@@ -12,7 +12,7 @@ class SupplierController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('role:Owner|Manager|KepalaToko');
+        $this->middleware('role:Owner|Manager|HeadStore');
     }
 
     public function index(): View
@@ -49,7 +49,7 @@ class SupplierController extends Controller
 
         return redirect()
             ->route('suppliers.index')
-            ->with('status', 'Supplier berhasil dibuat.');
+            ->with('status', 'Supplier created successfully.');
     }
 
     public function edit(Supplier $supplier): View
@@ -66,7 +66,7 @@ class SupplierController extends Controller
 
         return redirect()
             ->route('suppliers.index')
-            ->with('status', 'Supplier berhasil diperbarui.');
+            ->with('status', 'Supplier updated successfully.');
     }
 
     public function destroy(Supplier $supplier): RedirectResponse
@@ -75,6 +75,6 @@ class SupplierController extends Controller
 
         return redirect()
             ->route('suppliers.index')
-            ->with('status', 'Supplier berhasil dihapus.');
+            ->with('status', 'Supplier deleted successfully.');
     }
 }

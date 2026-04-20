@@ -22,7 +22,7 @@
                         Rp {{ number_format($totalValue, 0, ',', '.') }}
                     </h4>
                     <p class="text-[9px] font-bold text-slate-400 mt-1 italic">
-                        {{ $locationId ? ($locations->firstWhere('id', $locationId)?->name ?? 'Lokasi Terpilih') : __('report.all_units') }}
+                        {{ $locationId ? ($locations->firstWhere('id', $locationId)?->name ?? 'Selected Location') : __('report.all_units') }}
                     </p>
                 </div>
             </div>

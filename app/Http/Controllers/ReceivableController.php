@@ -18,7 +18,7 @@ class ReceivableController extends Controller
 {
     public function __construct(public LocationResolver $locationResolver)
     {
-        $this->middleware('role:Owner|Manager|KepalaToko');
+        $this->middleware('role:Owner|Manager|HeadStore');
     }
 
     public function index(Request $request): View
@@ -95,7 +95,7 @@ class ReceivableController extends Controller
         if (! $this->canAccessSale($user, $sale)) {
             return redirect()
                 ->route('receivables.index')
-                ->withErrors(['sale' => 'Anda tidak memiliki akses ke data ini.']);
+                ->withErrors(['sale' => 'You do not have access to this data.']);
         }
 
         $sale->load([
@@ -128,7 +128,7 @@ class ReceivableController extends Controller
         if (! $this->canAccessSale($user, $sale)) {
             return redirect()
                 ->route('receivables.index')
-                ->withErrors(['sale' => 'Anda tidak memiliki akses ke data ini.']);
+                ->withErrors(['sale' => 'You do not have access to this data.']);
         }
 
         $data = $request->validated();
@@ -137,7 +137,7 @@ class ReceivableController extends Controller
         if ($amount <= 0) {
             return redirect()
                 ->route('receivables.show', $sale)
-                ->withErrors(['amount' => 'Jumlah bayar harus lebih dari 0.']);
+                ->withErrors(['amount' => 'Payment amount must be greater than 0.']);
         }
 
         try {
@@ -149,13 +149,13 @@ class ReceivableController extends Controller
 
                 if ($lockedSale->payment_status === 'paid') {
                     throw ValidationException::withMessages([
-                        'sale' => 'Transaksi ini sudah lunas.',
+                        'sale' => 'This transaction is already fully paid.',
                     ]);
                 }
 
                 if ($amount > (float) $lockedSale->receivable_balance) {
                     throw ValidationException::withMessages([
-                        'amount' => 'Jumlah bayar melebihi sisa piutang.',
+                        'amount' => 'Payment amount exceeds remaining receivable balance.',
                     ]);
                 }
 
@@ -190,7 +190,7 @@ class ReceivableController extends Controller
 
         return redirect()
             ->route('receivables.show', $sale)
-            ->with('status', 'Pembayaran piutang berhasil disimpan.');
+            ->with('status', 'Receivable payment saved successfully.');
     }
 
     private function canAccessSale($user, Sale $sale): bool

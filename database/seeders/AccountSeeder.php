@@ -13,17 +13,17 @@ class AccountSeeder extends Seeder
     public function run(): void
     {
         $accounts = [
-            ['code' => '1001', 'name' => 'Kas', 'type' => 'asset', 'is_cash' => true],
+            ['code' => '1001', 'name' => 'Cash', 'type' => 'asset', 'is_cash' => true],
             ['code' => '1002', 'name' => 'Bank', 'type' => 'asset', 'is_cash' => true],
-            ['code' => '1101', 'name' => 'Piutang', 'type' => 'asset', 'is_cash' => false],
-            ['code' => '1201', 'name' => 'Persediaan', 'type' => 'asset', 'is_cash' => false],
-            ['code' => '2001', 'name' => 'Hutang', 'type' => 'liability', 'is_cash' => false],
-            ['code' => '4001', 'name' => 'Pendapatan', 'type' => 'income', 'is_cash' => false],
-            ['code' => '5001', 'name' => 'HPP', 'type' => 'expense', 'is_cash' => false],
-            ['code' => '6001', 'name' => 'Gaji', 'type' => 'expense', 'is_cash' => false],
-            ['code' => '6002', 'name' => 'Sewa', 'type' => 'expense', 'is_cash' => false],
-            ['code' => '6003', 'name' => 'Listrik', 'type' => 'expense', 'is_cash' => false],
-            ['code' => '6004', 'name' => 'Biaya Operasional', 'type' => 'expense', 'is_cash' => false],
+            ['code' => '1101', 'name' => 'Receivables', 'type' => 'asset', 'is_cash' => false],
+            ['code' => '1201', 'name' => 'Inventory', 'type' => 'asset', 'is_cash' => false],
+            ['code' => '2001', 'name' => 'Payables', 'type' => 'liability', 'is_cash' => false],
+            ['code' => '4001', 'name' => 'Revenue', 'type' => 'income', 'is_cash' => false],
+            ['code' => '5001', 'name' => 'COGS', 'type' => 'expense', 'is_cash' => false],
+            ['code' => '6001', 'name' => 'Salary', 'type' => 'expense', 'is_cash' => false],
+            ['code' => '6002', 'name' => 'Rent', 'type' => 'expense', 'is_cash' => false],
+            ['code' => '6003', 'name' => 'Utilities', 'type' => 'expense', 'is_cash' => false],
+            ['code' => '6004', 'name' => 'Operational Expenses', 'type' => 'expense', 'is_cash' => false],
         ];
 
         foreach ($accounts as $account) {

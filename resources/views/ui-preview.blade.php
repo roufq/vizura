@@ -27,7 +27,7 @@
                 Vizura UI/UX Transformation
             </h1>
             <p class="text-slate-500 text-lg max-w-2xl mx-auto">
-                Eksplorasi desain masa depan untuk sistem POS dan Keuangan Vizura. Pilih arah visual yang paling sesuai dengan brand Anda.
+                Future design exploration for Vizura POS and Financial systems. Choose the visual direction that best fits your brand.
             </p>
         </div>
     </header>
@@ -56,11 +56,11 @@
                             </div>
                             <div class="flex items-center gap-3 text-slate-400 p-3">
                                 <div class="w-5 h-5 bg-slate-700 rounded-md"></div>
-                                <span>Penjualan</span>
+                                <span>Sales</span>
                             </div>
                             <div class="flex items-center gap-3 text-slate-400 p-3">
                                 <div class="w-5 h-5 bg-slate-700 rounded-md"></div>
-                                <span>Stok</span>
+                                <span>Stock</span>
                             </div>
                         </nav>
                     </div>
@@ -128,10 +128,10 @@
                                 <span>Dashboard</span>
                             </div>
                             <div class="flex items-center gap-3 text-slate-500 px-4 py-3">
-                                <span>Penjualan</span>
+                                <span>Sales</span>
                             </div>
                             <div class="flex items-center gap-3 text-slate-500 px-4 py-3">
-                                <span>Laporan Keuangan</span>
+                                <span>Financial Reports</span>
                             </div>
                         </nav>
                     </div>
@@ -167,7 +167,7 @@
                                 <div class="flex justify-between items-start">
                                     <div>
                                         <p class="text-slate-400 text-sm">Store Performance</p>
-                                        <h5 class="text-lg font-bold">Cabang Jakarta Pusat</h5>
+                                        <h5 class="text-lg font-bold">Central Jakarta Branch</h5>
                                     </div>
                                     <div class="w-10 h-10 rounded-full bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center">
                                         <div class="w-5 h-5 bg-emerald-500 rounded-sm rotate-45"></div>
@@ -197,10 +197,10 @@
                 <div class="relative grid grid-cols-12 gap-8 items-center">
                     <div class="col-span-5 text-white space-y-6">
                         <h3 class="text-5xl font-black leading-tight italic uppercase tracking-tighter italic">BOOST YOUR BUSINESS</h3>
-                        <p class="text-indigo-100 text-lg">Visual yang dinamis dan berenergi untuk mempercepat fokus tim Anda dalam mengejar target harian.</p>
+                        <p class="text-indigo-100 text-lg">Dynamic and energetic visuals to accelerate team focus in pursuing daily targets.</p>
                         <div class="flex gap-4">
-                            <button class="bg-white text-indigo-600 px-8 py-3 rounded-2xl font-bold shadow-xl">COBA POS BARU</button>
-                            <button class="border border-white/30 text-white px-8 py-3 rounded-2xl font-bold">LIHAT LAPORAN</button>
+                            <button class="bg-white text-indigo-600 px-8 py-3 rounded-2xl font-bold shadow-xl">TRY NEW POS</button>
+                            <button class="border border-white/30 text-white px-8 py-3 rounded-2xl font-bold">VIEW REPORTS</button>
                         </div>
                     </div>
                     
@@ -211,7 +211,7 @@
                                     <div class="w-12 h-12 bg-indigo-100 rounded-2xl flex items-center justify-center">🛍️</div>
                                     <div>
                                         <p class="font-bold text-slate-800">Trx #2026-004</p>
-                                        <p class="text-xs text-slate-500">Selesai 2 menit yang lalu</p>
+                                        <p class="text-xs text-slate-500">Completed 2 minutes ago</p>
                                     </div>
                                     <div class="ml-auto font-black text-slate-900">Rp 450.000</div>
                                 </div>
@@ -219,7 +219,7 @@
                                     <div class="w-12 h-12 bg-rose-100 rounded-2xl flex items-center justify-center">🍱</div>
                                     <div>
                                         <p class="font-bold text-slate-800">Trx #2026-003</p>
-                                        <p class="text-xs text-slate-500">Selesai 10 menit yang lalu</p>
+                                        <p class="text-xs text-slate-500">Completed 10 minutes ago</p>
                                     </div>
                                     <div class="ml-auto font-black text-slate-900">Rp 125.000</div>
                                 </div>
@@ -227,7 +227,7 @@
                                     <div class="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center">☕</div>
                                     <div>
                                         <p class="font-bold text-slate-800">Trx #2026-002</p>
-                                        <p class="text-xs text-slate-500">Selesai 1 jam yang lalu</p>
+                                        <p class="text-xs text-slate-500">Completed 1 hour ago</p>
                                     </div>
                                     <div class="ml-auto font-black text-slate-900">Rp 35.000</div>
                                 </div>
@@ -241,10 +241,10 @@
     </main>
 
     <footer class="bg-slate-900 text-white py-24 text-center">
-        <h3 class="text-2xl font-bold mb-4">Siap untuk bertransformasi?</h3>
-        <p class="text-slate-400 mb-12">Klik style mana saja di atas untuk menjadikannya dasar desain sistem Anda.</p>
+        <h3 class="text-2xl font-bold mb-4">Ready to transform?</h3>
+        <p class="text-slate-400 mb-12">Click any style above to make it your design system base.</p>
         <div class="flex justify-center gap-4">
-             <a href="{{ route('dashboard') }}" class="px-8 py-3 bg-white text-slate-900 rounded-xl font-bold">KEMBALI KE DASHBOARD</a>
+             <a href="{{ route('dashboard') }}" class="px-8 py-3 bg-white text-slate-900 rounded-xl font-bold">BACK TO DASHBOARD</a>
         </div>
     </footer>
 

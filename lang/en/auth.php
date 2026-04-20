@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'login_title' => 'Terminal Login',
+    'welcome_back' => 'Welcome Back',
+    'manage_business' => 'Log in to manage your business.',
+    'email_label' => 'Employee Email',
+    'password_label' => 'Security Password',
+    'forgot_password' => 'Forgot Password?',
+    'remember_me' => 'Remember my session',
+    'login_btn' => 'Log In Now',
+    'no_account' => 'Don\'t have an account?',
+    'register_branch' => 'Register New Branch',
+    'register_title' => 'Register',
+    'full_name' => 'Full Name',
+    'confirm_password' => 'Confirm Password',
+    'agree_terms' => 'I agree to the Terms & Conditions',
+    'has_account' => 'Already have an account? Log In.',
+    'register_btn' => 'Register',
+    'forgot_password_desc' => 'Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.',
+    'email_password_reset_link' => 'Email Password Reset Link',
+    'reset_password' => 'Reset Password',
+    'verify_email_desc' => 'Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn\'t receive the email, we will gladly send you another.',
+    'verification_link_sent' => 'A new verification link has been sent to the email address you provided during registration.',
+    'resend_verification_email' => 'Resend Verification Email',
+];

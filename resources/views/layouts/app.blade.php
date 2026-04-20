@@ -156,7 +156,7 @@
                     $user = Auth::user();
                     $isOwner = $user?->hasRole('Owner');
                     $isManager = $user?->hasRole('Manager');
-                    $isHeadStore = $user?->hasRole('KepalaToko');
+                    $isHeadStore = $user?->hasRole('HeadStore');
                     $isAdmin = $isOwner || $isManager || $isHeadStore;
 
                     $menuItems = [];
@@ -283,16 +283,7 @@
             </nav>
         </div>
 
-        <!-- Language Switcher -->
-        <div class="px-8 flex items-center gap-2 py-6 border-t border-slate-50 mt-auto">
-            <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest mr-2">Language</span>
-            <div class="flex gap-1">
-                <a href="{{ route('lang.switch', 'id') }}" 
-                   class="w-8 h-8 flex items-center justify-center rounded-lg text-[10px] font-black border transition-all {{ app()->getLocale() == 'id' ? 'bg-brand border-brand text-white shadow-sm shadow-brand/20' : 'bg-white border-slate-200 text-slate-400 hover:border-slate-300 hover:text-slate-600' }}">ID</a>
-                <a href="{{ route('lang.switch', 'en') }}" 
-                   class="w-8 h-8 flex items-center justify-center rounded-lg text-[10px] font-black border transition-all {{ app()->getLocale() == 'en' ? 'bg-brand border-brand text-white shadow-sm shadow-brand/20' : 'bg-white border-slate-200 text-slate-400 hover:border-slate-300 hover:text-slate-600' }}">EN</a>
-            </div>
-        </div>
+
     </div>
 
     <!-- Main Content Area -->
@@ -304,7 +295,7 @@
                 <button @click="sidebarOpen = true" class="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 text-slate-600">
                     <i class="fa fa-bars"></i>
                 </button>
-                <h2 class="text-xl font-bold text-slate-900">@yield('page-title', 'Dashboard')</h2>
+                <h2 class="text-xl font-bold text-slate-900">@yield('page-title', __('app.dashboard'))</h2>
             </div>
 
             <div class="flex items-center gap-4">
@@ -318,7 +309,7 @@
 
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="w-10 h-10 flex items-center justify-center rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 transition-colors" title="Logout">
+                    <button type="submit" class="w-10 h-10 flex items-center justify-center rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 transition-colors" title="{{ __('app.logout') }}">
                         <i class="fa fa-power-off"></i>
                     </button>
                 </form>
@@ -378,7 +369,7 @@
                         if (!$el.hasClass('select2-hidden-accessible')) {
                             $el.select2({
                                 width: '100%',
-                                placeholder: $el.attr('placeholder') || 'Pilih...',
+                                placeholder: $el.attr('placeholder') || '{{ __('app.choose') }}...',
                                 allowClear: true
                             });
                         }

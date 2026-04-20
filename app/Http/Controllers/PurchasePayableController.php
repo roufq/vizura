@@ -18,7 +18,7 @@ class PurchasePayableController extends Controller
 {
     public function __construct(public LocationResolver $locationResolver)
     {
-        $this->middleware('role:Owner|Manager|KepalaToko');
+        $this->middleware('role:Owner|Manager|HeadStore');
     }
 
     public function index(Request $request): View
@@ -90,13 +90,13 @@ class PurchasePayableController extends Controller
         if (! $this->canAccessPurchase($user, $purchase)) {
             return redirect()
                 ->route('purchases.payables.index')
-                ->withErrors(['purchase' => 'Anda tidak memiliki akses ke data ini.']);
+                ->withErrors(['purchase' => 'You do not have access to this data.']);
         }
 
         if ($purchase->payment_method !== 'payable') {
             return redirect()
                 ->route('purchases.payables.index')
-                ->withErrors(['purchase' => 'Pembelian ini tidak memiliki hutang.']);
+                ->withErrors(['purchase' => 'This purchase does not have any debt.']);
         }
 
         $purchase->load([
@@ -130,13 +130,13 @@ class PurchasePayableController extends Controller
         if (! $this->canAccessPurchase($user, $purchase)) {
             return redirect()
                 ->route('purchases.payables.index')
-                ->withErrors(['purchase' => 'Anda tidak memiliki akses ke data ini.']);
+                ->withErrors(['purchase' => 'You do not have access to this data.']);
         }
 
         if ($purchase->payment_method !== 'payable') {
             return redirect()
                 ->route('purchases.payables.index')
-                ->withErrors(['purchase' => 'Pembelian ini tidak memiliki hutang.']);
+                ->withErrors(['purchase' => 'This purchase does not have any debt.']);
         }
 
         $data = $request->validated();
@@ -145,7 +145,7 @@ class PurchasePayableController extends Controller
         if ($amount <= 0) {
             return redirect()
                 ->route('purchases.payables.show', $purchase)
-                ->withErrors(['amount' => 'Jumlah bayar harus lebih dari 0.']);
+                ->withErrors(['amount' => 'Payment amount must be greater than 0.']);
         }
 
         try {
@@ -157,13 +157,13 @@ class PurchasePayableController extends Controller
 
                 if ($lockedPurchase->payment_method !== 'payable') {
                     throw ValidationException::withMessages([
-                        'purchase' => 'Pembelian ini tidak memiliki hutang.',
+                        'purchase' => 'This purchase does not have any debt.',
                     ]);
                 }
 
                 if ($amount > (float) $lockedPurchase->payable_balance) {
                     throw ValidationException::withMessages([
-                        'amount' => 'Jumlah bayar melebihi sisa hutang.',
+                        'amount' => 'Payment amount exceeds remaining debt.',
                     ]);
                 }
 
@@ -197,7 +197,7 @@ class PurchasePayableController extends Controller
 
         return redirect()
             ->route('purchases.payables.show', $purchase)
-            ->with('status', 'Pembayaran hutang berhasil disimpan.');
+            ->with('status', 'Debt payment saved successfully.');
     }
 
     private function canAccessPurchase($user, Purchase $purchase): bool
