@@ -38,5 +38,6 @@ return [
     'cancel' => 'Cancel',
     'select_location_title' => 'Select Work Location',
     'select_location_desc' => 'Select the location where you will transact today. This will adjust stock and reports automatically.',
+    'choose_location' => 'Choose Location',
     'enter_location' => 'Enter Location',
 ];

@@ -53,4 +53,5 @@ return [
     'customer_info_hint' => 'Type a new name to automatically add a new customer when the transaction is posted.',
     'add_payment_method' => '+ Add Method',
     'product_not_found' => 'Barcode/Product not found.',
+    'confirm_reset' => 'Are you sure you want to reset the current POS session? All unsaved data will be lost.',
 ];

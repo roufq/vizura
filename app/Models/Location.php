@@ -20,6 +20,9 @@ class Location extends Model
         'phone',
         'is_active',
         'toko_pusat',
+        'receipt_header',
+        'receipt_footer',
+        'receipt_tagline',
     ];
 
     protected $casts = [

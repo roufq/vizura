@@ -101,6 +101,8 @@
         }
         ::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
     </style>
+
+    @stack('styles')
 </head>
 
 <body class="h-full text-slate-800 antialiased font-sans" x-data="{ sidebarOpen: false }">
@@ -215,6 +217,9 @@
                         $menuItems[] = ['route' => 'users.index', 'icon' => 'users', 'label' => __('app.menu.users')];
                         $menuItems[] = ['route' => 'locations.index', 'icon' => 'map-marker', 'label' => __('app.menu.locations')];
                     }
+                    if ($isOwner || $isManager) {
+                        $menuItems[] = ['route' => 'settings.receipt.edit', 'icon' => 'file-text-o', 'label' => __('app.menu.receipt_settings')];
+                    }
                     if ($isOwner) {
                         $menuItems[] = ['route' => 'manager-locations.index', 'icon' => 'sitemap', 'label' => __('app.menu.manager_access')];
                     }
@@ -303,6 +308,30 @@
                 <div class="hidden sm:flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-xl border border-slate-100">
                     <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
                     <span class="text-xs font-semibold text-slate-600">{{ __('app.live_server') }}</span>
+                </div>
+
+                <div class="relative" x-data="{ open: false }">
+                    <button @click="open = !open" @click.away="open = false" 
+                            class="flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-slate-100 hover:border-brand/20 transition-all text-sm font-bold text-slate-600">
+                        <span>{{ App::getLocale() == 'id' ? '🇮🇩 ID' : '🇺🇸 EN' }}</span>
+                        <i class="fa fa-chevron-down text-[10px] opacity-40 transition-transform" :class="open ? 'rotate-180' : ''"></i>
+                    </button>
+                    <div x-show="open" 
+                         x-transition:enter="transition ease-out duration-100"
+                         x-transition:enter-start="transform opacity-0 scale-95"
+                         x-transition:enter-end="transform opacity-100 scale-100"
+                         class="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 p-2 z-50">
+                        <a href="{{ route('lang.update', 'id') }}" 
+                           class="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-slate-50 transition-colors {{ App::getLocale() == 'id' ? 'bg-brand/5 text-brand' : 'text-slate-600' }}">
+                            <span class="text-sm font-bold">🇮🇩 Bahasa Indonesia</span>
+                            @if(App::getLocale() == 'id') <i class="fa fa-check text-xs"></i> @endif
+                        </a>
+                        <a href="{{ route('lang.update', 'en') }}" 
+                           class="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-slate-50 transition-colors {{ App::getLocale() == 'en' ? 'bg-brand/5 text-brand' : 'text-slate-600' }}">
+                            <span class="text-sm font-bold">🇺🇸 English</span>
+                            @if(App::getLocale() == 'en') <i class="fa fa-check text-xs"></i> @endif
+                        </a>
+                    </div>
                 </div>
 
                 <div class="h-10 w-px bg-slate-200 mx-2"></div>

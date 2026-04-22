@@ -7,46 +7,57 @@
     <div class="space-y-8">
         <x-ui.card icon="sliders" title="{{ __('adjustment.card_title') }}">
             <x-slot name="actions">
-                <form method="GET" action="{{ route('stock-adjustments.index') }}" class="flex flex-wrap items-center justify-end gap-3">
-                    <div class="flex items-center gap-2">
-                        <input type="text" name="search" value="{{ $search }}" placeholder="{{ __('adjustment.search_placeholder') }}" 
-                               class="bg-slate-50 border-slate-100 rounded-xl px-4 py-2 text-[10px] font-black w-32 focus:ring-2 focus:ring-brand/20 transition-all uppercase">
-                        
-                        <div class="flex items-center gap-2 bg-slate-50 rounded-xl px-3 py-1.5 border border-slate-100">
-                            <span class="text-[9px] font-black text-slate-300 uppercase whitespace-nowrap">{{ __('adjustment.period') }}:</span>
+                <div class="flex flex-col lg:flex-row items-start lg:items-center gap-4">
+                    <form method="GET" action="{{ route('stock-adjustments.index') }}" class="flex flex-wrap items-center gap-3">
+                        <!-- Search Box -->
+                        <div class="relative group">
+                            <i class="fa fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 text-xs group-focus-within:text-brand transition-colors"></i>
+                            <input type="text" name="search" value="{{ $search }}" placeholder="{{ __('adjustment.search_placeholder') }}" 
+                                   class="bg-slate-50 border-slate-100 rounded-xl pl-14 pr-4 py-2.5 text-xs font-bold text-slate-700 focus:ring-4 focus:ring-brand/10 w-44 sm:w-64 transition-all border outline-none">
+                        </div>
+
+                        <!-- Date Range -->
+                        <div class="flex items-center gap-3 bg-slate-50 rounded-xl px-4 py-2 border border-slate-100 shadow-sm transition-all focus-within:border-brand/30">
+                            <i class="fa fa-calendar text-[10px] text-slate-300"></i>
                             <div class="flex items-center gap-2">
-                                <input type="date" name="start_date" value="{{ $startDate }}" class="bg-transparent border-none p-0 text-[10px] font-black text-slate-600 focus:ring-0 w-24 h-4 uppercase">
-                                <span class="text-slate-300">-</span>
-                                <input type="date" name="end_date" value="{{ $endDate }}" class="bg-transparent border-none p-0 text-[10px] font-black text-slate-600 focus:ring-0 w-24 h-4 uppercase">
+                                <input type="date" name="start_date" value="{{ $startDate }}" class="bg-transparent border-none p-0 text-[10px] font-black text-slate-600 focus:ring-0 w-24 h-4 uppercase tracking-tighter">
+                                <span class="text-slate-300 font-bold">/</span>
+                                <input type="date" name="end_date" value="{{ $endDate }}" class="bg-transparent border-none p-0 text-[10px] font-black text-slate-600 focus:ring-0 w-24 h-4 uppercase tracking-tighter">
                             </div>
                         </div>
-                    </div>
 
-                    <div class="flex items-center gap-2">
-                        <div class="min-w-[140px]">
-                            <select name="status" class="bg-slate-50 border-slate-100 rounded-xl px-4 py-2 text-[10px] font-black text-slate-600">
+                        <!-- Status Selection -->
+                        <div class="relative group">
+                            <select name="status" class="bg-slate-50 border-slate-100 rounded-xl px-5 py-2.5 text-xs font-bold text-slate-500 focus:ring-4 focus:ring-brand/10 transition-all border outline-none cursor-pointer appearance-none pr-10 min-w-[140px]">
                                 <option value="">{{ __('adjustment.all_status') }}</option>
                                 <option value="pending" {{ $status === 'pending' ? 'selected' : '' }}>{{ __('adjustment.pending') }}</option>
                                 <option value="approved" {{ $status === 'approved' ? 'selected' : '' }}>{{ __('adjustment.approved') }}</option>
                             </select>
+                            <i class="fa fa-angle-down absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400 pointer-events-none group-hover:text-brand transition-colors"></i>
                         </div>
 
-                        <button type="submit" class="w-10 h-10 flex items-center justify-center bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all flex-shrink-0">
+                        <!-- Submit Filter -->
+                        <button type="submit" class="w-10 h-10 flex items-center justify-center bg-slate-900 text-white rounded-xl hover:bg-brand transition-all shadow-lg shadow-slate-900/10 active:scale-90">
                             <i class="fa fa-filter text-xs"></i>
                         </button>
+                    </form>
 
+                    <div class="hidden lg:block w-px h-8 bg-slate-100 mx-1"></div>
+
+                    <div class="flex items-center gap-3">
                         @if($adjustments->where('status', 'pending')->count() > 0)
-                            <button type="button" onclick="if(confirm('Approve semua data pending?')) document.getElementById('bulk-approve-form').submit();" 
-                                    class="px-5 py-2.5 bg-emerald-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 hover:bg-emerald-600 transition-all whitespace-nowrap">
-                                <i class="fa fa-check-double mr-2 text-[10px]"></i>{{ __('adjustment.bulk_approve') }}
+                            <button type="button" onclick="if(confirm('{{ __('adjustment.bulk_approve_confirm') ?? 'Approve all pending data?' }}')) document.getElementById('bulk-approve-form').submit();" 
+                                    class="px-5 py-2.5 bg-emerald-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all">
+                                <i class="fa fa-check-double mr-2"></i>{{ __('adjustment.bulk_approve') }}
                             </button>
                         @endif
                         
-                        <a href="{{ route('stock-adjustments.create') }}" class="px-5 py-2.5 bg-brand text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-brand/20 hover:bg-brand-dark transition-all whitespace-nowrap">
-                            <i class="fa fa-plus-circle mr-2"></i>{{ __('adjustment.create_btn') }}
+                        <a href="{{ route('stock-adjustments.create') }}" class="flex items-center gap-2 px-5 py-2.5 bg-brand text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-brand/20 hover:scale-105 active:scale-95 transition-all">
+                            <i class="fa fa-plus-circle text-xs"></i>
+                            <span>{{ __('adjustment.create_btn') }}</span>
                         </a>
                     </div>
-                </form>
+                </div>
 
                 @if($adjustments->where('status', 'pending')->count() > 0)
                     <form id="bulk-approve-form" method="POST" action="{{ route('stock-adjustments.bulk-approve') }}" class="hidden">

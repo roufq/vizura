@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'index_title' => 'Satuan Produk',
+    'page_title' => 'Satuan',
+    'card_title' => 'Manajemen Satuan',
+    'search_placeholder' => 'Cari satuan...',
+    'add_unit' => 'Tambah Satuan',
+    'name' => 'Nama Satuan',
+    'abbreviation' => 'Singkatan',
+    'status' => 'Status',
+    'actions' => 'Aksi',
+    'active' => 'Aktif',
+    'inactive' => 'Tidak Aktif',
+    'delete_confirm' => 'Hapus satuan ini?',
+    'no_data' => 'Satuan tidak ditemukan.',
+    'add_now' => 'Tambah Sekarang',
+    'create_title' => 'Tambah Satuan Baru',
+    'edit_title' => 'Ubah Satuan',
+    'unit_info' => 'Informasi Satuan',
+    'name_label' => 'Nama Satuan',
+    'name_placeholder' => 'Contoh: Kilogram, Buah, Dus...',
+    'abbr_label' => 'Singkatan',
+    'abbr_placeholder' => 'Contoh: Kg, Pcs, Box...',
+    'is_active_label' => 'Status Aktif',
+    'save_unit' => 'Simpan Satuan',
+    'cancel' => 'Batal',
+];

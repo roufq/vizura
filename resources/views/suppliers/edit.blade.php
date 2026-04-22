@@ -4,9 +4,9 @@
 @section('page-title', __('supplier.edit_title'))
 
 @section('content')
-    <div class="max-w-4xl mx-auto">
-        <a href="{{ route('suppliers.index') }}" class="inline-flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-brand transition-colors uppercase tracking-widest mb-6 px-4">
-            <i class="fa fa-arrow-left"></i> {{ __('app.back_to_list') }}
+    <div class="space-y-8">
+        <a href="{{ route('suppliers.index') }}" class="inline-flex items-center gap-2 text-xs font-black text-slate-400 hover:text-brand transition-all uppercase tracking-[0.2em] mb-2 group">
+            <i class="fa fa-arrow-left group-hover:-translate-x-1 transition-transform"></i> {{ __('app.back_to_list') }}
         </a>
 
         <x-ui.card icon="address-book" title="{{ __('supplier.info_header') }}">

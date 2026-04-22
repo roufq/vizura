@@ -7,24 +7,35 @@
     <div class="space-y-8">
         <x-ui.card icon="users" title="{{ __('user.card_title') }}">
             <x-slot name="actions">
-                <form method="GET" action="{{ route('users.index') }}" class="flex flex-wrap items-center gap-3">
-                    <div class="relative">
-                        <input type="text" name="search" value="{{ $search }}" placeholder="{{ __('user.search_placeholder') }}" 
-                               class="bg-slate-50 border-transparent rounded-xl px-5 py-2.5 text-sm focus:ring-2 focus:ring-brand/20 w-48 transition-all">
-                    </div>
-                    <select name="role" class="bg-slate-50 border-transparent rounded-xl px-5 py-2.5 text-sm focus:ring-2 focus:ring-brand/20 transition-all font-bold text-slate-600">
-                        <option value="">{{ __('user.all_roles') }}</option>
-                        @foreach (['Owner', 'Manager', 'HeadStore', 'Cashier'] as $roleOption)
-                            <option value="{{ $roleOption }}" {{ $role === $roleOption ? 'selected' : '' }}>{{ $roleOption }}</option>
-                        @endforeach
-                    </select>
-                    <button type="submit" class="p-2.5 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all">
-                        <i class="fa fa-filter"></i>
-                    </button>
-                    <a href="{{ route('users.create') }}" class="px-6 py-2.5 bg-brand text-white rounded-xl text-xs font-bold shadow-lg shadow-brand/20 hover:bg-brand-dark transition-all">
-                        <i class="fa fa-user-plus mr-2"></i>{{ __('user.add_user') }}
+                <div class="flex items-center gap-4">
+                    <form method="GET" action="{{ route('users.index') }}" class="flex items-center gap-3">
+                        <div class="relative group">
+                            <i class="fa fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 text-xs group-focus-within:text-brand transition-colors"></i>
+                            <input type="text" name="search" value="{{ $search }}" placeholder="{{ __('user.search_placeholder') }}" 
+                                   class="bg-slate-50 border-slate-100 rounded-xl pl-14 pr-5 py-2.5 text-xs font-bold text-slate-700 focus:ring-4 focus:ring-brand/10 w-44 sm:w-64 transition-all border outline-none">
+                        </div>
+                        
+                        <div class="hidden md:block">
+                            <select name="role" class="bg-slate-50 border-slate-100 rounded-xl px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-slate-500 focus:ring-4 focus:ring-brand/10 transition-all border outline-none cursor-pointer">
+                                <option value="">{{ __('user.all_roles') }}</option>
+                                @foreach (['Owner', 'Manager', 'HeadStore', 'Cashier'] as $roleOption)
+                                    <option value="{{ $roleOption }}" {{ $role === $roleOption ? 'selected' : '' }}>{{ $roleOption }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <button type="submit" class="w-10 h-10 flex items-center justify-center bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10">
+                            <i class="fa fa-filter text-xs"></i>
+                        </button>
+                    </form>
+
+                    <div class="w-px h-8 bg-slate-100 mx-1"></div>
+
+                    <a href="{{ route('users.create') }}" class="flex items-center gap-2 px-5 py-2.5 bg-brand text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-brand/20 hover:scale-105 active:scale-95 transition-all">
+                        <i class="fa fa-plus text-xs"></i>
+                        <span class="hidden sm:inline">{{ __('user.add_user') }}</span>
                     </a>
-                </form>
+                </div>
             </x-slot>
 
             <div class="overflow-x-auto -mx-8">

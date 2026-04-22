@@ -4,18 +4,23 @@
 @section('page-title', __('unit.page_title'))
 
 @section('content')
-    <div class="max-w-4xl">
+    <div class="space-y-8">
         <x-ui.card icon="balance-scale" title="{{ __('unit.card_title') }}">
             <x-slot name="actions">
-                <form method="GET" action="{{ route('units.index') }}" class="flex items-center gap-3">
-                    <div class="relative">
+                <div class="flex items-center gap-4">
+                    <form method="GET" action="{{ route('units.index') }}" class="relative group">
+                        <i class="fa fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 text-xs group-focus-within:text-brand transition-colors"></i>
                         <input type="text" name="search" value="{{ $search }}" placeholder="{{ __('unit.search_placeholder') }}" 
-                               class="bg-slate-50 border-transparent rounded-xl px-5 py-2 text-sm focus:ring-2 focus:ring-brand/20 w-48 transition-all">
-                    </div>
-                    <a href="{{ route('units.create') }}" class="px-5 py-2 bg-brand text-white rounded-xl text-xs font-bold shadow-lg shadow-brand/20 hover:bg-brand-dark transition-all">
-                        <i class="fa fa-plus mr-2"></i>{{ __('unit.add_unit') }}
+                               class="bg-slate-50 border-slate-100 rounded-xl pl-14 pr-5 py-2.5 text-xs font-bold text-slate-700 focus:ring-4 focus:ring-brand/10 w-44 sm:w-64 transition-all border outline-none">
+                    </form>
+
+                    <div class="w-px h-8 bg-slate-100 mx-1"></div>
+
+                    <a href="{{ route('units.create') }}" class="flex items-center gap-2 px-5 py-2.5 bg-brand text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-brand/20 hover:scale-105 active:scale-95 transition-all">
+                        <i class="fa fa-plus text-xs"></i>
+                        <span class="hidden sm:inline">{{ __('unit.add_unit') }}</span>
                     </a>
-                </form>
+                </div>
             </x-slot>
 
             <div class="overflow-x-auto -mx-8">

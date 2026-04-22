@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'login_title' => 'Login Terminal',
+    'welcome_back' => 'Selamat Datang Kembali',
+    'manage_business' => 'Masuk untuk mengelola bisnis Anda.',
+    'email_label' => 'Email Karyawan',
+    'password_label' => 'Kata Sandi Keamanan',
+    'forgot_password' => 'Lupa Kata Sandi?',
+    'remember_me' => 'Ingat sesi saya',
+    'login_btn' => 'Masuk Sekarang',
+    'no_account' => 'Belum punya akun?',
+    'register_branch' => 'Daftar Cabang Baru',
+    'register_title' => 'Pendaftaran',
+    'full_name' => 'Nama Lengkap',
+    'confirm_password' => 'Konfirmasi Kata Sandi',
+    'agree_terms' => 'Saya setuju dengan Syarat & Ketentuan',
+    'has_account' => 'Sudah punya akun? Masuk di sini.',
+    'register_btn' => 'Daftar',
+    'forgot_password_desc' => 'Lupa kata sandi? Tidak masalah. Beritahu kami alamat email Anda dan kami akan mengirimkan tautan reset kata sandi agar Anda bisa memilih yang baru.',
+    'email_password_reset_link' => 'Kirim Tautan Reset Kata Sandi',
+    'reset_password' => 'Reset Kata Sandi',
+    'verify_email_desc' => 'Terima kasih telah mendaftar! Sebelum memulai, mohon verifikasi alamat email Anda dengan mengeklik tautan yang baru saja kami kirimkan. Jika Anda tidak menerima emailnya, kami akan mengirimkan kembali.',
+    'verification_link_sent' => 'Tautan verifikasi baru telah dikirim ke alamat email yang Anda berikan saat pendaftaran.',
+    'resend_verification_email' => 'Kirim Ulang Email Verifikasi',
+];

@@ -13,6 +13,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\PurchasePayableController;
 use App\Http\Controllers\ReceivableController;
+use App\Http\Controllers\ReceiptSettingController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\StockAdjustmentController;
@@ -20,7 +21,10 @@ use App\Http\Controllers\StockTransferController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\LanguageController;
 use Illuminate\Support\Facades\Route;
+
+Route::get('lang/{locale}', [LanguageController::class, 'update'])->name('lang.update');
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -99,6 +103,9 @@ Route::middleware(['auth', 'active_location'])->group(function () {
         ->name('sales.void');
     Route::post('sales/{sale}/return', [SaleController::class, 'return'])
         ->name('sales.return');
+
+    Route::get('settings/receipt', [ReceiptSettingController::class, 'edit'])->name('settings.receipt.edit');
+    Route::put('settings/receipt', [ReceiptSettingController::class, 'update'])->name('settings.receipt.update');
 
     Route::get('reports/sales', [ReportController::class, 'sales'])->name('reports.sales');
     Route::get('reports/sales/export', [ReportController::class, 'exportSales'])->name('reports.sales.export');

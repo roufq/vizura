@@ -4,11 +4,12 @@
 @section('page-title', __('product.page_title'))
 
 @section('content')
-    <div class="max-w-4xl mx-auto">
+    <div class="space-y-8">
+        <a href="{{ route('products.index') }}" class="inline-flex items-center gap-2 text-xs font-black text-slate-400 hover:text-brand transition-all uppercase tracking-[0.2em] mb-2 group">
+            <i class="fa fa-arrow-left group-hover:-translate-x-1 transition-transform"></i> {{ __('app.back_to_list') }}
+        </a>
+
         <x-ui.card icon="pencil" title="{{ __('product.edit_title') }}">
-            <x-slot name="actions">
-                <a href="{{ route('products.index') }}" class="text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors">{{ __('product.cancel') }}</a>
-            </x-slot>
 
             <form method="POST" action="{{ route('products.update', $product) }}" class="space-y-8">
                 @csrf

@@ -8,26 +8,24 @@
         <!-- Input & Cart Area -->
         <div class="lg:col-span-8 space-y-6">
             
-            <!-- Quick Input Bar -->
-            <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex flex-col md:flex-row gap-6 items-end">
-                <div class="flex-1 space-y-2">
-                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">{{ __('pos.scan_placeholder') }}</label>
-                    <div class="relative group">
-                        <input type="text" id="scan_input" autofocus autocomplete="off" 
-                               placeholder="{{ __('pos.scan_placeholder') }}" 
-                               class="w-full bg-slate-50 border-transparent rounded-2xl pl-14 pr-6 py-4 text-sm font-bold text-slate-700 focus:ring-4 focus:ring-brand/10 transition-all">
-                        <div class="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand transition-colors">
-                            <i class="fa fa-barcode text-xl"></i>
-                        </div>
-                        <div class="absolute right-6 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                            <span class="text-[10px] bg-slate-200 text-slate-500 px-2 py-1 rounded font-black">ENTER</span>
-                        </div>
+            <!-- POS Hybrid Entry Grid (Executive Soft) -->
+            <div class="premium-pos-grid">
+                <!-- Barcode & SKU Entry -->
+                <div class="premium-input-wrapper group">
+                    <i class="fa fa-barcode premium-icon"></i>
+                    <input type="text" id="scan_input" autofocus autocomplete="off" 
+                           placeholder="{{ __('pos.scan_placeholder') }}" 
+                           class="premium-input">
+                    <div class="premium-badge">ENTER</div>
+                    
+                    <div id="search_results" class="search-results-overlay hidden">
+                        <div class="p-2 space-y-1" id="results_container"></div>
                     </div>
                 </div>
 
-                <div class="w-full md:w-64 space-y-2">
-                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">{{ __('pos.manual_product') }}</label>
-                    <select id="product_select" class="w-full bg-slate-50 border-transparent rounded-2xl px-6 py-4 text-sm font-bold text-slate-700 cursor-pointer">
+                <!-- Manual Product Search -->
+                <div class="manual-search-wrapper">
+                    <select id="product_select" class="w-full select2-pos">
                         <option value="">{{ __('pos.select_product') }}</option>
                         @foreach ($products as $product)
                             <option value="{{ $product->id }}">{{ $product->name }} ({{ $product->sku }})</option>
@@ -35,42 +33,45 @@
                     </select>
                 </div>
                 
-                <button type="button" id="add_manual" class="h-[60px] w-[60px] bg-brand text-white rounded-2xl flex items-center justify-center text-xl shadow-lg shadow-brand/20 hover:scale-105 active:scale-95 transition-all">
+                <!-- Dynamic Action Button -->
+                <button type="button" id="add_manual" class="premium-btn-add">
                     <i class="fa fa-plus"></i>
                 </button>
             </div>
 
-            <!-- Extra Options Toolbar (Improved) -->
-            <div class="bg-white/50 backdrop-blur px-8 py-4 rounded-[1.5rem] border border-slate-100 shadow-sm flex flex-wrap items-center justify-between gap-4">
-                <div class="flex flex-wrap items-center gap-8">
-                    <div class="flex flex-col gap-1.5">
-                        <span class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">{{ __('pos.order_type') }}</span>
-                        <div class="flex bg-slate-100/50 p-1.5 rounded-2xl border border-slate-100">
-                            <button type="button" class="order-type-btn px-6 py-2 rounded-xl text-[10px] font-black uppercase transition-all bg-white shadow-sm text-brand border border-slate-100" data-value="retail">{{ __('pos.retail') }}</button>
-                            <button type="button" class="order-type-btn px-6 py-2 rounded-xl text-[10px] font-black uppercase transition-all text-slate-400 hover:text-slate-600" data-value="wholesale">{{ __('pos.wholesale') }}</button>
-                            <button type="button" class="order-type-btn px-6 py-2 rounded-xl text-[10px] font-black uppercase transition-all text-slate-400 hover:text-slate-600" data-value="online">{{ __('pos.online') }}</button>
+            <!-- High-Precision Context Toolbar -->
+            <div class="bg-white/40 backdrop-blur-xl px-10 py-6 rounded-[2.5rem] border border-slate-100/50 shadow-sm flex flex-col md:flex-row items-center justify-between gap-8">
+                <div class="flex flex-wrap items-center gap-12">
+                    <!-- Order Type Selector -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[9px] font-black uppercase tracking-[0.4em] text-slate-400 ml-5 block">{{ __('pos.order_type') }}</span>
+                        <div class="bg-slate-100/50 p-1 rounded-full flex items-center gap-1 border border-slate-100">
+                            <button type="button" class="order-type-btn px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all bg-white shadow-xl shadow-slate-200/40 text-brand ring-1 ring-slate-100" data-value="retail">{{ __('pos.retail') }}</button>
+                            <button type="button" class="order-type-btn px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all text-slate-400 hover:text-slate-600" data-value="wholesale">{{ __('pos.wholesale') }}</button>
+                            <button type="button" class="order-type-btn px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all text-slate-400 hover:text-slate-600" data-value="online">{{ __('pos.online') }}</button>
                         </div>
                     </div>
 
-                    <div class="hidden md:block w-px h-10 bg-slate-100"></div>
+                    <!-- Separator -->
+                    <div class="hidden md:block w-px h-12 bg-slate-100"></div>
 
-                    <div class="flex flex-col gap-1.5">
-                        <span class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">{{ __('pos.tax_mode') }}</span>
-                        <div class="flex bg-slate-100/50 p-1.5 rounded-2xl border border-slate-100">
-                            <button type="button" class="tax-mode-btn px-6 py-2 rounded-xl text-[10px] font-black uppercase transition-all bg-white shadow-sm text-brand border border-slate-100" data-inc="0" data-rate="0">{{ __('pos.tax_none') }}</button>
-                            <button type="button" class="tax-mode-btn px-6 py-2 rounded-xl text-[10px] font-black uppercase transition-all text-slate-400 hover:text-slate-600" data-inc="1" data-rate="11">{{ __('pos.tax_inc') }}</button>
-                            <button type="button" class="tax-mode-btn px-6 py-2 rounded-xl text-[10px] font-black uppercase transition-all text-slate-400 hover:text-slate-600" data-inc="0" data-rate="11">{{ __('pos.tax_exc') }}</button>
+                    <!-- Tax Configuration -->
+                    <div class="flex flex-col gap-3">
+                        <span class="text-[9px] font-black uppercase tracking-[0.4em] text-slate-400 ml-5 block">{{ __('pos.tax_mode') }}</span>
+                        <div class="bg-slate-100/50 p-1 rounded-full flex items-center gap-1 border border-slate-100">
+                            <button type="button" class="tax-mode-btn px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all bg-white shadow-xl shadow-slate-200/40 text-brand ring-1 ring-slate-100" data-inc="0" data-rate="0">{{ __('pos.tax_none') }}</button>
+                            <button type="button" class="tax-mode-btn px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all text-slate-400 hover:text-slate-600" data-inc="1" data-rate="11">{{ __('pos.tax_inc') }}</button>
+                            <button type="button" class="tax-mode-btn px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all text-slate-400 hover:text-slate-600" data-inc="0" data-rate="11">{{ __('pos.tax_exc') }}</button>
                         </div>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-4 ml-auto">
-                     <div class="flex flex-col items-end gap-1">
-                        <span class="text-[9px] font-black uppercase tracking-widest text-slate-300 mr-1">{{ __('pos.view_mode') }}</span>
-                        <div class="flex bg-slate-50 p-1 rounded-xl border border-slate-100">
-                            <button type="button" id="toggle-list-view" class="p-2 rounded-lg text-brand bg-white shadow-sm transition-all"><i class="fa fa-list"></i></button>
-                            <button type="button" id="toggle-grid-view" class="p-2 rounded-lg text-slate-300 hover:text-brand transition-all"><i class="fa fa-th"></i></button>
-                        </div>
+                <!-- View Preferences -->
+                <div class="flex flex-col items-center md:items-end gap-3">
+                    <span class="text-[9px] font-black uppercase tracking-[0.4em] text-slate-300 mr-5 block">{{ __('pos.view_mode') }}</span>
+                    <div class="bg-slate-100/50 p-1.5 rounded-2xl flex items-center gap-1 border border-slate-100">
+                        <button type="button" id="toggle-list-view" class="w-12 h-12 flex items-center justify-center rounded-xl text-brand bg-white shadow-lg shadow-slate-200/30 transition-all"><i class="fa fa-list"></i></button>
+                        <button type="button" id="toggle-grid-view" class="w-12 h-12 flex items-center justify-center rounded-xl text-slate-300 hover:text-brand transition-all"><i class="fa fa-th"></i></button>
                     </div>
                 </div>
             </div>
@@ -115,7 +116,7 @@
             <div class="flex flex-col sm:flex-row gap-4 items-center justify-between">
                 <a href="{{ route('sales.index') }}" class="text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors uppercase tracking-widest px-4">{{ __('pos.cancel_back') }}</a>
                 <div class="flex items-center gap-3">
-                    <button type="button" onclick="location.reload()" class="px-8 py-4 bg-rose-50 text-rose-600 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-rose-100 transition-all">
+                    <button type="button" onclick="if(confirm('{{ __('pos.confirm_reset') ?? 'Reset POS?' }}')) { localStorage.removeItem('vizura_pos_cache_{{ auth()->id() }}_{{ $location->id }}'); location.reload(); }" class="px-8 py-4 bg-rose-50 text-rose-600 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-rose-100 transition-all">
                         {{ __('pos.reset_pos') }}
                     </button>
                     <button type="submit" name="action" value="draft" form="pos-form" class="px-8 py-4 bg-white border border-slate-200 rounded-2xl font-black text-[10px] uppercase tracking-widest text-slate-600 hover:bg-slate-50 transition-all">
@@ -224,34 +225,36 @@
                 </div>
             </div>
 
-            <!-- Payment Methods -->
+            <!-- Payment Matrix -->
             <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
-                <div class="flex items-center justify-between">
-                    <h4 class="text-sm font-black uppercase tracking-widest text-slate-800">{{ __('pos.payment') }}</h4>
-                    <button type="button" id="set_exact_payment" class="text-[10px] font-black text-brand uppercase tracking-widest hover:underline">{{ __('pos.exact_payment') }}</button>
+                <div class="flex items-center justify-between px-2">
+                    <h4 class="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400">{{ __('pos.payment') }}</h4>
+                    <button type="button" id="set_exact_payment" class="text-[10px] font-black text-brand uppercase tracking-[0.2em] px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-100 hover:bg-emerald-100 transition-all">{{ __('pos.exact_payment') }}</button>
                 </div>
 
                 <div id="payment-rows" class="space-y-4">
                     <!-- JS Inject -->
                 </div>
 
-                <button type="button" id="add_payment_row" class="w-full py-3 bg-slate-50 text-slate-400 rounded-2xl border-2 border-dashed border-slate-100 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-slate-100 transition-all">
+                <button type="button" id="add_payment_row" class="w-full py-4 bg-slate-50 text-slate-400 rounded-2xl border-2 border-dashed border-slate-100/80 text-[10px] font-black uppercase tracking-[0.3em] hover:bg-slate-100 hover:text-slate-600 transition-all flex items-center justify-center gap-2">
+                    <i class="fa fa-plus-circle opacity-30"></i>
                     {{ __('pos.add_payment_method') }}
                 </button>
 
-                <div class="space-y-3 pt-4 border-t border-slate-50">
-                    <div class="flex justify-between items-center">
-                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">{{ __('pos.paid') }}</span>
-                        <span class="text-sm font-black text-slate-700" id="paid_display">Rp 0</span>
+                <div class="space-y-4 pt-6 border-t border-slate-50">
+                    <div class="flex justify-between items-center px-2">
+                        <span class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">{{ __('pos.paid') ?? 'PAID' }}</span>
+                        <span class="text-sm font-black text-slate-600" id="paid_display">Rp 0</span>
                     </div>
-                    <div class="flex justify-between items-center text-brand">
-                        <span class="text-[10px] font-black uppercase tracking-widest italic">{{ __('pos.change_due') }}</span>
-                        <span class="text-xl font-black" id="change_display">Rp 0</span>
+                    <div class="flex justify-between items-center bg-emerald-50/50 p-4 rounded-2xl border border-emerald-100/50 text-brand">
+                        <span class="text-[10px] font-black uppercase tracking-[0.5em]">{{ __('pos.change_due') ?? 'CHANGE DUE' }}</span>
+                        <span class="text-2xl font-black" id="change_display">Rp 0</span>
                     </div>
                 </div>
 
-                <div id="payment-warning" class="p-3 bg-rose-50 text-rose-600 rounded-xl text-[10px] font-bold hidden text-center uppercase tracking-widest">
-                    ⚠️ {{ __('pos.payment_warning') }}
+                <div id="payment-warning" class="p-4 bg-rose-50 text-rose-600 rounded-2xl text-[9px] font-black hidden text-center uppercase tracking-[0.2em] border border-rose-100">
+                    <i class="fa fa-exclamation-circle mr-1"></i>
+                    {{ __('pos.payment_warning') }}
                 </div>
 
                 <form method="POST" action="{{ route('sales.store') }}" id="pos-form">
@@ -323,7 +326,7 @@
                                      <!-- Status Badges -->
                                      <div class="absolute top-2 left-2 flex flex-col gap-1 items-start">
                                          @if($p->stock <= 5)
-                                            <div class="bg-rose-500 text-white px-2 py-1 rounded text-[8px] font-black uppercase tracking-tighter shadow-sm">Low Stock</div>
+                                            <div class="bg-rose-500 text-white px-2 py-1 rounded text-[8px] font-black uppercase tracking-tighter shadow-sm">{{ __('pos.low_stock') }}</div>
                                          @endif
                                      </div>
 
@@ -388,6 +391,125 @@
 
 @endsection
 
+@push('styles')
+    <style>
+        .premium-pos-grid {
+            display: grid !important;
+            grid-template-columns: 1.2fr 1fr 64px !important;
+            gap: 16px !important;
+            margin-bottom: 2rem !important;
+        }
+        .premium-input-wrapper {
+            position: relative !important;
+            height: 64px !important;
+        }
+        .premium-input {
+            width: 100% !important;
+            height: 100% !important;
+            background-color: #ffffff !important;
+            border: 1px solid #f1f5f9 !important;
+            border-radius: 20px !important;
+            padding: 0 80px 0 64px !important;
+            font-size: 14px !important;
+            font-weight: 700 !important;
+            color: #334155 !important;
+            outline: none !important;
+            transition: all 0.2s ease !important;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05) !important;
+            box-sizing: border-box !important;
+        }
+        .premium-input:focus {
+            border-color: #10b981 !important;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.05) !important;
+        }
+        .premium-icon {
+            position: absolute !important;
+            left: 24px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            color: #10b981 !important;
+            opacity: 0.5 !important;
+            font-size: 20px !important;
+            z-index: 10 !important;
+        }
+        .premium-badge {
+            position: absolute !important;
+            right: 16px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            background-color: #f8fafc !important;
+            color: #94a3b8 !important;
+            font-size: 8px !important;
+            font-weight: 900 !important;
+            padding: 6px 10px !important;
+            border-radius: 8px !important;
+            text-transform: uppercase !important;
+            z-index: 10 !important;
+            pointer-events: none !important;
+            border: 1px solid #f1f5f9 !important;
+        }
+        .premium-btn-add {
+            width: 64px !important;
+            height: 64px !important;
+            background-color: #10b981 !important;
+            color: #ffffff !important;
+            border-radius: 20px !important;
+            border: none !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 26px !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.2) !important;
+        }
+        .premium-btn-add:hover {
+            transform: translateY(-2px) !important;
+        }
+
+        /* Select2 POS Custom Style */
+        .select2-container--default .select2-selection--single {
+            background-color: #ffffff !important;
+            border: 1px solid #f1f5f9 !important;
+            border-radius: 20px !important;
+            height: 64px !important;
+            display: flex !important;
+            align-items: center !important;
+            padding: 0 16px !important;
+            font-size: 14px !important;
+            font-weight: 700 !important;
+            color: #334155 !important;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05) !important;
+        }
+        .select2-container--default.select2-container--focus .select2-selection--single {
+            border-color: #10b981 !important;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.05) !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 62px !important;
+            padding-left: 12px !important;
+            text-transform: none !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 62px !important;
+        }
+        
+        .search-results-overlay {
+            position: absolute !important;
+            z-index: 50 !important;
+            left: 0 !important;
+            right: 0 !important;
+            margin-top: 12px !important;
+            background-color: #ffffff !important;
+            border-radius: 20px !important;
+            border: 1px solid #f1f5f9 !important;
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.15) !important;
+            overflow: hidden !important;
+            padding: 4px !important;
+        }
+    </style>
+@endpush
+
 @push('scripts')
     <script>
         jQuery(function($) {
@@ -397,7 +519,36 @@
             const productMap = new Map(products.map(p => [String(p.id), p]));
             let currentTotal = 0;
 
-            // 2. Element Selectors
+            const STORAGE_KEY = 'vizura_pos_cache_' + '{{ auth()->id() }}' + '_' + '{{ $location->id }}';
+
+            // 2. Persistence Logic
+            function saveState() {
+                try {
+                    const state = {
+                        cart: Array.from(cart.entries()),
+                        customer_id: $('#customer-id-input').val(),
+                        customer_name: $('#customer-select').val(),
+                        customer_phone: $('#customer-phone').val(),
+                        order_type: $('#order_type_input').val(),
+                        order_discount: $('#order_discount').val(),
+                        tax_rate: $('#tax_rate').val(),
+                        tax_inc: $('#is_tax_inclusive').prop('checked'),
+                        notes: $('textarea[name="notes"]').val(),
+                        payments: Array.from(document.querySelectorAll('.payment-row')).map(row => ({
+                            method: row.querySelector('.payment-method').value,
+                            amount: row.querySelector('.payment-amount').value,
+                            reference_no: row.querySelector('input[name*="reference_no"]').value
+                        }))
+                    };
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+                } catch (e) { console.warn("Failed to save POS state", e); }
+            }
+
+            function clearState() {
+                localStorage.removeItem(STORAGE_KEY);
+            }
+
+            // 3. Element Selectors
             const scanInput = document.getElementById('scan_input');
             const addManualButton = document.getElementById('add_manual');
             const productSelect = $('#product_select');
@@ -414,8 +565,8 @@
             const taxRateLabel = document.getElementById('tax_rate_val');
             const taxInclusiveInput = document.getElementById('is_tax_inclusive');
             const paymentRows = document.getElementById('payment-rows');
-            const paymentWarning = document.getElementById('payment-warning');
-            const searchResults = document.createElement('div');
+            const searchResults = document.getElementById('search_results');
+            const resultsContainer = document.getElementById('results_container');
 
             // 3. Helper Functions
             const moneyFormat = v => 'Rp ' + new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(v);
@@ -496,6 +647,7 @@
                 }));
                 syncBrowserBadges();
                 updateTotals();
+                saveState();
             }
 
             function syncBrowserBadges() {
@@ -554,6 +706,7 @@
                 if (stockWarning) stockWarning.classList.toggle('hidden', !si);
                 if (paymentWarning) paymentWarning.classList.toggle('hidden', paid >= currentTotal || cart.size === 0);
                 if (payButton) payButton.disabled = si || od > st || paid < currentTotal || cart.size === 0;
+                saveState();
             }
 
             function handleScan(val) {
@@ -632,20 +785,22 @@
 
             initSelect2();
 
-            // Custom Styling for Select2
+            // Enhanced Select2 Integration
             const style = document.createElement('style');
             style.innerHTML = `
-                .select2-container--default .select2-selection--single { background-color: #f8fafc; border: none; border-radius: 1rem; height: 56px; padding-left: 12px; display: flex; align-items: center; font-size: 13px; font-weight: 700; color: #334155; }
-                .select2-container--default .select2-selection--single .select2-selection__arrow { height: 56px; right: 15px; }
-                .select2-container--default .select2-selection--single .select2-selection__rendered { color: #334155; }
-                .select2-dropdown { border-radius: 1rem; border: 1px solid #f1f5f9; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); overflow: hidden; }
-                .select2-search__field { border-radius: 0.5rem !important; border: 1px solid #f1f5f9 !important; }
+                /* Hide number spinners */
+                input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+                input[type=number] { -moz-appearance: textfield; }
+
+                .select2-container--default .select2-selection--single { background-color: #ffffff; border: 1px solid #f1f5f9; border-radius: 2rem; height: 64px !important; padding-left: 20px !important; display: flex !important; align-items: center !important; font-size: 14px; font-weight: 800; color: #334155; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); }
+                .select2-container--default .select2-selection--single .select2-selection__arrow { height: 64px !important; right: 20px !important; }
+                .select2-container--default .select2-selection--single .select2-selection__rendered { color: #334155 !important; padding-right: 30px !important; }
+                .select2-dropdown { border-radius: 1.5rem; border: 1px solid #f1f5f9; box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.2); overflow: hidden; margin-top: 8px; z-index: 9999; }
+                .select2-search__field { border-radius: 0.75rem !important; border: 1px solid #f1f5f9 !important; padding: 12px 16px !important; }
             `;
             document.head.appendChild(style);
 
-            // Search Results Overlay setup
-            searchResults.className = 'absolute z-50 left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-slate-100 hidden overflow-hidden';
-            if (scanInput?.parentElement) scanInput.parentElement.appendChild(searchResults);
+            // Search Results Overlay setup is already in HTML structure
 
             let searchTimeout = null;
             if (scanInput) {
@@ -674,14 +829,24 @@
             }
 
             function renderSearchResults(data) {
-                searchResults.innerHTML = '';
+                resultsContainer.innerHTML = '';
                 searchResults.classList.remove('hidden');
                 data.forEach(p => {
                     const item = document.createElement('div');
-                    item.className = 'px-6 py-4 hover:bg-slate-50 cursor-pointer flex justify-between items-center border-b border-slate-50 last:border-0';
+                    item.className = "flex items-center justify-between p-4 hover:bg-slate-50 cursor-pointer rounded-2xl transition-all group text-left";
                     item.innerHTML = `
-                        <div><p class="text-sm font-bold text-slate-700">${p.name}</p><p class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">${p.sku} | Stok: ${p.stock}</p></div>
-                        <div class="text-right"><p class="text-sm font-black text-brand">${moneyFormat(p.price)}</p></div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-brand/10 group-hover:text-brand transition-all">
+                                <i class="fa fa-cube"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-sm font-bold text-slate-700">${p.name}</p>
+                                <p class="text-[10px] font-black text-slate-400 uppercase leading-none mt-1">${p.sku} | Stok: ${p.stock}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                           <p class="text-sm font-black text-brand">${moneyFormat(p.price)}</p>
+                        </div>
                     `;
                     item.onclick = () => {
                         productMap.set(String(p.id), p);
@@ -690,7 +855,7 @@
                         searchResults.classList.add('hidden');
                         if (scanInput) { scanInput.value = ''; scanInput.focus(); }
                     };
-                    searchResults.appendChild(item);
+                    resultsContainer.appendChild(item);
                 });
             }
 
@@ -816,20 +981,33 @@
                 if (!paymentRows) return;
                 const idx = paymentRows.querySelectorAll('.payment-row').length;
                 const row = document.createElement('div');
-                row.className = 'payment-row flex items-center gap-2 mb-2';
+                row.className = 'payment-row grid grid-cols-[85px_1fr_65px_25px] gap-2 mb-3 items-center';
                 row.innerHTML = `
-                    <select class="payment-method bg-slate-50 border-none rounded-xl px-3 py-3 text-xs font-bold text-slate-600 focus:ring-1 focus:ring-brand" name="payments[${idx}][method]" form="pos-form">
+                    <select class="payment-method h-12 bg-slate-50 border-none rounded-xl px-2 text-[9px] font-black uppercase tracking-tighter text-slate-500 focus:ring-4 focus:ring-brand/10 transition-all cursor-pointer" name="payments[${idx}][method]" form="pos-form">
                         <option value="cash" ${m === 'cash' ? 'selected' : ''}>CASH</option>
                         <option value="card" ${m === 'card' ? 'selected' : ''}>CARD</option>
                         <option value="transfer" ${m === 'transfer' ? 'selected' : ''}>TRF</option>
                         <option value="qris" ${m === 'qris' ? 'selected' : ''}>QRIS</option>
-                        <option value="piutang" ${m === 'piutang' ? 'selected' : ''}>RECEIVABLE</option>
+                        <option value="piutang" ${m === 'piutang' ? 'selected' : ''}>PIUTANG</option>
                     </select>
-                    <input type="number" step="0.01" class="payment-amount flex-1 bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-black text-slate-900 focus:ring-1 focus:ring-brand" name="payments[${idx}][amount]" value="${a}" placeholder="Amount" form="pos-form">
-                    <input type="text" class="w-16 bg-slate-50 border-none rounded-xl px-2 py-3 text-[10px] font-bold text-slate-400 focus:ring-1 focus:ring-brand" name="payments[${idx}][reference_no]" value="${r}" placeholder="Ref" form="pos-form">
+                    <div class="relative">
+                        <input type="number" step="0.01" class="payment-amount w-full h-12 bg-slate-50 border-none rounded-xl px-4 text-sm font-black text-slate-800 focus:ring-4 focus:ring-brand/10 transition-all placeholder:text-slate-300" name="payments[${idx}][amount]" value="${a}" placeholder="0" form="pos-form">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[7px] font-black text-slate-300 pointer-events-none uppercase tracking-tighter hidden lg:block">AMOUNT</span>
+                    </div>
+                    <input type="text" class="w-full h-12 bg-slate-50 border-none rounded-xl px-2 text-[9px] font-bold text-slate-400 focus:ring-4 focus:ring-brand/10 transition-all placeholder:text-slate-300 text-center" name="payments[${idx}][reference_no]" value="${r}" placeholder="REF" form="pos-form">
+                    <button type="button" class="remove-payment-row text-slate-300 hover:text-rose-500 transition-colors flex items-center justify-center">
+                        <i class="fa fa-times-circle text-lg"></i>
+                    </button>
                 `;
                 paymentRows.appendChild(row);
                 row.querySelectorAll('input, select').forEach(i => i.addEventListener('input', updateTotals));
+                
+                row.querySelector('.remove-payment-row').addEventListener('click', () => {
+                    if (paymentRows.querySelectorAll('.payment-row').length > 1) {
+                        row.remove();
+                        updateTotals();
+                    }
+                });
             }
 
             $('#add_payment_row').on('click', () => { addPaymentRowFields('', '', ''); updateTotals(); });
@@ -845,13 +1023,65 @@
 
             // Initial Data Load
             const initialItems = @json(old('items', $draftItems ?? []));
-            initialItems.forEach(item => {
-                const p = productMap.get(String(item.product_id));
-                if (p) addToCart(p, item.quantity, item.unit_price || p.price, item.line_discount || 0);
-            });
             const initialPayments = @json(old('payments', []));
-            if (initialPayments.length) initialPayments.forEach(p => addPaymentRowFields(p.method, p.amount, p.reference_no));
-            else addPaymentRowFields('cash', '', '');
+            
+            // Try to load from cache if no server-side draft or old input
+            const cachedData = localStorage.getItem(STORAGE_KEY);
+            let hasLoadedFromCache = false;
+
+            if (cachedData && initialItems.length === 0 && initialPayments.length === 0) {
+                try {
+                    const state = JSON.parse(cachedData);
+                    if (state.cart) state.cart.forEach(([k, v]) => cart.set(k, v));
+                    
+                    setTimeout(() => {
+                        if (state.customer_name) {
+                            $('#customer-select').val(state.customer_name).trigger('change');
+                            $('#customer-phone').val(state.customer_phone);
+                            $('#customer-id-input').val(state.customer_id);
+                        }
+                        if (state.order_type) {
+                            $(`.order-type-btn[data-value="${state.order_type}"]`).click();
+                        }
+                        if (state.tax_rate) {
+                            $('#tax_rate').val(state.tax_rate).trigger('input');
+                            if (state.tax_inc) $('#is_tax_inclusive').prop('checked', true);
+                            // Set tax button active
+                            $(`.tax-mode-btn[data-rate="${state.tax_rate}"][data-inc="${state.tax_inc ? 1 : 0}"]`).click();
+                        }
+                        if (state.order_discount) $('#order_discount').val(state.order_discount).trigger('input');
+                        if (state.notes) $('textarea[name="notes"]').val(state.notes);
+                        
+                        // Payments
+                        if (state.payments && state.payments.length) {
+                            paymentRows.innerHTML = '';
+                            state.payments.forEach(p => addPaymentRowFields(p.method, p.amount, p.reference_no));
+                        }
+                        updateTotals();
+                    }, 500); // Small delay for select2 and other inits
+                    hasLoadedFromCache = true;
+                } catch (e) { console.warn("Failed to load POS cache", e); }
+            }
+
+            if (!hasLoadedFromCache) {
+                initialItems.forEach(item => {
+                    const p = productMap.get(String(item.product_id));
+                    if (p) addToCart(p, item.quantity, item.unit_price || p.price, item.line_discount || 0);
+                });
+                if (initialPayments.length) initialPayments.forEach(p => addPaymentRowFields(p.method, p.amount, p.reference_no));
+                else addPaymentRowFields('cash', '', '');
+            }
+
+            // Clear cache on submit
+            $('#pos-form').on('submit', function() {
+                saveState(); // Update one last time
+                // We clear it here, but if validation fails, old() will take over on refresh.
+                // If it succeeds, they go to a new page, and returning here will have a fresh screen.
+                localStorage.removeItem(STORAGE_KEY);
+            });
+
+            // Extra listeners for saveState
+            $('textarea[name="notes"]').on('input', saveState);
 
             updateCartTable();
         });

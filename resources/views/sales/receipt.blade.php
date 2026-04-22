@@ -88,6 +88,9 @@
                     <h3 class="text-2xl font-black text-slate-900 tracking-tighter italic">{{ $sale->location?->name ?? config('app.name') }}</h3>
                     <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mt-1.5 leading-relaxed">{{ $sale->location?->address ?? 'Operation Address' }}</p>
                     <p class="text-[10px] font-bold text-slate-300 mt-1 italic">Phone: {{ $sale->location?->phone ?? '-' }}</p>
+                    @if($sale->location?->receipt_header)
+                        <p class="text-[10px] font-medium text-slate-400 mt-2 px-6">{{ $sale->location->receipt_header }}</p>
+                    @endif
                 </div>
             </div>
 
@@ -172,8 +175,8 @@
             <div class="mt-16 text-center">
                 <div class="py-6 border-y border-slate-50 relative">
                     <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 bg-white text-[9px] font-black text-slate-300 uppercase tracking-[0.3em] italic">Closing Tag</div>
-                    <p class="text-sm font-black text-slate-900 uppercase tracking-[0.2em] italic">Thank You</p>
-                    <p class="text-[10px] font-bold text-slate-400 mt-1 italic">Please Come Again</p>
+                    <p class="text-sm font-black text-slate-900 uppercase tracking-[0.2em] italic">{{ $sale->location?->receipt_footer ?? 'Thank You' }}</p>
+                    <p class="text-[10px] font-bold text-slate-400 mt-1 italic">{{ $sale->location?->receipt_tagline ?? 'Please Come Again' }}</p>
                 </div>
                 <div class="mt-10 flex justify-center items-center gap-2 opacity-30">
                      <span class="w-8 h-px bg-slate-300"></span>
