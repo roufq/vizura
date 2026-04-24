@@ -3,74 +3,9 @@
 @section('title', 'Sale Receipt')
 
 @section('content')
-    <style>
-        /* receipt-view-isolation */
-        header, .fixed.inset-y-0, footer { display: none !important; }
-        .lg\:pl-72 { padding-left: 0 !important; }
-        main.flex-1 { padding: 0 !important; }
-        body { background-color: #f1f5f9 !important; }
-
-        @media print {
-            @page {
-                margin: 0;
-                size: auto;
-            }
-            html, body { 
-                background-color: white !important; 
-                margin: 0 !important;
-                padding: 0 !important;
-                height: auto !important;
-                min-height: 0 !important;
-                overflow: visible !important;
-            }
-            .print-hidden { display: none !important; }
-            
-            /* Reset wrapper constraints - Remove flex centering for print */
-            .min-h-screen { 
-                min-height: 0 !important; 
-                height: auto !important; 
-                display: block !important; 
-                padding: 0 !important;
-                margin: 0 !important;
-            }
-            .py-12, .px-4 { padding: 0 !important; }
-            
-            #receipt-area {
-                width: 76mm !important;
-                max-width: 76mm !important;
-                margin: 0 auto !important;
-                padding: 5mm !important;
-                box-shadow: none !important;
-                border: none !important;
-                border-radius: 0 !important;
-                overflow: visible !important;
-                position: relative !important;
-                top: 0 !important;
-                left: 0 !important;
-                display: block !important;
-                page-break-inside: avoid !important;
-                break-inside: avoid-page !important;
-            }
-
-            /* Tighten spacings for print */
-            #receipt-area .mb-12 { margin-bottom: 0.75rem !important; }
-            #receipt-area .mb-10 { margin-bottom: 0.5rem !important; }
-            #receipt-area .mt-10 { margin-top: 0.5rem !important; }
-            #receipt-area .mt-16 { margin-top: 0.75rem !important; }
-            #receipt-area .space-y-8 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem !important; }
-            #receipt-area .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.25rem !important; }
-            #receipt-area .p-8, #receipt-area .p-12, #receipt-area .sm\:p-12 { padding: 0 !important; }
-            #receipt-area .p-6 { padding: 0.5rem !important; }
-            #receipt-area .pt-8 { padding-top: 0.5rem !important; }
-            #receipt-area .pt-4 { padding-top: 0.25rem !important; }
-            #receipt-area .py-6 { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
-            #receipt-area .mt-4 { margin-top: 0.25rem !important; }
-            
-            /* Adjust font sizes if needed */
-            #receipt-area .text-3xl { font-size: 1.25rem !important; }
-            #receipt-area .text-2xl { font-size: 1.1rem !important; }
-        }
-    </style>
+    @push('styles')
+        <link href="{{ asset('assets/css/pages/sale-receipt.css') }}" rel="stylesheet">
+    @endpush
 
     <div class="flex flex-col items-center justify-center min-h-screen py-12 px-4 text-slate-900">
         
@@ -197,11 +132,7 @@
         </div>
     </div>
 
-    <script>
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                window.print();
-            }, 500);
-        });
-    </script>
+    @push('scripts')
+        <script src="{{ asset('assets/js/pages/sale-receipt-print.js') }}"></script>
+    @endpush
 @endsection

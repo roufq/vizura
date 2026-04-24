@@ -86,7 +86,7 @@ Route::middleware(['auth', 'active_location'])->group(function () {
         ->name('receivables.show');
     Route::post('receivables/{sale}', [ReceivableController::class, 'store'])
         ->name('receivables.store');
-    Route::resource('stock-transfers', StockTransferController::class)->except(['show', 'edit', 'update']);
+    Route::resource('stock-transfers', StockTransferController::class)->except(['edit', 'update']);
     Route::post('stock-transfers/{stockTransfer}/send', [StockTransferController::class, 'send'])
         ->name('stock-transfers.send');
     Route::post('stock-transfers/{stockTransfer}/receive', [StockTransferController::class, 'receive'])

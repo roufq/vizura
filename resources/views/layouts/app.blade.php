@@ -23,84 +23,14 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
+    <!-- Turbo for Seamless Transitions -->
+    <script src="https://cdn.jsdelivr.net/npm/@hotwired/turbo@8.0.0/dist/turbo.es2017-umd.js"></script>
+    <meta name="turbo-refresh-method" content="morph">
+    <meta name="turbo-refresh-scroll" content="preserve">
 
-    @stack('styles')
-
-    <style>
-        [x-cloak] { display: none !important; }
-
-        /* Select2 Premium Theme */
-        .select2-container { width: 100% !important; }
-        .select2-container--default .select2-selection--single {
-            background-color: #f8fafc !important;
-            border: 1px solid #f1f5f9 !important;
-            border-radius: 12px !important;
-            height: 40px !important;
-            display: flex !important;
-            align-items: center !important;
-            transition: all 0.2s ease-in-out !important;
-        }
-        .select2-container--default.select2-container--focus .select2-selection--single,
-        .select2-container--default.select2-container--open .select2-selection--single {
-            border-color: #6366f1 !important;
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important;
-            background-color: #fff !important;
-        }
-        .select2-container--default .select2-selection--single .select2-selection__rendered {
-            color: #1e293b !important;
-            font-size: 11px !important;
-            font-weight: 800 !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.025em !important;
-            padding-left: 1.25rem !important;
-        }
-        .select2-container--default .select2-selection--single .select2-selection__arrow {
-            height: 38px !important;
-            right: 12px !important;
-        }
-        .select2-dropdown {
-            border: 1px solid #f1f5f9 !important;
-            border-radius: 16px !important;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05) !important;
-            overflow: hidden !important;
-            margin-top: 6px !important;
-            z-index: 9999 !important;
-        }
-        .select2-search--dropdown { padding: 10px !important; }
-        .select2-container--default .select2-search--dropdown .select2-search__field {
-            border: 1px solid #f1f5f9 !important;
-            border-radius: 10px !important;
-            background-color: #f8fafc !important;
-            padding: 6px 12px !important;
-            font-size: 11px !important;
-            font-weight: 700 !important;
-            outline: none !important;
-        }
-        .select2-results__option {
-            padding: 10px 16px !important;
-            font-size: 11px !important;
-            font-weight: 700 !important;
-            color: #64748b !important;
-        }
-        .select2-container--default .select2-results__option--highlighted[aria-selected] {
-            background-color: #6366f1 !important;
-            color: #fff !important;
-        }
-        .select2-container--default .select2-results__option[aria-selected=true] {
-            background-color: #f8fafc !important;
-            color: #6366f1 !important;
-            font-weight: 800 !important;
-        }
-
-        /* Custom Scrollbar Premium */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { 
-            background: #e2e8f0; 
-            border-radius: 10px; 
-        }
-        ::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
-    </style>
+    <!-- Modernization Assets -->
+    <link href="{{ asset('assets/css/app-modern.css') }}" rel="stylesheet">
 
     @stack('styles')
 </head>
@@ -119,7 +49,7 @@
          @click="sidebarOpen = false"></div>
 
     <!-- Sidebar Wrapper -->
-    <div class="fixed inset-y-0 left-0 w-72 bg-white border-r border-slate-200 z-50 transform transition-transform duration-300 lg:translate-x-0"
+    <div id="main-sidebar" class="fixed inset-y-0 left-0 w-72 bg-white border-r border-slate-200 z-50 transform transition-transform duration-300 lg:translate-x-0"
          :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
         
         <!-- Logo & Header -->
@@ -387,47 +317,15 @@
     <script src="{{ asset('assets/plugin/waves/waves.min.js') }}"></script>
     <script src="{{ asset('assets/plugin/sweet-alert/sweetalert.min.js') }}"></script>
     
+    <!-- Modernization Logic -->
     <script>
-        (function($) {
-            $(document).ready(function() {
-                const initSelect2 = () => {
-                    if (typeof $.fn.select2 === 'undefined') return;
-                    
-                    $('select:not(.no-select2)').each(function() {
-                        const $el = $(this);
-                        if (!$el.hasClass('select2-hidden-accessible')) {
-                            $el.select2({
-                                width: '100%',
-                                placeholder: $el.attr('placeholder') || '{{ __('app.choose') }}...',
-                                allowClear: true
-                            });
-                        }
-                    });
-                };
-
-                initSelect2();
-
-                // Re-init on dynamic changes (Alpine/Livewire)
-                document.addEventListener('alpine:initialized', initSelect2);
-                $(document).on('select2-reinit', initSelect2);
-
-                // Sidebar Scroll Persistence
-                const sidebarScroll = document.getElementById('sidebar-scroll');
-                if (sidebarScroll) {
-                    // Restore position
-                    const savedPosition = localStorage.getItem('sidebar-scroll-position');
-                    if (savedPosition) {
-                        sidebarScroll.scrollTop = parseInt(savedPosition, 10);
-                    }
-
-                    // Save position before navigation
-                    window.addEventListener('beforeunload', () => {
-                        localStorage.setItem('sidebar-scroll-position', sidebarScroll.scrollTop);
-                    });
-                }
-            });
-        })(window.jQuery || $);
+        window.VizuraConfig = {
+            translations: {
+                choose: "{{ __('app.choose') }}..."
+            }
+        };
     </script>
+    <script src="{{ asset('assets/js/app-modern.js') }}"></script>
     
     @stack('scripts')
 </body>

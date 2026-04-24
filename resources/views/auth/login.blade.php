@@ -14,14 +14,7 @@
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-    <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-    </style>
+    <link href="{{ asset('assets/css/pages/login.css') }}" rel="stylesheet">
 </head>
 
 <body class="h-full bg-slate-50 flex items-center justify-center p-6 sm:p-12 overflow-hidden relative">

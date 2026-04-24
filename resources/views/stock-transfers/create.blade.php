@@ -4,9 +4,10 @@
 @section('page-title', __('transfer.page_title'))
 
 @section('content')
-    <div class="max-w-6xl mx-auto space-y-8">
-        <a href="{{ route('stock-transfers.index') }}" class="inline-flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-brand transition-colors uppercase tracking-widest mb-2 px-4">
-            <i class="fa fa-arrow-left"></i> {{ __('transfer.back_to_history') }}
+    <div class="space-y-8">
+        <a href="{{ route('stock-transfers.index') }}" class="group inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-brand transition-all">
+            <i class="fa fa-arrow-left transition-transform group-hover:-translate-x-1"></i>
+            {{ __('app.back_to_list') }}
         </a>
 
         <form method="POST" action="{{ route('stock-transfers.store') }}" id="transfer-form" class="space-y-8">
@@ -136,55 +137,7 @@
         </tr>
     </template>
 
-    <script>
-        (function () {
-            const tableBody = document.getElementById('transfer-items');
-            const addButton = document.getElementById('add-transfer-row');
-            const template = document.getElementById('transfer-item-template');
-
-            if (!tableBody || !addButton || !template) return;
-
-            let nextIndex = tableBody.querySelectorAll('tr').length;
-
-            function refreshRemoveButtons() {
-                const rows = tableBody.querySelectorAll('tr');
-                rows.forEach(row => {
-                    const btn = row.querySelector('.js-remove-row');
-                    if (btn) btn.style.display = rows.length <= 1 ? 'none' : 'block';
-                });
-            }
-
-            addButton.addEventListener('click', () => {
-                const html = template.innerHTML.replace(/__INDEX__/g, nextIndex++);
-                const wrapper = document.createElement('tbody');
-                wrapper.innerHTML = html.trim();
-                const newRow = wrapper.firstElementChild;
-                tableBody.appendChild(newRow);
-                
-                // Initialize Select2 for the new row if using any specialized library
-                if (window.jQuery && typeof jQuery.fn.select2 === 'function') {
-                    jQuery(newRow).find('.js__select1').select2({ width: '100%', dropdownAutoWidth: true });
-                }
-                
-                refreshRemoveButtons();
-            });
-
-            tableBody.addEventListener('click', e => {
-                const btn = e.target.closest('.js-remove-row');
-                if (!btn) return;
-                const rows = tableBody.querySelectorAll('tr');
-                if (rows.length > 1) {
-                    btn.closest('tr').remove();
-                    refreshRemoveButtons();
-                }
-            });
-
-            // Initialize existing select2 elements
-            $(document).ready(function() {
-                $('.js__select2').select2({ width: '100%', dropdownAutoWidth: true });
-            });
-
-            refreshRemoveButtons();
-        })();
-    </script>
+    @push('scripts')
+        <script src="{{ asset('assets/js/pages/stock-transfer-create.js') }}"></script>
+    @endpush
 @endsection

@@ -27,9 +27,28 @@ class StockTransferController extends Controller
         $allowedLocationIds = $user?->accessibleLocationIds() ?? [];
         $canViewAll = $user?->hasRole('Owner') ?? false;
 
+        $search = request('search');
+        $status = request('status');
+        $locationId = request('location_id');
+
         $transfersQuery = StockTransfer::query()
             ->with(['sourceLocation', 'destinationLocation', 'requester', 'sender', 'receiver'])
             ->latest();
+
+        if ($search) {
+            $transfersQuery->where('reference_no', 'like', "%{$search}%");
+        }
+
+        if ($status) {
+            $transfersQuery->where('status', $status);
+        }
+
+        if ($locationId) {
+            $transfersQuery->where(function ($query) use ($locationId): void {
+                $query->where('source_location_id', $locationId)
+                    ->orWhere('destination_location_id', $locationId);
+            });
+        }
 
         if (! $canViewAll) {
             if ($allowedLocationIds === []) {
@@ -43,8 +62,9 @@ class StockTransferController extends Controller
         }
 
         $transfers = $transfersQuery->paginate(10);
+        $locations = Location::active()->orderBy('name')->get();
 
-        return view('stock-transfers.index', compact('transfers'));
+        return view('stock-transfers.index', compact('transfers', 'search', 'status', 'locationId', 'locations'));
     }
 
     public function create(): View
@@ -80,6 +100,13 @@ class StockTransferController extends Controller
         $referenceNo = $this->generateReferenceNo();
 
         return view('stock-transfers.create', compact('locations', 'products', 'referenceNo', 'sourceLocation'));
+    }
+
+    public function show(StockTransfer $stockTransfer): View
+    {
+        $stockTransfer->load(['items.product', 'sourceLocation', 'destinationLocation', 'requester', 'sender', 'receiver']);
+
+        return view('stock-transfers.show', compact('stockTransfer'));
     }
 
     public function store(StoreStockTransferRequest $request): RedirectResponse

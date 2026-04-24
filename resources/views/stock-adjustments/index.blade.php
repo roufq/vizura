@@ -46,8 +46,10 @@
 
                     <div class="flex items-center gap-3">
                         @if($adjustments->where('status', 'pending')->count() > 0)
-                            <button type="button" onclick="if(confirm('{{ __('adjustment.bulk_approve_confirm') ?? 'Approve all pending data?' }}')) document.getElementById('bulk-approve-form').submit();" 
-                                    class="px-5 py-2.5 bg-emerald-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all">
+                            <button type="button" 
+                                    class="js-bulk-approve px-5 py-2.5 bg-emerald-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all"
+                                    data-confirm="{{ __('adjustment.bulk_approve_confirm') ?? 'Approve all pending data?' }}"
+                                    data-form="bulk-approve-form">
                                 <i class="fa fa-check-double mr-2"></i>{{ __('adjustment.bulk_approve') }}
                             </button>
                         @endif
@@ -162,3 +164,7 @@
         </x-ui.card>
     </div>
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('assets/js/pages/stock-adjustment-index.js') }}"></script>
+@endpush
