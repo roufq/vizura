@@ -28,7 +28,7 @@ class UpdateLocationRequest extends FormRequest
                 'required',
                 'string',
                 'max:50',
-                Rule::unique('locations', 'code')->ignore($this->route('location')),
+                Rule::unique('locations', 'code')->ignore($this->route('location'))->where('tenant_id', auth()->user()->tenant_id),
             ],
             'name' => ['required', 'string', 'max:150'],
             'address' => ['nullable', 'string', 'max:255'],

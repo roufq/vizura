@@ -9,7 +9,7 @@
             <i class="fa fa-arrow-left"></i> {{ __('location.back_to_list') }}
         </a>
 
-        <x-ui.card icon="map-marker" title="{{ __('location.location_info') }}">
+        <x-ui.card icon="map-marker" title="{{ $hasMainStore ? __('location.location_info') : 'Informasi Toko Utama' }}">
             <form method="POST" action="{{ route('locations.store') }}" class="space-y-6">
                 @csrf
 
@@ -22,8 +22,8 @@
                     </div>
 
                     <div class="space-y-2">
-                        <label for="name" class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">{{ __('location.name_label') }} <span class="text-rose-500">*</span></label>
-                        <input type="text" id="name" name="name" value="{{ old('name') }}" placeholder="{{ __('location.name_placeholder') }}" required
+                        <label for="name" class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">{{ $hasMainStore ? __('location.name_label') : 'Nama Toko Utama' }} <span class="text-rose-500">*</span></label>
+                        <input type="text" id="name" name="name" value="{{ old('name') }}" placeholder="{{ $hasMainStore ? __('location.name_placeholder') : 'Masukkan nama toko utama Anda...' }}" required
                                class="w-full bg-slate-50 border-transparent rounded-2xl px-6 py-4 text-sm font-bold text-slate-800 focus:ring-4 focus:ring-brand/10 transition-all">
                         @error('name') <p class="text-[10px] text-rose-500 font-bold mt-1 ml-1 uppercase">{{ $message }}</p> @enderror
                     </div>
@@ -45,10 +45,13 @@
                                     <span class="ml-3 text-xs font-bold text-slate-600 uppercase tracking-widest">{{ __('location.active') }}</span>
                                 </label>
 
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" name="toko_pusat" value="1" class="sr-only peer" {{ old('toko_pusat') ? 'checked' : '' }}>
+                                <label class="relative inline-flex items-center {{ !$hasMainStore ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'cursor-pointer' }}">
+                                    <input type="checkbox" name="toko_pusat" value="1" class="sr-only peer" {{ $hasMainStore ? (old('toko_pusat') ? 'checked' : '') : 'checked' }}>
                                     <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
                                     <span class="ml-3 text-xs font-bold text-slate-600 uppercase tracking-widest">{{ __('location.headquarters') }}</span>
+                                    @if(!$hasMainStore)
+                                        <input type="hidden" name="toko_pusat" value="1">
+                                    @endif
                                 </label>
                             </div>
                             @error('toko_pusat') <p class="text-[10px] text-rose-500 font-bold mt-1 ml-1 uppercase">{{ $message }}</p> @enderror

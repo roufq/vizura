@@ -23,7 +23,7 @@ class StoreLocationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'code' => ['required', 'string', 'max:50', 'unique:locations,code'],
+            'code' => ['required', 'string', 'max:50', \Illuminate\Validation\Rule::unique('locations')->where('tenant_id', auth()->user()->tenant_id)],
             'name' => ['required', 'string', 'max:150'],
             'address' => ['nullable', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'max:30'],

@@ -16,7 +16,7 @@ class EnsureActiveLocation
             return $next($request);
         }
 
-        if (! $request->user()) {
+        if (! $request->user() || $request->routeIs('locations.active') || $request->routeIs('locations.update') || $request->routeIs('locations.create') || $request->routeIs('locations.store')) {
             return $next($request);
         }
 

@@ -14,7 +14,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use AuditLoggable, HasFactory, HasRoles, Notifiable, SoftDeletes;
+    use \App\Models\Concerns\BelongsToTenant, AuditLoggable, HasFactory, HasRoles, Notifiable, SoftDeletes;
 
     protected string $guard_name = 'web';
 
@@ -28,6 +28,7 @@ class User extends Authenticatable
         'email',
         'password',
         'active_location_id',
+        'tenant_id',
     ];
 
     /**
@@ -56,6 +57,11 @@ class User extends Authenticatable
     public function activeLocation(): BelongsTo
     {
         return $this->belongsTo(Location::class, 'active_location_id');
+    }
+
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class);
     }
 
     public function locations(): BelongsToMany

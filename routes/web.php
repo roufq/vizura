@@ -115,6 +115,20 @@ Route::middleware(['auth', 'active_location'])->group(function () {
     Route::get('reports/stock-card', [ReportController::class, 'stockCard'])->name('reports.stock-card');
     Route::get('reports/income-statement', [ReportController::class, 'incomeStatement'])->name('reports.income-statement');
     Route::get('reports/cash-flow', [ReportController::class, 'cashFlow'])->name('reports.cash-flow');
+
+    // Billing / Upgrade
+    Route::get('billing/upgrade', function () {
+        return view('billing.upgrade');
+    })->name('billing.upgrade');
+
+    // Super Admin Routes
+    Route::middleware('role:Super Admin')->prefix('super-admin')->name('super-admin.')->group(function () {
+        Route::patch('tenants/{tenant}/status', [App\Http\Controllers\SuperAdmin\TenantController::class, 'updateStatus'])->name('tenants.status');
+        Route::resource('tenants', App\Http\Controllers\SuperAdmin\TenantController::class);
+        
+        Route::get('settings', [App\Http\Controllers\SuperAdmin\SaaSConfigController::class, 'index'])->name('settings.index');
+        Route::post('settings', [App\Http\Controllers\SuperAdmin\SaaSConfigController::class, 'update'])->name('settings.update');
+    });
 });
 
 Route::get('/ui-preview', function () {

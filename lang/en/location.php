@@ -40,4 +40,5 @@ return [
     'select_location_desc' => 'Select the location where you will transact today. This will adjust stock and reports automatically.',
     'choose_location' => 'Choose Location',
     'enter_location' => 'Enter Location',
+    'back_to_list' => 'Back to List',
 ];

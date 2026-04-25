@@ -27,8 +27,14 @@ trait AuditLoggable
 
     protected static function logActivity(Model $model, string $event, array $extra = []): void
     {
+        $user = auth()->user();
+        if ($user && $user->tenant && !$user->tenant->canAccess('audit_trail')) {
+            return;
+        }
+
         AuditLog::create([
             'user_id' => auth()->id(),
+            'tenant_id' => $user?->tenant_id,
             'location_id' => \App\Support\ActiveLocation::id(),
             'action' => strtolower(class_basename($model)).'_'.$event,
             'metadata' => array_merge([

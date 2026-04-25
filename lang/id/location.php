@@ -40,4 +40,5 @@ return [
     'select_location_desc' => 'Pilih lokasi tempat Anda bertransaksi hari ini. Stok dan laporan akan menyesuaikan secara otomatis.',
     'choose_location' => 'Pilih Lokasi',
     'enter_location' => 'Masuk ke Lokasi',
+    'back_to_list' => 'Kembali ke Daftar',
 ];

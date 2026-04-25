@@ -46,9 +46,13 @@ class UserController extends Controller
         return view('users.index', compact('users', 'search', 'role'));
     }
 
-    public function create(): View
+    public function create(): \Illuminate\View\View|\Illuminate\Http\RedirectResponse
     {
         $user = request()->user();
+        if ($user->tenant && \App\Models\User::count() >= $user->tenant->maxUsers()) {
+            return redirect()->route('billing.upgrade');
+        }
+
         $locations = $this->allowedLocations($user);
 
         return view('users.create', [
@@ -59,8 +63,13 @@ class UserController extends Controller
 
     public function store(StoreUserRequest $request): RedirectResponse
     {
-        $data = $request->validated();
         $creator = $request->user();
+        // Check limit during store as well
+        if ($creator->tenant && \App\Models\User::count() >= $creator->tenant->maxUsers()) {
+            return redirect()->route('billing.upgrade');
+        }
+
+        $data = $request->validated();
 
         $this->ensureRoleAllowed($creator, $data['role']);
         $locationIds = $this->filterLocationIds($creator, $data['location_ids'] ?? []);
@@ -193,8 +202,16 @@ class UserController extends Controller
      */
     private function availableRoles($user): array
     {
+        $isSuperAdmin = $user?->hasRole('Super Admin');
+        $tenant = $user?->tenant;
+        $hasRBAC = $isSuperAdmin || ($tenant && $tenant->canAccess('rbac_manager_head'));
+
         if ($user?->hasRole('Owner')) {
-            return ['Owner', 'Manager', 'HeadStore', 'Cashier'];
+            if ($hasRBAC) {
+                return ['Owner', 'Manager', 'HeadStore', 'Cashier'];
+            }
+            // For Starter: only Owner and Cashier
+            return ['Owner', 'Cashier'];
         }
 
         return ['HeadStore', 'Cashier'];

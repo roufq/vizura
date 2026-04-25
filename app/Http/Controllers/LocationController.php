@@ -42,13 +42,27 @@ class LocationController extends Controller
         return view('locations.index', compact('locations', 'search', 'canSync'));
     }
 
-    public function create(): View
+    public function create(): \Illuminate\View\View|\Illuminate\Http\RedirectResponse
     {
-        return view('locations.create');
+        $user = request()->user();
+        $locationCount = \App\Models\Location::count();
+        
+        if ($user->tenant && $locationCount >= $user->tenant->maxOutlets()) {
+            return redirect()->route('billing.upgrade');
+        }
+
+        $hasMainStore = \App\Models\Location::where('toko_pusat', true)->exists();
+
+        return view('locations.create', compact('hasMainStore', 'locationCount'));
     }
 
     public function store(StoreLocationRequest $request): RedirectResponse
     {
+        $user = $request->user();
+        if ($user->tenant && Location::count() >= $user->tenant->maxOutlets()) {
+            return back()->withInput()->withErrors(['error' => 'You have reached the maximum number of outlets for your plan.']);
+        }
+
         $data = $request->validated();
         $data['is_active'] = (bool) ($data['is_active'] ?? false);
         $data['toko_pusat'] = (bool) ($data['toko_pusat'] ?? false);

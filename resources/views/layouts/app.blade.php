@@ -89,10 +89,18 @@
                     $isOwner = $user?->hasRole('Owner');
                     $isManager = $user?->hasRole('Manager');
                     $isHeadStore = $user?->hasRole('HeadStore');
-                    $isAdmin = $isOwner || $isManager || $isHeadStore;
+                    $isSuperAdmin = $user?->hasRole('Super Admin');
+                    $isAdmin = $isOwner || $isManager || $isHeadStore || $isSuperAdmin;
+                    $tenant = $user?->tenant;
 
                     $menuItems = [];
                     
+                    if ($isSuperAdmin) {
+                        $menuItems[] = ['header' => 'SUPER ADMIN'];
+                        $menuItems[] = ['route' => 'super-admin.tenants.index', 'icon' => 'diamond', 'label' => 'Manage Owners / SaaS'];
+                        $menuItems[] = ['route' => 'super-admin.settings.index', 'icon' => 'sliders', 'label' => 'SaaS Settings'];
+                    }
+
                     // Dashboard & Active Location
                     $menuItems[] = ['route' => 'dashboard', 'icon' => 'home', 'label' => __('app.menu.dashboard')];
                     $menuItems[] = ['route' => 'locations.active', 'icon' => 'check-square-o', 'label' => __('app.menu.active_location')];
@@ -111,7 +119,11 @@
                     if ($isAdmin) {
                         $menuItems[] = ['header' => __('app.menu.warehouse_header')];
                         $menuItems[] = ['route' => 'stock-adjustments.index', 'icon' => 'sliders', 'label' => __('app.menu.stock_adjustments')];
-                        $menuItems[] = ['route' => 'stock-transfers.index', 'icon' => 'truck', 'label' => __('app.menu.stock_transfers')];
+                        
+                        // RESTRICTION: Stock Transfer (Business/Enterprise only)
+                        if ($isSuperAdmin || ($tenant && $tenant->canAccess('stock_transfer'))) {
+                            $menuItems[] = ['route' => 'stock-transfers.index', 'icon' => 'truck', 'label' => __('app.menu.stock_transfers')];
+                        }
                     }
 
                     // Transactions
@@ -127,9 +139,19 @@
                     
                     if ($isAdmin) {
                         $menuItems[] = ['route' => 'purchases.index', 'icon' => 'shopping-basket', 'label' => __('app.menu.purchases')];
-                        $menuItems[] = ['route' => 'receivables.index', 'icon' => 'hand-holding-usd', 'label' => __('app.menu.receivables')];
-                        $menuItems[] = ['route' => 'purchases.payables.index', 'icon' => 'credit-card', 'label' => __('app.menu.payables')];
-                        $menuItems[] = ['route' => 'expenses.index', 'icon' => 'money', 'label' => __('app.menu.expenses')];
+                        
+                        // RESTRICTION: AR/AP Management
+                        if ($isSuperAdmin || ($tenant && $tenant->canAccess('ar_management'))) {
+                            $menuItems[] = ['route' => 'receivables.index', 'icon' => 'hand-holding-usd', 'label' => __('app.menu.receivables')];
+                        }
+                        if ($isSuperAdmin || ($tenant && $tenant->canAccess('ap_management'))) {
+                            $menuItems[] = ['route' => 'purchases.payables.index', 'icon' => 'credit-card', 'label' => __('app.menu.payables')];
+                        }
+                        
+                        // RESTRICTION: Expenses/Full Accounting
+                        if ($isSuperAdmin || ($tenant && $tenant->canAccess('full_accounting'))) {
+                            $menuItems[] = ['route' => 'expenses.index', 'icon' => 'money', 'label' => __('app.menu.expenses')];
+                        }
                     }
 
                     // Reports (Owner/Manager/HeadStore)
@@ -138,7 +160,11 @@
                         $menuItems[] = ['route' => 'reports.sales', 'icon' => 'bar-chart', 'label' => __('app.menu.report_sales')];
                         $menuItems[] = ['route' => 'reports.stock', 'icon' => 'archive', 'label' => __('app.menu.report_stock')];
                         $menuItems[] = ['route' => 'reports.stock-card', 'icon' => 'history', 'label' => __('app.menu.report_stock_card')];
-                        $menuItems[] = ['route' => 'reports.income-statement', 'icon' => 'pie-chart', 'label' => __('app.menu.report_income')];
+                        
+                        // RESTRICTION: Income Statement
+                        if ($isSuperAdmin || ($tenant && $tenant->canAccess('full_accounting'))) {
+                            $menuItems[] = ['route' => 'reports.income-statement', 'icon' => 'pie-chart', 'label' => __('app.menu.report_income')];
+                        }
                     }
 
                     // Settings
@@ -148,7 +174,10 @@
                         $menuItems[] = ['route' => 'locations.index', 'icon' => 'map-marker', 'label' => __('app.menu.locations')];
                     }
                     if ($isOwner || $isManager) {
-                        $menuItems[] = ['route' => 'settings.receipt.edit', 'icon' => 'file-text-o', 'label' => __('app.menu.receipt_settings')];
+                        // RESTRICTION: Custom Receipt
+                        if ($isSuperAdmin || ($tenant && $tenant->canAccess('custom_receipt'))) {
+                            $menuItems[] = ['route' => 'settings.receipt.edit', 'icon' => 'file-text-o', 'label' => __('app.menu.receipt_settings')];
+                        }
                     }
                     if ($isOwner) {
                         $menuItems[] = ['route' => 'manager-locations.index', 'icon' => 'sitemap', 'label' => __('app.menu.manager_access')];

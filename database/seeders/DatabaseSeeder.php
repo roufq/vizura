@@ -16,7 +16,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(RolePermissionSeeder::class);
+        $this->call([
+            RolePermissionSeeder::class,
+            SuperAdminSeeder::class,
+        ]);
+
+        $tenant = \App\Models\Tenant::updateOrCreate(
+            ['slug' => 'main-tenant'],
+            [
+                'name' => 'Main Business',
+                'plan' => 'enterprise',
+                'status' => 'active',
+            ]
+        );
 
         $location = Location::updateOrCreate(
             ['code' => 'HQ'],
@@ -26,6 +38,7 @@ class DatabaseSeeder extends Seeder
                 'phone' => '021000000',
                 'is_active' => true,
                 'toko_pusat' => true,
+                'tenant_id' => $tenant->id,
             ]
         );
 
@@ -35,8 +48,11 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Test Owner',
                 'password' => bcrypt('password'),
                 'active_location_id' => $location->id,
+                'tenant_id' => $tenant->id,
             ]
         );
+
+        $tenant->update(['owner_id' => $user->id]);
 
         if (! $user->hasRole('Owner')) {
             $user->assignRole('Owner');
@@ -48,6 +64,7 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Manager User',
                 'password' => bcrypt('password'),
                 'active_location_id' => $location->id,
+                'tenant_id' => $tenant->id,
             ]
         );
 
@@ -63,6 +80,7 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Head Store',
                 'password' => bcrypt('password'),
                 'active_location_id' => $location->id,
+                'tenant_id' => $tenant->id,
             ]
         );
 
@@ -76,6 +94,7 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Cashier User',
                 'password' => bcrypt('password'),
                 'active_location_id' => $location->id,
+                'tenant_id' => $tenant->id,
             ]
         );
 

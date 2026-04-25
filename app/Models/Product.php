@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Product extends Model
 {
     /** @use HasFactory<\Database\Factories\ProductFactory> */
-    use AuditLoggable, HasFactory, SoftDeletes;
+    use \App\Models\Concerns\BelongsToTenant, AuditLoggable, HasFactory, SoftDeletes;
 
     protected $fillable = [
         'sku',

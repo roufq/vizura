@@ -10,9 +10,16 @@ use Illuminate\View\View;
 
 class ActiveLocationController extends Controller
 {
-    public function show(Request $request): View
+    public function show(Request $request): \Illuminate\View\View|\Illuminate\Http\RedirectResponse
     {
         $user = $request->user();
+        
+        // If owner has no locations yet, redirect to create brand new location
+        if ($user?->hasRole('Owner') && \App\Models\Location::count() === 0) {
+            return redirect()->route('locations.create')
+                ->with('status', 'Selamat datang! Silakan daftarkan lokasi toko pertama Anda.');
+        }
+
         $locationIds = $user?->accessibleLocationIds() ?? [];
 
         $locations = Location::active()

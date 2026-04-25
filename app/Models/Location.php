@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Location extends Model
 {
-    use AuditLoggable, HasFactory, SoftDeletes;
+    use \App\Models\Concerns\BelongsToTenant, AuditLoggable, HasFactory, SoftDeletes;
 
     protected $fillable = [
         'code',
@@ -20,6 +20,7 @@ class Location extends Model
         'phone',
         'is_active',
         'toko_pusat',
+        'tenant_id',
         'receipt_header',
         'receipt_footer',
         'receipt_tagline',
