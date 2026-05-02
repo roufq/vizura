@@ -20,6 +20,7 @@ trait BelongsToTenant
         static::addGlobalScope('tenant', function (Builder $builder) {
             if (app()->runningInConsole()) return;
 
+
             $manager = app(\App\Support\TenantManager::class);
             if ($manager->hasTenant()) {
                 $builder->where($builder->getQuery()->from . '.tenant_id', '=', $manager->getTenantId());

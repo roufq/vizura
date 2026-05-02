@@ -321,7 +321,11 @@
                                  data-category="{{ $p->category_id }}">
                                 
                                 <div class="aspect-square rounded-2xl bg-slate-50 mb-3 flex items-center justify-center text-slate-200 group-hover:bg-brand/5 group-hover:text-brand transition-all relative overflow-hidden">
-                                     <i class="fa fa-cube text-3xl opacity-40 group-hover:scale-110 transition-all"></i>
+                                     @if($p->image)
+                                         <img src="{{ asset('storage/' . $p->image) }}" alt="{{ $p->name }}" class="w-full h-full object-cover group-hover:scale-110 transition-all duration-500">
+                                     @else
+                                         <i class="fa fa-cube text-3xl opacity-40 group-hover:scale-110 transition-all"></i>
+                                     @endif
                                      
                                      <!-- Status Badges -->
                                      <div class="absolute top-2 left-2 flex flex-col gap-1 items-start">

@@ -59,6 +59,11 @@ class User extends Authenticatable
         return $this->belongsTo(Location::class, 'active_location_id');
     }
 
+    public function isSuperAdmin(): bool
+    {
+        return $this->hasRole('Super Admin');
+    }
+
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
@@ -74,7 +79,7 @@ class User extends Authenticatable
      */
     public function accessibleLocationIds(): array
     {
-        if ($this->hasRole('Owner')) {
+        if ($this->isSuperAdmin() || $this->hasRole('Owner')) {
             return Location::active()->pluck('id')->all();
         }
 

@@ -16,6 +16,8 @@ class Tenant extends Model
         'slug',
         'owner_id',
         'plan',
+        'extra_locations',
+        'extra_users',
         'status',
         'expires_at',
     ];
@@ -89,21 +91,25 @@ class Tenant extends Model
 
     public function maxOutlets(): int
     {
-        return match($this->plan) {
+        $base = match($this->plan) {
             'starter' => 1,
             'business' => 5,
             'enterprise' => 9999,
             default => 0
         };
+
+        return $base + ($this->extra_locations ?? 0);
     }
 
     public function maxUsers(): int
     {
-        return match($this->plan) {
+        $base = match($this->plan) {
             'starter' => 3,
             'business' => 15,
             'enterprise' => 9999,
             default => 0
         };
+
+        return $base + ($this->extra_users ?? 0);
     }
 }

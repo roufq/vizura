@@ -660,6 +660,7 @@ class SaleController extends Controller
             'price' => (float) ($priceOverrides[$product->id] ?? $product->sale_price),
             'stock' => (float) ($stockLevels[$product->id] ?? 0),
             'block_when_out_of_stock' => (bool) $product->block_when_out_of_stock,
+            'image' => $product->image ? asset('storage/' . $product->image) : null,
         ]);
 
         $location = $locationId ? Location::query()->find($locationId) : null;

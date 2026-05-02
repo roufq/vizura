@@ -72,7 +72,8 @@
                     block: p.block_when_out_of_stock, 
                     quantity: parseFloat(q), 
                     unitPrice: parseFloat(up), 
-                    lineDiscount: parseFloat(ld) 
+                    lineDiscount: parseFloat(ld),
+                    image: p.image
                 });
             }
         }
@@ -89,8 +90,13 @@
                 row.className = "hover:bg-slate-50/50 transition-all border-b border-slate-50 last:border-0";
                 row.innerHTML = `
                     <td class="px-8 py-4">
-                        <p class="text-sm font-bold text-slate-800 leading-tight">${item.name}</p>
-                        <p class="text-[10px] font-black text-slate-400 mt-1 uppercase tracking-tighter">SKU: ${item.sku} | Stok: ${item.stock}</p>
+                        <div class="flex items-center gap-3">
+                            ${item.image ? `<img src="${item.image}" class="w-8 h-8 rounded-lg object-cover">` : `<div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-[10px] text-slate-400 font-black">${item.name.charAt(0)}</div>`}
+                            <div>
+                                <p class="text-sm font-bold text-slate-800 leading-tight">${item.name}</p>
+                                <p class="text-[10px] font-black text-slate-400 mt-1 uppercase tracking-tighter">SKU: ${item.sku} | Stok: ${item.stock}</p>
+                            </div>
+                        </div>
                         <input type="hidden" name="items[${idx}][product_id]" value="${item.productId}" form="pos-form">
                         <input type="hidden" name="items[${idx}][quantity]" value="${item.quantity}" form="pos-form">
                         <input type="hidden" name="items[${idx}][unit_price]" value="${item.unitPrice}" form="pos-form">
@@ -301,8 +307,8 @@
                 item.className = "flex items-center justify-between p-4 hover:bg-slate-50 cursor-pointer rounded-2xl transition-all group text-left";
                 item.innerHTML = `
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-brand/10 group-hover:text-brand transition-all">
-                            <i class="fa fa-cube"></i>
+                        <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-brand/10 group-hover:text-brand transition-all overflow-hidden">
+                            ${p.image ? `<img src="${p.image}" class="w-full h-full object-cover">` : `<i class="fa fa-cube"></i>`}
                         </div>
                         <div class="text-left">
                             <p class="text-sm font-bold text-slate-700">${p.name}</p>

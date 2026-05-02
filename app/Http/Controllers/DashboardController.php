@@ -17,7 +17,7 @@ class DashboardController extends Controller
     public function index(Request $request): View
     {
         $user = $request->user();
-        $canViewAll = $user?->hasRole('Owner') ?? false;
+        $canViewAll = $user?->hasRole('Owner') || $user?->hasRole('Super Admin') ?? false;
         $allowedLocationIds = $canViewAll ? ($user?->accessibleLocationIds() ?? []) : [];
         $locationId = $canViewAll
             ? $this->locationResolver->resolveFromRequest($request, $allowedLocationIds, $canViewAll)

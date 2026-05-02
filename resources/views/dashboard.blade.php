@@ -9,16 +9,16 @@
         <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm relative overflow-hidden">
             <div class="absolute -top-24 -right-24 w-64 h-64 bg-brand/5 rounded-full blur-3xl"></div>
             
-            <div class="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="relative flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div>
                     <h1 class="text-3xl font-black text-slate-900 tracking-tight">{{ __('dashboard.location_summary') }}</h1>
                     <p class="text-slate-500 font-medium">{{ __('dashboard.monitoring_performance') }} <span class="text-brand font-bold">{{ $locationName }}</span></p>
                 </div>
 
                 @if ($canSelectLocations)
-                    <form method="GET" action="{{ route('dashboard') }}" class="flex flex-wrap items-center gap-3">
-                        <div class="relative group">
-                            <select id="location_id" name="location_id" class="appearance-none bg-slate-50 border-none rounded-2xl px-6 py-3 pr-12 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-brand/20 transition-all cursor-pointer">
+                    <form method="GET" action="{{ route('dashboard') }}" class="flex flex-wrap items-center gap-3 bg-slate-50 p-2 rounded-3xl border border-slate-100">
+                        <div class="relative group min-w-[200px]">
+                            <select id="location_id" name="location_id" class="w-full appearance-none bg-white border border-slate-200 rounded-2xl px-5 py-2.5 pr-10 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-brand/20 focus:border-brand transition-all cursor-pointer shadow-sm">
                                 <option value="">📍 {{ __('dashboard.active_location') }}</option>
                                 @foreach ($locations as $location)
                                     <option value="{{ $location->id }}" {{ (int) ($filters['location_id'] ?? 0) === $location->id ? 'selected' : '' }}>
@@ -32,13 +32,13 @@
                         </div>
 
                         @if ($canViewAll)
-                            <label class="flex items-center gap-2 cursor-pointer bg-slate-50 px-4 py-3 rounded-2xl border border-transparent hover:border-brand/20 transition-all">
+                            <label class="flex items-center gap-2 cursor-pointer bg-white px-4 py-2.5 rounded-2xl border border-slate-200 hover:border-brand/30 transition-all shadow-sm">
                                 <input type="checkbox" name="all_locations" value="1" {{ ($filters['all_locations'] ?? false) ? 'checked' : '' }} class="w-4 h-4 rounded border-slate-300 text-brand focus:ring-brand">
                                 <span class="text-xs font-bold text-slate-600">{{ __('dashboard.all_locations') }}</span>
                             </label>
                         @endif
 
-                        <button type="submit" class="bg-brand text-white px-6 py-3 rounded-2xl font-bold text-sm shadow-lg shadow-brand/20 hover:bg-brand-dark transition-all">{{ __('dashboard.apply') }}</button>
+                        <button type="submit" class="bg-brand text-white px-6 py-2.5 rounded-2xl font-bold text-sm shadow-md shadow-brand/20 hover:bg-brand-dark transition-all shrink-0">{{ __('dashboard.apply') }}</button>
                     </form>
                 @endif
             </div>
@@ -60,7 +60,7 @@
                         ['label' => __('dashboard.metrics.total_sales_month'), 'value' => $salesMonth, 'icon' => 'shopping-cart', 'color' => 'bg-brand'],
                         ['label' => __('dashboard.metrics.gross_profit_month'), 'value' => $grossProfitMonth, 'icon' => 'line-chart', 'color' => 'bg-indigo-600'],
                         ['label' => __('dashboard.metrics.transactions_today'), 'value' => $transactionsToday, 'icon' => 'bolt', 'color' => 'bg-amber-500', 'is_qty' => true],
-                        ['label' => __('dashboard.metrics.total_receivable'), 'value' => $receivableTotal, 'icon' => 'hand-holding-usd', 'color' => 'bg-rose-500'],
+                        ['label' => __('dashboard.metrics.total_receivable'), 'value' => $receivableTotal, 'icon' => 'money', 'color' => 'bg-rose-500'],
                     ];
                 } elseif ($isManager) {
                     $metrics = [
@@ -83,18 +83,17 @@
             @endphp
 
             @foreach ($metrics as $m)
-                <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex flex-col justify-between group hover:border-brand/40 transition-all duration-300">
-                    <div class="flex justify-between items-start mb-6">
-                        <div class="w-12 h-12 rounded-2xl {{ $m['color'] }} text-white flex items-center justify-center text-xl shadow-lg shadow-{{ explode('-', $m['color'])[1] ?? 'slate' }}-500/20">
+                <div class="bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden group hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
+                    <div class="flex items-center justify-between gap-4">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 truncate">{{ $m['label'] }}</p>
+                            <h4 class="text-2xl xl:text-3xl font-black text-slate-900 tracking-tighter truncate">
+                                {{ isset($m['is_qty']) ? number_format((float) $m['value'], 0, ',', '.') : 'Rp '.number_format((float) $m['value'], 0, ',', '.') }}
+                            </h4>
+                        </div>
+                        <div class="w-12 h-12 shrink-0 rounded-2xl {{ $m['color'] }} text-white flex items-center justify-center text-xl shadow-lg shadow-{{ explode('-', $m['color'])[1] ?? 'slate' }}-500/30 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
                             <i class="fa fa-{{ $m['icon'] }}"></i>
                         </div>
-                        <div class="w-2 h-2 rounded-full bg-slate-200 group-hover:bg-brand transition-colors"></div>
-                    </div>
-                    <div>
-                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{{ $m['label'] }}</p>
-                        <h4 class="text-2xl font-black text-slate-900 tracking-tighter">
-                            {{ isset($m['is_qty']) ? number_format((float) $m['value'], 0, ',', '.') : 'Rp '.number_format((float) $m['value'], 0, ',', '.') }}
-                        </h4>
                     </div>
                 </div>
             @endforeach
@@ -111,23 +110,23 @@
                 </div>
                 
                 <div class="flex flex-wrap gap-4">
-                    <a href="{{ route('sales.create') }}" class="group/btn flex items-center gap-3 bg-brand px-6 py-4 rounded-2xl text-white font-bold shadow-lg shadow-brand/20 hover:scale-[1.02] active:scale-100 transition-all">
-                        <i class="fa fa-plus-circle text-lg"></i>
+                    <a href="{{ route('sales.create') }}" class="group/btn flex items-center gap-3 bg-slate-900 px-6 py-3.5 rounded-2xl text-white font-bold shadow-lg shadow-slate-900/20 hover:-translate-y-1 transition-all">
+                        <i class="fa fa-shopping-cart text-brand text-lg"></i>
                         <span>{{ __('dashboard.new_transaction') }}</span>
                     </a>
                     @if (! $isCashier)
-                        <a href="{{ route('purchases.create') }}" class="flex items-center gap-3 bg-white border border-slate-200 px-6 py-4 rounded-2xl text-slate-700 font-bold hover:bg-slate-50 transition-all">
-                            <i class="fa fa-shopping-basket text-emerald-500"></i>
+                        <a href="{{ route('purchases.create') }}" class="flex items-center gap-3 bg-white border border-slate-200 px-6 py-3.5 rounded-2xl text-slate-700 font-bold hover:border-emerald-500/30 hover:bg-emerald-50 hover:text-emerald-700 transition-all hover:-translate-y-1 shadow-sm">
+                            <i class="fa fa-shopping-basket text-emerald-500 text-lg"></i>
                             <span>{{ __('dashboard.make_purchase') }}</span>
                         </a>
-                        <a href="{{ route('stock-adjustments.create') }}" class="flex items-center gap-3 bg-white border border-slate-200 px-6 py-4 rounded-2xl text-slate-700 font-bold hover:bg-slate-50 transition-all">
-                            <i class="fa fa-sliders text-amber-500"></i>
+                        <a href="{{ route('stock-adjustments.create') }}" class="flex items-center gap-3 bg-white border border-slate-200 px-6 py-3.5 rounded-2xl text-slate-700 font-bold hover:border-amber-500/30 hover:bg-amber-50 hover:text-amber-700 transition-all hover:-translate-y-1 shadow-sm">
+                            <i class="fa fa-sliders text-amber-500 text-lg"></i>
                             <span>{{ __('dashboard.stock_adjustment') }}</span>
                         </a>
                     @endif
                     @if ($isManager || $isHeadStore || $isOwner)
-                        <a href="{{ route('stock-transfers.create') }}" class="flex items-center gap-3 bg-white border border-slate-200 px-6 py-4 rounded-2xl text-slate-700 font-bold hover:bg-slate-50 transition-all">
-                            <i class="fa fa-truck text-indigo-500"></i>
+                        <a href="{{ route('stock-transfers.create') }}" class="flex items-center gap-3 bg-white border border-slate-200 px-6 py-3.5 rounded-2xl text-slate-700 font-bold hover:border-indigo-500/30 hover:bg-indigo-50 hover:text-indigo-700 transition-all hover:-translate-y-1 shadow-sm">
+                            <i class="fa fa-truck text-indigo-500 text-lg"></i>
                             <span>{{ __('dashboard.stock_transfer') }}</span>
                         </a>
                     @endif

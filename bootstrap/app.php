@@ -6,7 +6,6 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Spatie\Permission\Middleware\PermissionMiddleware;
-use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -25,7 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'active_location' => EnsureActiveLocation::class,
             'permission' => PermissionMiddleware::class,
-            'role' => RoleMiddleware::class,
+            'role' => \App\Http\Middleware\CheckRole::class,
             'role_or_permission' => RoleOrPermissionMiddleware::class,
         ]);
     })

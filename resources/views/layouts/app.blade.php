@@ -36,6 +36,17 @@
 </head>
 
 <body class="h-full text-slate-800 antialiased font-sans" x-data="{ sidebarOpen: false }">
+    @if(session('impersonated_by'))
+        <div class="bg-indigo-600 text-white px-4 py-2 text-center text-xs font-black uppercase tracking-widest flex items-center justify-center gap-4 sticky top-0 z-[60]">
+            <span><i class="fa fa-user-secret mr-2"></i> IMPERSONATING: {{ auth()->user()->name }} ({{ auth()->user()->tenant->name }})</span>
+            <form action="{{ route('super-admin.tenants.stop-impersonate') }}" method="POST">
+                @csrf
+                <button type="submit" class="bg-white text-indigo-600 px-3 py-1 rounded-lg hover:bg-slate-100 transition-colors">
+                    Return to Super Admin
+                </button>
+            </form>
+        </div>
+    @endif
     
     <!-- Mobile Sidebar Backdrop -->
     <div x-show="sidebarOpen" 

@@ -42,4 +42,6 @@ return [
     'save_product' => 'Simpan Produk',
     'back_to_list' => 'Kembali ke Daftar',
     'cancel_btn' => 'Batal & Kembali',
+    'product_image' => 'Foto Produk',
+    'product_image_desc' => 'Gunakan foto yang jelas agar mudah dikenali di POS',
 ];

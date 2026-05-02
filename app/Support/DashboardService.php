@@ -24,7 +24,7 @@ class DashboardService
         $today = now()->toDateString();
         $monthStart = now()->startOfMonth()->toDateString();
 
-        $isOwner = $user?->hasRole('Owner') ?? false;
+        $isOwner = (bool) ($user?->hasRole('Owner') || $user?->hasRole('Super Admin'));
         $isManager = $user?->hasRole('Manager') ?? false;
         $isHeadStore = $user?->hasRole('HeadStore') ?? false;
         $isCashier = $user?->hasRole('Cashier') ?? false;

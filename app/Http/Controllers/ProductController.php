@@ -53,6 +53,10 @@ class ProductController extends Controller
         $data['is_active'] = (bool) ($data['is_active'] ?? false);
         $data['block_when_out_of_stock'] = (bool) ($data['block_when_out_of_stock'] ?? false);
 
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
+
         Product::create($data);
 
         return redirect()
@@ -75,6 +79,13 @@ class ProductController extends Controller
         $data['is_active'] = (bool) ($data['is_active'] ?? false);
         $data['block_when_out_of_stock'] = (bool) ($data['block_when_out_of_stock'] ?? false);
 
+        if ($request->hasFile('image')) {
+            if ($product->image) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($product->image);
+            }
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
+
         $product->update($data);
 
         return redirect()
@@ -84,6 +95,10 @@ class ProductController extends Controller
 
     public function destroy(Product $product): RedirectResponse
     {
+        if ($product->image) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($product->image);
+        }
+
         $product->delete();
 
         return redirect()

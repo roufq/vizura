@@ -121,10 +121,22 @@ Route::middleware(['auth', 'active_location'])->group(function () {
         return view('billing.upgrade');
     })->name('billing.upgrade');
 
+    // Super Tools
+    Route::post('super-admin/tenants/stop-impersonate', [App\Http\Controllers\SuperAdmin\TenantController::class, 'stopImpersonate'])->name('super-admin.tenants.stop-impersonate');
+
     // Super Admin Routes
     Route::middleware('role:Super Admin')->prefix('super-admin')->name('super-admin.')->group(function () {
         Route::patch('tenants/{tenant}/status', [App\Http\Controllers\SuperAdmin\TenantController::class, 'updateStatus'])->name('tenants.status');
         Route::resource('tenants', App\Http\Controllers\SuperAdmin\TenantController::class);
+        
+        // Super Tools
+        Route::post('tenants/{tenant}/impersonate', [App\Http\Controllers\SuperAdmin\TenantController::class, 'impersonate'])->name('tenants.impersonate');
+
+        Route::get('tenants/{tenant}/export', [App\Http\Controllers\SuperAdmin\TenantController::class, 'export'])->name('tenants.export');
+        Route::post('tenants/{tenant}/import', [App\Http\Controllers\SuperAdmin\TenantController::class, 'import'])->name('tenants.import');
+        Route::patch('tenants/{tenant}/quota', [App\Http\Controllers\SuperAdmin\TenantController::class, 'updateQuota'])->name('tenants.update-quota');
+        Route::get('tenants/{tenant}/add-user', [App\Http\Controllers\SuperAdmin\TenantController::class, 'addUser'])->name('tenants.add-user');
+        Route::get('tenants/{tenant}/add-location', [App\Http\Controllers\SuperAdmin\TenantController::class, 'addLocation'])->name('tenants.add-location');
         
         Route::get('settings', [App\Http\Controllers\SuperAdmin\SaaSConfigController::class, 'index'])->name('settings.index');
         Route::post('settings', [App\Http\Controllers\SuperAdmin\SaaSConfigController::class, 'update'])->name('settings.update');

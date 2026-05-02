@@ -45,10 +45,15 @@
                         @forelse ($products as $product)
                             <tr class="hover:bg-slate-50/50 transition-colors group">
                                 <td class="px-8 py-5">
-                                    <div class="flex items-center gap-4">
-                                        <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 font-bold text-xs uppercase">
-                                            {{ substr($product->name, 0, 1) }}
-                                        </div>
+                                        @if($product->image)
+                                            <div class="w-12 h-12 rounded-xl overflow-hidden shadow-sm border border-slate-100 flex-shrink-0">
+                                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
+                                            </div>
+                                        @else
+                                            <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 font-bold text-xs uppercase flex-shrink-0">
+                                                {{ substr($product->name, 0, 1) }}
+                                            </div>
+                                        @endif
                                         <div>
                                             <p class="text-sm font-bold text-slate-900 leading-tight">{{ $product->name }}</p>
                                             <p class="text-[10px] font-black text-slate-400 uppercase tracking-tighter mt-1">

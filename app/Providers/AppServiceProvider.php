@@ -24,9 +24,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Super Admin access bypass
+        \Illuminate\Support\Facades\Gate::before(function ($user, $ability) {
+            if (method_exists($user, 'hasRole') && $user->hasRole('Super Admin')) {
+                return true;
+            }
+            return null;
+        });
+
         Event::listen(Login::class, function (Login $event): void {
             AuditLog::create([
-                'user_id' => $event->user?->id,
+                'user_id' => $event->user?->getAuthIdentifier(),
                 'location_id' => ActiveLocation::id(),
                 'action' => 'login',
                 'ip_address' => request()->ip(),
@@ -37,7 +45,7 @@ class AppServiceProvider extends ServiceProvider
 
         Event::listen(Logout::class, function (Logout $event): void {
             AuditLog::create([
-                'user_id' => $event->user?->id,
+                'user_id' => $event->user?->getAuthIdentifier(),
                 'location_id' => ActiveLocation::id(),
                 'action' => 'logout',
                 'ip_address' => request()->ip(),

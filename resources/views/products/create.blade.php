@@ -11,7 +11,7 @@
 
         <x-ui.card icon="plus" title="{{ __('product.info_header') }}">
 
-            <form method="POST" action="{{ route('products.store') }}" class="space-y-8">
+            <form method="POST" action="{{ route('products.store') }}" class="space-y-8" enctype="multipart/form-data">
                 @csrf
 
                 <!-- Section: Identitas -->
@@ -33,6 +33,15 @@
                         <input type="text" id="name" name="name" value="{{ old('name') }}" placeholder="{{ __('product.product_name_placeholder') }}" 
                                class="w-full bg-slate-50 border-transparent rounded-2xl px-6 py-4 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-brand/20 transition-all" required>
                         @error('name') <p class="text-[10px] text-rose-500 font-bold mt-1 ml-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div class="md:col-span-2 space-y-2">
+                        <label for="image" class="text-xs font-black uppercase tracking-wider text-slate-400 ml-1">{{ __('product.product_image') }}</label>
+                        <div class="relative group">
+                            <input type="file" id="image" name="image" accept="image/*"
+                                   class="w-full bg-slate-50 border-transparent rounded-2xl px-6 py-4 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-brand/20 transition-all file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-brand/10 file:text-brand hover:file:bg-brand/20">
+                        </div>
+                        <p class="text-[10px] text-slate-400 ml-1">{{ __('product.product_image_desc') }} (Maks: 2MB)</p>
+                        @error('image') <p class="text-[10px] text-rose-500 font-bold mt-1 ml-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
 

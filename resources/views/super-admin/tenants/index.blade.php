@@ -6,16 +6,16 @@
 @section('content')
 <div class="space-y-8">
     <!-- Header Summary -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+    <div class="flex flex-col lg:flex-row gap-6 w-full">
+        <div class="flex-1 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-center">
             <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total Owners</p>
             <h3 class="text-3xl font-black text-slate-900">{{ $tenants->count() }}</h3>
         </div>
-        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+        <div class="flex-1 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-center">
             <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Active Subscriptions</p>
             <h3 class="text-3xl font-black text-emerald-600">{{ $tenants->where('status', 'active')->count() }}</h3>
         </div>
-        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+        <div class="flex-1 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-center">
             <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total System Outlets</p>
             <h3 class="text-3xl font-black text-brand">{{ $tenants->sum('locations_count') }}</h3>
         </div>

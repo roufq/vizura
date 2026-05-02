@@ -27,6 +27,7 @@ class Product extends Model
         'block_when_out_of_stock',
         'batch_code',
         'expires_at',
+        'image',
     ];
 
     /**

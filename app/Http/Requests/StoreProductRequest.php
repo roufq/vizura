@@ -34,6 +34,7 @@ class StoreProductRequest extends FormRequest
             'block_when_out_of_stock' => ['nullable', 'boolean'],
             'batch_code' => ['nullable', 'string', 'max:100'],
             'expires_at' => ['nullable', 'date'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ];
     }
 
@@ -62,6 +63,9 @@ class StoreProductRequest extends FormRequest
             'block_when_out_of_stock.boolean' => 'Status blok stok nol tidak valid.',
             'batch_code.max' => 'Batch maksimal 100 karakter.',
             'expires_at.date' => 'Tanggal kadaluarsa tidak valid.',
+            'image.image' => 'File harus berupa gambar.',
+            'image.mimes' => 'Format gambar harus jpeg, png, jpg, atau webp.',
+            'image.max' => 'Ukuran gambar maksimal 2MB.',
         ];
     }
 }
